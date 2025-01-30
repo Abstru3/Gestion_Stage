@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once '../app/config/database.php';
+require_once '../app/helpers/functions.php';
 $recent_internships = get_internships($pdo);
 ?>
 <!DOCTYPE html>
@@ -11,7 +11,7 @@ $recent_internships = get_internships($pdo);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stages Iut - Plateforme de stages</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style_accueil.css">
+    <link rel="stylesheet" href="./assets/css/style_accueil.css">
 </head>
 <body>
     <header class="main-header">
@@ -112,6 +112,6 @@ $recent_internships = get_internships($pdo);
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>

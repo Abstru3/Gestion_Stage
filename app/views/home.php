@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once '../app/config/database.php';
+require_once '../app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");

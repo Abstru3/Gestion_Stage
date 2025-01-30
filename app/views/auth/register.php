@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once '../app/config/database.php';
+require_once '../app/helpers/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
