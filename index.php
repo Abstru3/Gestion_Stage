@@ -26,11 +26,15 @@ $recent_internships = get_internships($pdo);
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="./app/views/home.php" class="nav-link"><i class="fas fa-user"></i> Mon Espace</a>
                     <a href="./app/views/auth/logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
+                        <a href="./app/views/panels/admin_panel.php" class="nav-link"><i class="fas fa-cogs"></i> Panel Admin</a>
+                    <?php endif; ?>
                 <?php else: ?>
                     <a href="./app/views/auth/login.php" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Connexion</a>
                     <a href="./app/views/auth/register.php" class="btn btn-register"><i class="fas fa-user-plus"></i> Inscription</a>
                 <?php endif; ?>
             </div>
+
         </nav>
 
         <div class="hero-section">
