@@ -1,7 +1,9 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     header("Location: login.php");
@@ -33,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voir les candidatures</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
     <h1>Candidatures pour l'offre de stage</h1>

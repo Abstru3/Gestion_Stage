@@ -1,7 +1,10 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
-require_once '../app/config/database.php';
-require_once '../app/helpers/functions.php';
+require_once './app/config/database.php';
+require_once './app/helpers/functions.php';
 $recent_internships = get_internships($pdo);
 ?>
 <!DOCTYPE html>
@@ -11,7 +14,7 @@ $recent_internships = get_internships($pdo);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stages Iut - Plateforme de stages</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="./assets/css/style_accueil.css">
+    <link rel="stylesheet" href="./public/assets/css/style_accueil.css">
 </head>
 <body>
     <header class="main-header">
@@ -21,11 +24,11 @@ $recent_internships = get_internships($pdo);
             </div>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="home.php" class="nav-link"><i class="fas fa-user"></i> Mon Espace</a>
-                    <a href="logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    <a href="./app/views/home.php" class="nav-link"><i class="fas fa-user"></i> Mon Espace</a>
+                    <a href="./app/views/auth/logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                 <?php else: ?>
-                    <a href="login.php" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Connexion</a>
-                    <a href="register.php" class="btn btn-register"><i class="fas fa-user-plus"></i> Inscription</a>
+                    <a href="./app/views/auth/login.php" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Connexion</a>
+                    <a href="./app/views/auth/register.php" class="btn btn-register"><i class="fas fa-user-plus"></i> Inscription</a>
                 <?php endif; ?>
             </div>
         </nav>
@@ -112,6 +115,6 @@ $recent_internships = get_internships($pdo);
         </div>
     </footer>
 
-    <script src="assets/js/script.js"></script>
+    <script src="../public/assets/js/script.js"></script> <!-- Mise à jour du chemin -->
 </body>
 </html>

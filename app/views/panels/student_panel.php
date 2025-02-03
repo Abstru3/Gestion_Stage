@@ -1,7 +1,9 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'etudiant') {
     header("Location: login.php");
@@ -31,7 +33,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panneau Étudiant</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
     <header>
@@ -42,9 +44,9 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     
     <nav>
         <ul>
-            <li><a href="home.php">Accueil</a></li>
-            <li><a href="profile.php">Mon profil</a></li>
-            <li><a href="logout.php">Déconnexion</a></li>
+            <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
+            <li><a href="/Gestion_Stage/app/views/profile.php">Mon profil</a></li>
+            <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
         </ul>
     </nav>
 

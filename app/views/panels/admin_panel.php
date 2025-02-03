@@ -1,10 +1,12 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require_once 'includes/db_connect.php';
-require_once 'includes/functions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login.php");
+    header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
 
@@ -21,7 +23,7 @@ $total_applications = $pdo->query("SELECT COUNT(*) FROM candidatures")->fetchCol
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panneau d'administration</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
     <h1>Panneau d'administration</h1>
@@ -34,6 +36,6 @@ $total_applications = $pdo->query("SELECT COUNT(*) FROM candidatures")->fetchCol
     
     <!-- Ajouter d'autres fonctionnalités d'administration ici -->
 
-    <p><a href="home.php">Retour à l'accueil</a></p>
+    <p><a href="/Gestion_Stage/app/views/home.php">Retour à l'accueil</a></p>
 </body>
 </html>
