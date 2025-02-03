@@ -20,7 +20,7 @@ $recent_internships = get_internships($pdo);
     <header class="main-header">
         <nav class="navbar">
             <div class="logo">
-                <h1>Stage<span>Iut</span></h1>
+                <h1>Nevers<span>Stage</span></h1>
             </div>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
@@ -67,38 +67,48 @@ $recent_internships = get_internships($pdo);
         </section>
 
         <section class="recent-offers">
-            <h2>Dernières offres de stages</h2>
-            <div class="offers-grid">
-                <?php foreach ($recent_internships as $internship): ?>
+    <h2>Dernières offres de stages</h2>
+    <div class="offers-grid">
+        <?php if (!empty($recent_internships)): ?>
+            
+            <?php foreach ($recent_internships as $internship): ?>
                 <div class="offer-card">
                     <div class="offer-header">
                         <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                        <span class="company-name"><?php echo htmlspecialchars($internship['nom_entreprise']); ?></span>
+                        <span class="company-name">
+                            <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
+                        </span>
                     </div>
                     <div class="offer-body">
                         <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
                         <div class="offer-details">
                             <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
-                            <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($internship['lieu']); ?></span>
+                            <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>
+                            <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
                         </div>
+
                     </div>
                     <div class="offer-footer">
                         <a href="stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
                     </div>
                 </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="see-more">
-                <a href="stages.php" class="btn btn-primary">Voir toutes les offres</a>
-            </div>
-        </section>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Aucune offre de stage disponible pour le moment.</p>
+        <?php endif; ?>
+    </div>
+    <div class="see-more">
+        <a href="stages.php" class="btn btn-primary">Voir toutes les offres</a>
+    </div>
+</section>
+
     </main>
 
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>À propos</h3>
-                <p>StagesIut est votre plateforme de référence pour trouver le stage qui correspond à vos aspirations professionnelles.</p>
+                <p>NeversStage est votre plateforme de référence pour trouver le stage qui correspond à vos aspirations professionnelles.</p>
             </div>
             <div class="footer-section">
                 <h3>Liens rapides</h3>

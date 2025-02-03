@@ -60,13 +60,21 @@ function get_user($pdo, $user_id, $role = null) {
 // Fonction pour récupérer toutes les offres de stages
 function get_internships($pdo) {
     try {
-        $stmt = $pdo->query("SELECT * FROM offres_stages ORDER BY date_debut DESC");
-        return $stmt->fetchAll();
+        $stmt = $pdo->query("
+            SELECT o.*, e.nom AS nom_entreprise 
+            FROM offres_stages o
+            JOIN entreprises e ON o.entreprise_id = e.id
+            ORDER BY o.date_debut DESC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         error_log($e->getMessage());
         return false;
     }
 }
+
+
+
 
 // Fonction pour récupérer les candidatures d'un étudiant
 function get_applications($pdo, $etudiant_id) {

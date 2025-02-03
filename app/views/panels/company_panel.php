@@ -10,7 +10,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     exit();
 }
 
-$entreprise_id = $_SESSION['user_id'];
+// Récupérer l'ID de l'entreprise associée à l'utilisateur connecté
+$stmt = $pdo->prepare("SELECT id FROM entreprises WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$entreprise_id = $stmt->fetchColumn();
+
+if (!$entreprise_id) {
+    die("Erreur : aucune entreprise associée à cet utilisateur.");
+}
 
 // Supprimer une offre
 if (isset($_POST['delete_offre'])) {
@@ -19,11 +26,10 @@ if (isset($_POST['delete_offre'])) {
     $stmt->execute([$offre_id, $entreprise_id]);
 }
 
-// Récupérer les offres de l'entreprise
+// Récupérer les offres de stage publiées par l'entreprise
 $stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ? ORDER BY date_debut DESC");
 $stmt->execute([$entreprise_id]);
 $internships = $stmt->fetchAll();
-
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +71,7 @@ $internships = $stmt->fetchAll();
                         <p>Date de fin: <?php echo $internship['date_fin']; ?></p>
                     </div>
                     <div class="card-footer">
-                        <a href="view_applications.php?offre_id=<?php echo $internship['id']; ?>" class="btn-primary">Voir les candidatures</a>
+                        <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?php echo $internship['id']; ?>" class="btn-primary">Voir les candidatures</a>
                         <a href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?php echo $internship['id']; ?>" class="btn-warning">Modifier</a>
                         <form action="" method="post" style="display: inline;">
                             <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">

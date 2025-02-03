@@ -190,3 +190,20 @@ th {
         margin: 10px;
     }
 }
+/* Ajouter un style pour le logo */
+.logo-entreprise {
+    max-width: 200px;
+    max-height: 100px;
+    margin-bottom: 10px;
+}
+.offre-stage {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.offre-stage h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+}

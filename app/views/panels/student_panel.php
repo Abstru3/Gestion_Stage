@@ -82,7 +82,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
                         <p>Date de fin: <?php echo $internship['date_fin']; ?></p>
                     </div>
                     <div class="card-footer">
-                        <form action="apply.php" method="post">
+                        <form action="/Gestion_Stage/app/views/internships/apply.php" method="post">
                             <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
                             <button type="submit" class="btn-primary">Postuler</button>
                         </form>

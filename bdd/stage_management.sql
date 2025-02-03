@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  localhost
--- Généré le :  Mer 29 Janvier 2025 à 15:31
+-- Généré le :  Lun 03 Février 2025 à 14:06
 -- Version du serveur :  5.7.11
 -- Version de PHP :  7.2.7
 
@@ -89,6 +89,15 @@ CREATE TABLE `offres_stages` (
   `date_fin` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Contenu de la table `offres_stages`
+--
+
+INSERT INTO `offres_stages` (`id`, `entreprise_id`, `titre`, `description`, `date_debut`, `date_fin`) VALUES
+(4, NULL, 'Stage numéro 1 en informatique', 'ss', '2025-01-30', '2025-02-27'),
+(5, NULL, 'Stage numéro 1 en informatique', 'hhjhh', '2025-01-31', '2025-02-06'),
+(6, NULL, 'Stage numéro 1 en informatique', 'x', '2025-02-13', '2025-02-21');
+
 -- --------------------------------------------------------
 
 --
@@ -109,9 +118,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `role`) VALUES
 (1, 'besi', '$2y$10$WuKihrfa1q0yqDmH7G2jlOQmHUarTuiPkm921PiXlV4jDLq21ROeK', 'gygy@gmail.com', 'etudiant'),
-(2, 'ff', '$2y$10$Bqv8DbDU.kHCQasZZtJf8.frYqemJImtxC0fd8gnaXEB7YDRIOSMm', 'aa@gmail.com', 'etudiant'),
 (3, 'fff', '$2y$10$tROPY.JyKf0iLF8Wo.esM.Yki5fcn32EA6FVYS6jPuUVWnxndPezO', 'fef@gmail.com', 'etudiant'),
-(4, 'f', '$2y$10$DWWvtQyqdD0YDqHy6yJPB.ee/r8CDvseQfkKY2EIEsWlCF7FqP1Fa', 'rt@gmail.com', 'entreprise');
+(4, 'f', '$2y$10$DWWvtQyqdD0YDqHy6yJPB.ee/r8CDvseQfkKY2EIEsWlCF7FqP1Fa', 'rt@gmail.com', 'entreprise'),
+(5, 'mw3', '123', 'tt@gmail.com', 'etudiant'),
+(6, 'admin', '$2y$10$GJ4FzVjVaRvDll/7pWG6leeKEPC/ZEPzlCRAhKLsB/.j28XWGP4SW', 'admin@gmail.com', 'admin'),
+(7, 'besjan', '$2y$10$ihSthHka0E7WnZPLcpvb/OTVxQPl0Y4XFD2/9qTwvLB9VwYOeLTkO', 'i@gmail.com', 'etudiant');
 
 --
 -- Index pour les tables exportées
@@ -189,12 +200,12 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT pour la table `offres_stages`
 --
 ALTER TABLE `offres_stages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- Contraintes pour les tables exportées
 --
