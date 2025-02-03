@@ -3,6 +3,8 @@
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
     --accent-color: #e74c3c;
+    --secondary-color-hover: #4ea8e4;
+    --accent-color-hover: #f26858;
     --text-color: #333;
     --light-gray: #f5f6fa;
     --border-radius: 8px;
@@ -163,14 +165,32 @@ body {
     transition: all 0.3s ease;
 }
 
-.btn-login {
+.btn-login,
+.btn-workspace {
     background: var(--secondary-color);
     color: white;
+    transition: background 0.2s ease;
 }
 
-.btn-register {
+.btn-register,
+.btn-disconnect {
     background: var(--accent-color);
     color: white;
+    transition: background 0.2s ease;
+}
+
+.btn-login:hover,
+.btn-workspace:hover {
+    background: var(--secondary-color-hover);
+    color: white;
+    transition: background 0.2s ease;
+}
+
+.btn-register:hover,
+.btn-disconnect:hover {
+    background: var(--accent-color-hover);
+    color: white;
+    transition: background 0.2s ease;
 }
 
 .btn-details {

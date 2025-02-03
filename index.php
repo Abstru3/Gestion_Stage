@@ -12,7 +12,7 @@ $recent_internships = get_internships($pdo);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stages Iut - Plateforme de stages</title>
+    <title>NeversStage - Plateforme de stages</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="./public/assets/css/style_accueil.css">
 </head>
@@ -24,8 +24,8 @@ $recent_internships = get_internships($pdo);
             </div>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="./app/views/home.php" class="nav-link"><i class="fas fa-user"></i> Mon Espace</a>
-                    <a href="./app/views/auth/logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                    <a href="./app/views/home.php" class="btn btn-workspace"><i class="fas fa-user"></i> Mon Espace</a>
+                    <a href="./app/views/auth/logout.php" class="btn btn-disconnect"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
                         <a href="./app/views/panels/admin_panel.php" class="nav-link"><i class="fas fa-cogs"></i> Panel Admin</a>
                     <?php endif; ?>
