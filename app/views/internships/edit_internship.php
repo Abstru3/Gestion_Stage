@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
-    header("Location: login.php");
+    header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
 
@@ -19,7 +19,7 @@ $stmt->execute([$offre_id, $entreprise_id]);
 $offre = $stmt->fetch();
 
 if (!$offre) {
-    header("Location: company_panel.php");
+    header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
     exit();
 }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $stmt = $pdo->prepare("UPDATE offres_stages SET titre = ?, description = ?, date_debut = ?, date_fin = ? WHERE id = ? AND entreprise_id = ?");
     if ($stmt->execute([$titre, $description, $date_debut, $date_fin, $offre_id, $entreprise_id])) {
-        header("Location: company_panel.php");
+        header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
         exit();
     } else {
         $error = "Erreur lors de la mise à jour de l'offre de stage.";
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier une offre de stage</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
     <header>
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <button type="submit" class="btn-primary">Mettre à jour l'offre de stage</button>
         </form>
-        <p><a href="company_panel.php">Retour au panneau entreprise</a></p>
+        <p><a href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></p>
     </main>
 </body>
 </html>

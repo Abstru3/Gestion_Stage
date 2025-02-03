@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'etudiant') {
-    header("Location: login.php");
+    header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
 
@@ -30,6 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-header("Location: student_panel.php");
+header("Location: /Gestion_Stage/app/views/panels/student_panel.php");
 exit();
 ?>
