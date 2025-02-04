@@ -18,8 +18,9 @@ $total_students = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'étudian
 $total_companies = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'entreprise'")->fetchColumn();
 
 // Récupérer la liste des utilisateurs
-$users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -34,8 +35,6 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-
-
 </head>
 <body>
     <!-- Sidebar -->
@@ -64,8 +63,6 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
                 </div>
             </div>
         </nav>
-
-
 
         <!-- Content -->
         <div class="container mt-4">
@@ -112,7 +109,6 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Nom</th>
                                 <th>Email</th>
                                 <th>Rôle</th>
                             </tr>
@@ -121,7 +117,6 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
                             <?php foreach ($users as $user) : ?>
                                 <tr>
                                     <td><?= htmlspecialchars($user['id']) ?></td>
-                                    <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role']) ?></td>
                                 </tr>
@@ -131,26 +126,25 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
                 </div>
             </div>
 
-
-        <script>
-            $(document).ready(function() {
-                // Initialiser DataTables sur le tableau
-                $('#usersTable').DataTable({
-                    "paging": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "lengthMenu": [5, 10, 20],
-                    "language": {
-                        "search": "Rechercher :",
-                        "paginate": {
-                            "previous": "Précédent",
-                            "next": "Suivant"
+            <script>
+                $(document).ready(function() {
+                    // Initialiser DataTables sur le tableau
+                    $('#usersTable').DataTable({
+                        "paging": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "lengthMenu": [5, 10, 20],
+                        "language": {
+                            "search": "Rechercher :",
+                            "paginate": {
+                                "previous": "Précédent",
+                                "next": "Suivant"
+                            }
                         }
-                    }
+                    });
                 });
-            });
-        </script>
+            </script>
 
             <p class="text-center mt-4">
                 <a href="/Gestion_Stage/app/views/home.php" class="btn btn-primary">Retour à l'accueil</a>
@@ -178,43 +172,60 @@ $users = $pdo->query("SELECT id, username, email, role FROM users ORDER BY id DE
         });
     </script>
 
+    <div class="container mt-4">
+    <h1 class="text-center mb-4">Gestion des Rôles des Utilisateurs</h1>
+
     <div class="card p-4 shadow mt-4">
-    <h2 class="mb-3">Gestion des Rôles des Utilisateurs</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($users as $user) : ?>
+        <h2 class="mb-3">Modifier les Rôles</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
                 <tr>
-                    <td><?= htmlspecialchars($user['id']) ?></td>
-                    <td><?= htmlspecialchars($user['username']) ?></td>
-                    <td><?= htmlspecialchars($user['email']) ?></td>
-                    <td>
-                        <form method="POST" action="update_role.php">
-                            <select name="role_id" class="form-control">
-                                <?php foreach ($roles as $role) : ?>
-                                    <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>><?= htmlspecialchars($role['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                            <button type="submit" class="btn btn-sm btn-primary mt-2">Modifier</button>
-                        </form>
-                    </td>
-                    <td>
-                        <a href="delete_user.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-danger">Supprimer</a>
-                    </td>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (!empty($users)) : ?>
+                    <?php foreach ($users as $user) : ?>
+                        <tr>
+                            <td><?= htmlspecialchars($user['id']) ?></td>
+                            <td><?= htmlspecialchars($user['email']) ?></td>
+                            <td>
+                                <form method="POST" action="update_role.php">
+                                    <div class="input-group">
+                                        <select name="role_id" class="form-control">
+                                            <?php if (!empty($roles)) : ?>
+                                                <?php foreach ($roles as $role) : ?>
+                                                    <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($role['name']) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            <?php else : ?>
+                                                <option>Aucun rôle disponible</option>
+                                            <?php endif; ?>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary btn-sm mt-1">Modifier</button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                </form>
+                            </td>
+                            <td>
+                                <a href="delete_user.php?id=<?= $user['id'] ?>" class="btn btn-danger btn-sm">Supprimer</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <tr><td colspan="4" class="text-center">Aucun utilisateur trouvé.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

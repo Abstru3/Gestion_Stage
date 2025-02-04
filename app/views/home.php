@@ -23,7 +23,8 @@ $user = get_user($pdo, $_SESSION['user_id']);
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
-    <h1>Bienvenue, <?php echo htmlspecialchars($user['username']); ?></h1>
+   <h1>Bienvenue, <?php echo htmlspecialchars($user['email']); ?></h1>
+
     <nav>
         <ul>
             <li><a href="profile.php">Mon profil</a></li>

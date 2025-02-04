@@ -6,17 +6,15 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
+    $email = $_POST['email']; // Utilisation de l'email au lieu de username
     $password = $_POST['password'];
 
-    // Connexion de l'utilisateur
-    $user = login($pdo, $username, $password);
+    $user = login($pdo, $email, $password);
 
     if ($user) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
 
-        // Redirection en fonction du rôle
         if ($_SESSION['role'] == 'admin') {
             header("Location: /Gestion_Stage/app/views/panels/admin_panel.php");
         } else {
@@ -24,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         exit();
     } else {
-        // Message d'erreur si la connexion échoue
-        $error = "Nom d'utilisateur ou mot de passe incorrect.";
+        $error = "Email ou mot de passe incorrect.";
     }
 }
 ?>
@@ -44,10 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h1>Connexion</h1>
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
         <form action="" method="post">
-            <label for="username">Nom d'utilisateur:</label>
-            <input type="text" id="username" name="username" required>
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required>
 
-            <label for="password">Mot de passe:</label>
+            <label for="password">Mot de passe :</label>
             <input type="password" id="password" name="password" required>
 
             <button type="submit">Se connecter</button>

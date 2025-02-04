@@ -1,23 +1,25 @@
 <?php
 
 // Fonction de connexion
-function login($pdo, $username, $password) {
+function login($pdo, $email, $password) {
     try {
-        $username = htmlspecialchars($username);
-
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-        $stmt->execute([$username]);
+        $email = htmlspecialchars($email);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
             return $user;
         }
+
         return false;
     } catch (Exception $e) {
         error_log($e->getMessage());
         return false;
     }
 }
+
+
 
 // Fonction d'inscription
 function register($pdo, $username, $password, $email, $role) {
