@@ -85,6 +85,12 @@ body {
     color: white;
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+    background: var(--secondary-color-hover);
+    transition: background 0.3s ease;
 }
 
 /* Stats Section */

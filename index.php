@@ -15,12 +15,13 @@ $recent_internships = get_internships($pdo);
     <title>NeversStage - Plateforme de stages</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="./public/assets/css/style_accueil.css">
+    <link rel="icon" type="image/png" href="./public/assets/images/logo_reduis.png">
 </head>
 <body>
     <header class="main-header">
         <nav class="navbar">
             <div class="logo">
-                <h1>Nevers<span>Stage</span></h1>
+                <img src="./public/assets/images/logo.png" alt="NeversStage" height="100">
             </div>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
@@ -34,7 +35,6 @@ $recent_internships = get_internships($pdo);
                     <a href="./app/views/auth/register.php" class="btn btn-register"><i class="fas fa-user-plus"></i> Inscription</a>
                 <?php endif; ?>
             </div>
-
         </nav>
 
         <div class="hero-section">
@@ -125,7 +125,7 @@ $recent_internships = get_internships($pdo);
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; <?php echo date('Y'); ?> StagesIut - Tous droits réservés</p>
+            <p>&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
         </div>
     </footer>
 
