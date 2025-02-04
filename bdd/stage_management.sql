@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  localhost
--- Généré le :  Lun 03 Février 2025 à 14:06
+-- Généré le :  Mar 04 Février 2025 à 08:33
 -- Version du serveur :  5.7.11
 -- Version de PHP :  7.2.7
 
@@ -47,6 +47,13 @@ CREATE TABLE `entreprises` (
   `description` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Contenu de la table `entreprises`
+--
+
+INSERT INTO `entreprises` (`id`, `user_id`, `nom`, `description`) VALUES
+(1, 4, 'Nom de l\'entreprise', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -86,17 +93,21 @@ CREATE TABLE `offres_stages` (
   `titre` varchar(100) NOT NULL,
   `description` text,
   `date_debut` date DEFAULT NULL,
-  `date_fin` date DEFAULT NULL
+  `date_fin` date DEFAULT NULL,
+  `lieu` varchar(255) DEFAULT NULL,
+  `mode_stage` enum('distanciel','présentiel') NOT NULL,
+  `logo` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Contenu de la table `offres_stages`
 --
 
-INSERT INTO `offres_stages` (`id`, `entreprise_id`, `titre`, `description`, `date_debut`, `date_fin`) VALUES
-(4, NULL, 'Stage numéro 1 en informatique', 'ss', '2025-01-30', '2025-02-27'),
-(5, NULL, 'Stage numéro 1 en informatique', 'hhjhh', '2025-01-31', '2025-02-06'),
-(6, NULL, 'Stage numéro 1 en informatique', 'x', '2025-02-13', '2025-02-21');
+INSERT INTO `offres_stages` (`id`, `entreprise_id`, `titre`, `description`, `date_debut`, `date_fin`, `lieu`, `mode_stage`, `logo`) VALUES
+(4, NULL, 'Stage numéro 1 en informatique', 'ss', '2025-01-30', '2025-02-27', NULL, 'distanciel', NULL),
+(5, NULL, 'Stage numéro 1 en informatique', 'hhjhh', '2025-01-31', '2025-02-06', NULL, 'distanciel', NULL),
+(6, NULL, 'Stage numéro 1 en informatique', 'x', '2025-02-13', '2025-02-21', NULL, 'distanciel', NULL),
+(29, 1, 'Stage numéro 1 en informatique', '25', '2025-02-04', '2025-02-20', 'nevers , 45 rue des boloss', 'présentiel', NULL);
 
 -- --------------------------------------------------------
 
@@ -185,7 +196,7 @@ ALTER TABLE `candidatures`
 -- AUTO_INCREMENT pour la table `entreprises`
 --
 ALTER TABLE `entreprises`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pour la table `etudiants`
 --
@@ -200,7 +211,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT pour la table `offres_stages`
 --
 ALTER TABLE `offres_stages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 --
 -- AUTO_INCREMENT pour la table `users`
 --
