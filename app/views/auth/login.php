@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_login.css">
 </head>
 <body>
     <div class="container">
@@ -51,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <button type="submit">Se connecter</button>
         </form>
-        <p>Pas encore inscrit? <a href="/Gestion_Stage/app/views/auth/register.php">S'inscrire</a></p>
+        <p class="link-button">Pas encore inscrit ? <a href="/Gestion_Stage/app/views/auth/register.php">S'inscrire</a></p>
     </div>
 </body>
 </html>

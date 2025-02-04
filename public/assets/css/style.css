@@ -59,6 +59,10 @@ nav a:hover {
     background: #f0f0f0;
 }
 
+.link-button {
+    text-align: center;
+}
+
 /* Formulaires */
 form {
     background: white;
