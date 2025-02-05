@@ -5,13 +5,21 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
+// Définition des constantes pour les messages d'erreur
+define('ERROR_REQUIRED_FIELDS', "Tous les champs doivent être remplis.");
+define('ERROR_INVALID_EMAIL', "Adresse email invalide.");
+define('ERROR_EMAIL_EXISTS', "Cet email est déjà utilisé.");
+define('ERROR_PASSWORD_REQUIREMENTS', "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.");
+define('ERROR_PASSWORD_MISMATCH', "Les mots de passe ne correspondent pas.");
+define('ERROR_INVALID_SIRET', "Le numéro SIRET doit contenir exactement 14 chiffres.");
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $role = $_POST['role'];
-    $honeypot = $_POST['honeypot'] ?? ''; 
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_STRING);
+    $honeypot = filter_input(INPUT_POST, 'honeypot', FILTER_SANITIZE_STRING);
     $errors = [];
 
     // Vérification du champ honeypot (anti-robots)
@@ -19,67 +27,81 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Inscription bloquée.");
     }
 
-    // Vérifier que les champs obligatoires sont remplis
+    // Vérification des champs obligatoires
     if (empty($username) || empty($password) || empty($email) || empty($role)) {
-        $errors[] = "Tous les champs doivent être remplis.";
+        $errors[] = ERROR_REQUIRED_FIELDS;
     }
 
-    // Vérifier si l'email est valide
+    // Vérification de l'email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Adresse email invalide.";
+        $errors[] = ERROR_INVALID_EMAIL;
     }
 
-    // Vérifier si l'email existe déjà
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+    // Vérification de l'unicité de l'email
+    $stmt = $pdo->prepare("SELECT id FROM " . ($role === 'etudiant' ? 'etudiants' : 'entreprises') . " WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetch()) {
-        $errors[] = "Cet email est déjà utilisé.";
+        $errors[] = ERROR_EMAIL_EXISTS;
     }
 
-    // Vérifier la complexité du mot de passe
+    // Vérification du mot de passe
     if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
-        $errors[] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.";
+        $errors[] = ERROR_PASSWORD_REQUIREMENTS;
     }
 
-    // Vérifier la confirmation du mot de passe
+    // Vérification de la confirmation du mot de passe
     if ($password !== $confirm_password) {
-        $errors[] = "Les mots de passe ne correspondent pas.";
+        $errors[] = ERROR_PASSWORD_MISMATCH;
     }
 
     // Si aucune erreur, on enregistre dans la base
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        if ($role === 'etudiant') {
-            $nom = trim($_POST['nom']);
-            $prenom = trim($_POST['prenom']);
+        try {
+            $pdo->beginTransaction();
 
-            if (empty($nom) || empty($prenom)) {
-                $errors[] = "Tous les champs pour l'étudiant doivent être remplis.";
-            } else {
+            if ($role === 'etudiant') {
+                $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_STRING);
+                $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_STRING);
+
+                if (empty($nom) || empty($prenom)) {
+                    throw new Exception(ERROR_REQUIRED_FIELDS);
+                }
+
                 $stmt = $pdo->prepare("INSERT INTO etudiants (username, email, password, nom, prenom) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$username, $email, $hashed_password, $nom, $prenom]);
-            }
-        } elseif ($role === 'entreprise') {
-            $nom_entreprise = trim($_POST['nom_entreprise']);
-            $description = trim($_POST['description']);
-            $adresse_facturation = trim($_POST['adresse_facturation']);
-            $nom_contact = trim($_POST['nom_contact']);
-            $telephone = $_POST['telephone'];
-            $site_web = $_POST['site_web'];
-            $tva_intracommunautaire = $_POST['tva_intracommunautaire'];
+            } elseif ($role === 'entreprise') {
+                $nom_entreprise = filter_input(INPUT_POST, 'nom_entreprise', FILTER_SANITIZE_STRING);
+                $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
+                $adresse_facturation = filter_input(INPUT_POST, 'adresse_facturation', FILTER_SANITIZE_STRING);
+                $nom_contact = filter_input(INPUT_POST, 'nom_contact', FILTER_SANITIZE_STRING);
+                $telephone = filter_input(INPUT_POST, 'telephone', FILTER_SANITIZE_STRING);
+                $site_web = filter_input(INPUT_POST, 'site_web', FILTER_SANITIZE_URL);
+                $tva_intracommunautaire = filter_input(INPUT_POST, 'tva_intracommunautaire', FILTER_SANITIZE_STRING);
+                $siret = filter_input(INPUT_POST, 'siret', FILTER_SANITIZE_STRING);
 
-            if (empty($nom_entreprise) || empty($description) || empty($adresse_facturation) || empty($telephone)) {
-                $errors[] = "Tous les champs pour l'entreprise doivent être remplis.";
-            } else {
-                $stmt = $pdo->prepare("INSERT INTO entreprises (username, email, password, nom_entreprise, description, adresse_facturation, nom_contact, telephone, site_web, tva_intracommunautaire) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$username, $email, $hashed_password, $nom_entreprise, $description, $adresse_facturation, $nom_contact, $telephone, $site_web, $tva_intracommunautaire]);
+                if (empty($nom_entreprise) || empty($description) || empty($adresse_facturation) || empty($siret)) {
+                    throw new Exception(ERROR_REQUIRED_FIELDS);
+                }
+
+                // Vérification du format SIRET
+                if (!preg_match('/^[0-9]{14}$/', $siret)) {
+                    throw new Exception(ERROR_INVALID_SIRET);
+                }
+
+                $stmt = $pdo->prepare("INSERT INTO entreprises (username, email, password, nom, description, adresse_facturation, nom_contact, telephone, site_web, tva_intracommunautaire, siret) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$username, $email, $hashed_password, $nom_entreprise, $description, $adresse_facturation, $nom_contact, $telephone, $site_web, $tva_intracommunautaire, $siret]);
             }
+
+            $pdo->commit();
+            $_SESSION['success'] = "Inscription réussie ! Connectez-vous.";
+            header("Location: login.php");
+            exit();
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $errors[] = $e->getMessage();
         }
-
-        $_SESSION['success'] = "Inscription réussie ! Connectez-vous.";
-        header("Location: login.php");
-        exit();
     }
 }
 ?>
@@ -89,95 +111,166 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
+    <title>Inscription - Gestion des Stages</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_register.css">
     <script>
         function updateForm() {
-            var role = document.getElementById("role").value;
-            var extraInfoField = document.getElementById("extra-info-field");
+            const role = document.getElementById("role").value;
+            const formContent = document.getElementById("dynamic-form-content");
 
-            let passwordFields = `
-                <fieldset>
-                    <legend>Sécurité</legend>
-                    <label for="password">Mot de passe :</label>
-                    <input type="password" id="password" name="password" required placeholder="Min. 8 caractères, 1 majuscule, 1 chiffre">
-                    <small>Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.</small>
+            // Récupérer les valeurs précédentes avec PHP
+            const email = `<?= htmlspecialchars($_POST['email'] ?? '') ?>`;
+            const username = `<?= htmlspecialchars($_POST['username'] ?? '') ?>`;
+            const nom = `<?= htmlspecialchars($_POST['nom'] ?? '') ?>`;
+            const prenom = `<?= htmlspecialchars($_POST['prenom'] ?? '') ?>`;
+            const nom_entreprise = `<?= htmlspecialchars($_POST['nom_entreprise'] ?? '') ?>`;
+            const description = `<?= htmlspecialchars($_POST['description'] ?? '') ?>`;
+            const adresse_facturation = `<?= htmlspecialchars($_POST['adresse_facturation'] ?? '') ?>`;
+            const nom_contact = `<?= htmlspecialchars($_POST['nom_contact'] ?? '') ?>`;
+            const telephone = `<?= htmlspecialchars($_POST['telephone'] ?? '') ?>`;
+            const site_web = `<?= htmlspecialchars($_POST['site_web'] ?? '') ?>`;
 
-                    <label for="confirm_password">Confirmer le mot de passe :</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirmez votre mot de passe">
-                </fieldset>
+            // Champs communs
+            const commonFields = `
+                <div class="form-section">
+                    <h2>Informations de connexion</h2>
+                    <div class="form-group">
+                        <label for="email">Email professionnel :</label>
+                        <input type="email" id="email" name="email" required value="${email}"
+                               placeholder="votre.email@exemple.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="username">Nom d'utilisateur :</label>
+                        <input type="text" id="username" name="username" required value="${username}"
+                               placeholder="Choisissez un nom d'utilisateur">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mot de passe :</label>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="8 caractères minimum">
+                        <small>Minimum 8 caractères, une majuscule et un chiffre</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmation du mot de passe :</label>
+                        <input type="password" id="confirm_password" name="confirm_password" 
+                               required placeholder="Confirmez votre mot de passe">
+                    </div>
+                </div>
             `;
 
+            let specificFields = '';
+
             if (role === "etudiant") {
-                extraInfoField.innerHTML = `
-                    <fieldset>
-                        <legend>Informations personnelles</legend>
-                        <label for="nom">Nom :</label>
-                        <input type="text" id="nom" name="nom" required placeholder="Ex : Dupont">
+                specificFields = `
+                    <div class="form-section">
+                        <h2>Informations personnelles</h2>
+                        <div class="form-group">
+                            <label for="nom">Nom :</label>
+                            <input type="text" id="nom" name="nom" required value="${nom}"
+                                   placeholder="Votre nom de famille">
+                        </div>
 
-                        <label for="prenom">Prénom :</label>
-                        <input type="text" id="prenom" name="prenom" required placeholder="Ex : Jean">
-                    <label for="email">Email :</label>
-                    <input type="email" id="email" name="email" required placeholder="Ex : jean.dupont@email.com">
-
-
-                    </fieldset>
-
-                    ${passwordFields}
+                        <div class="form-group">
+                            <label for="prenom">Prénom :</label>
+                            <input type="text" id="prenom" name="prenom" required value="${prenom}"
+                                   placeholder="Votre prénom">
+                        </div>
+                    </div>
                 `;
             } else if (role === "entreprise") {
-                extraInfoField.innerHTML = `
-                    <fieldset>
-                        <legend>Informations sur l'entreprise</legend>
-                        <label for="nom_entreprise">Nom de l'entreprise :</label>
-                        <input type="text" id="nom_entreprise" name="nom_entreprise" required placeholder="Ex : TechCorp">
-                    <label for="email">Email :</label>
-                    <input type="email" id="email" name="email" required placeholder="Ex : jean.dupont@email.com">
+                specificFields = `
+                    <div class="form-section">
+                        <h2>Informations de l'entreprise</h2>
+                        <div class="form-group">
+                            <label for="nom_entreprise">Raison sociale :</label>
+                            <input type="text" id="nom_entreprise" name="nom_entreprise" required value="${nom_entreprise}"
+                                   placeholder="Nom de votre entreprise">
+                        </div>
 
+                        <div class="form-group">
+                            <label for="description">Présentation de l'entreprise :</label>
+                            <textarea id="description" name="description" required 
+                                    placeholder="Décrivez brièvement votre entreprise">${description}</textarea>
+                        </div>
 
-                    ${passwordFields}
+                        <div class="form-group">
+                            <label for="adresse_facturation">Adresse de facturation :</label>
+                            <input type="text" id="adresse_facturation" name="adresse_facturation" 
+                                   required value="${adresse_facturation}" placeholder="Adresse complète">
+                        </div>
 
-                        <label for="description">Description :</label>
-                        <textarea id="description" name="description" required placeholder="Décrivez brièvement votre activité"></textarea>
+                        <div class="form-group">
+                            <label for="nom_contact">Personne à contacter :</label>
+                            <input type="text" id="nom_contact" name="nom_contact" 
+                                   value="${nom_contact}" placeholder="Nom et prénom">
+                        </div>
 
-                        <label for="adresse_facturation">Adresse de facturation :</label>
-                        <input type="text" id="adresse_facturation" name="adresse_facturation" required placeholder="Ex : 10 rue des affaires, Paris">
+                        <div class="form-group">
+                            <label for="siret">SIRET :</label>
+                            <input type="text" id="siret" name="siret" required 
+                                   value="<?= htmlspecialchars($_POST['siret'] ?? '') ?>" 
+                                   placeholder="Numéro SIRET (14 chiffres)">
+                        </div>
 
-                        <label for="nom_contact">Nom du contact :</label>
-                        <input type="text" id="nom_contact" name="nom_contact" required placeholder="Ex : Pierre Martin">
+                        <div class="form-group">
+                            <label for="telephone">Téléphone :</label>
+                            <input type="tel" id="telephone" name="telephone" 
+                                   value="${telephone}" placeholder="01 23 45 67 89">
+                        </div>
 
-                        <label for="telephone">Téléphone :</label>
-                        <input type="text" id="telephone" name="telephone" required placeholder="Ex : 06 12 34 56 78">
-
-                        <label for="site_web">Site Web :</label>
-                        <input type="url" id="site_web" name="site_web" placeholder="Ex : https://www.mon-entreprise.com">
-
-                        <label for="tva_intracommunautaire">TVA intracommunautaire :</label>
-                        <input type="text" id="tva_intracommunautaire" name="tva_intracommunautaire" placeholder="Ex : FR123456789">
-                    </fieldset>
+                        <div class="form-group">
+                            <label for="site_web">Site Web :</label>
+                            <input type="url" id="site_web" name="site_web" 
+                                   value="${site_web}" placeholder="https://www.exemple.com">
+                        </div>
+                    </div>
                 `;
-            } else {
-                extraInfoField.innerHTML = "";
             }
+
+            formContent.innerHTML = commonFields + specificFields;
         }
     </script>
 </head>
-<body onload="updateForm()">
+<body>
     <div class="container">
-        <h1>Inscription</h1>
+        <h1>Créer un compte</h1>
+        
+        <?php if (!empty($errors)): ?>
+            <div class="errors">
+                <?php foreach ($errors as $error): ?>
+                    <p><?php echo htmlspecialchars($error); ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <form action="" method="post">
-            <fieldset>
-                <legend>Informations générales</legend>
-                <label for="role">Rôle :</label>
-                <select id="role" name="role" required onchange="updateForm()">
-                    <option value="etudiant">Étudiant</option>
-                    <option value="entreprise">Entreprise</option>
-                </select>
-            </fieldset>
-            <div id="extra-info-field"></div>
-            <button type="submit">S'inscrire</button>
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="role">Je suis :</label>
+                    <select id="role" name="role" required onchange="updateForm()">
+                        <option value="etudiant" <?= (isset($_POST['role']) && $_POST['role'] == "etudiant") ? "selected" : "" ?>>Un étudiant</option>
+                        <option value="entreprise" <?= (isset($_POST['role']) && $_POST['role'] == "entreprise") ? "selected" : "" ?>>Une entreprise</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="dynamic-form-content"></div>
+            
+            <input type="hidden" name="honeypot">
+            <button type="submit">Créer mon compte</button>
         </form>
+
+        <p class="link-button">
+            Déjà inscrit ? <a href="login.php">Se connecter</a>
+        </p>
     </div>
-    <p class="link-button">Déjà inscrit? <a href="login.php">Se connecter</a></p>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateForm();
+        });
+    </script>
 </body>
 </html>
