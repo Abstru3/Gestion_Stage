@@ -19,24 +19,39 @@ if (!$user) {
     exit();
 }
 
+$errors = [];
+$successMessage = "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Traiter la mise à jour du profil ici
     $username = $_POST['username'];
     $email = $_POST['email'];
     $new_password = $_POST['new_password'];
 
-    // Vérifiez si le mot de passe a été modifié
+    // Vérification des exigences du mot de passe
     if (!empty($new_password)) {
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $hashed_password, $_SESSION['user_id']]);
-    } else {
-        $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $_SESSION['user_id']]);
+        if (strlen($new_password) < 8 || !preg_match('/[A-Z]/', $new_password) || !preg_match('/[0-9]/', $new_password)) {
+            $errors[] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.";
+        } else {
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        }
     }
 
-    // Rafraîchir les données de l'utilisateur
-    $user = get_user($pdo, $_SESSION['user_id'], $table);
+    // Si aucun mot de passe n'est fourni, ne pas modifier le mot de passe
+    if (empty($errors)) {
+        if (!empty($new_password)) {
+            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $hashed_password, $_SESSION['user_id']]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $_SESSION['user_id']]);
+        }
+
+        // Rafraîchir les données de l'utilisateur
+        $user = get_user($pdo, $_SESSION['user_id'], $table);
+
+        // Message de succès
+        $successMessage = "Votre profil a été mis à jour avec succès !";
+    }
 }
 ?>
 
@@ -51,6 +66,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container">
         <h1>Mon profil</h1>
+
+        <!-- Affichage des erreurs -->
+        <?php if (!empty($errors)): ?>
+            <div class="errors">
+                <?php foreach ($errors as $error): ?>
+                    <p><?php echo htmlspecialchars($error); ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Message de succès -->
+        <?php if (!empty($successMessage)): ?>
+            <div class="success">
+                <p><?php echo htmlspecialchars($successMessage); ?></p>
+            </div>
+        <?php endif; ?>
+
         <form action="" method="post">
             <label for="username">Nom d'utilisateur:</label>
             <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
@@ -77,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <button type="submit">Mettre à jour le profil</button>
         </form>
+
         <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'accueil</a></p>
     </div>
 </body>

@@ -89,7 +89,7 @@ $recent_internships = get_internships($pdo);
 
                     </div>
                     <div class="offer-footer">
-                        <a href="stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
+                        <a href="/Gestion_Stage/app/views/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -128,6 +128,17 @@ $recent_internships = get_internships($pdo);
             <p>&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
         </div>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const offers = document.querySelectorAll('.offer-card');
+            offers.forEach((offer, index) => {
+                setTimeout(() => {
+                    offer.classList.add('visible');
+                }, index * 200);
+            });
+        });
+
+    </script>
 
     <script src="../public/assets/js/script.js"></script> <!-- Mise à jour du chemin -->
 </body>

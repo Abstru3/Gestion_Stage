@@ -59,8 +59,8 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     <nav>
         <ul>
             <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
-            <li><a href="/Gestion_Stage/app/views/profile.php">Mon profil</a></li>
-            <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
+            <li><a href="/Gestion_Stage/app/views/profile.php">📋 Mon profil</a></li>
+            <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
         </ul>
     </nav>
 
@@ -96,8 +96,12 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
                         <p>Date de fin: <?php echo $internship['date_fin']; ?></p>
                     </div>
                     <div class="card-footer">
-                        <form action="/Gestion_Stage/app/views/internships/apply.php" method="post">
+                        <form action="/Gestion_Stage/app/views/internships/apply.php" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
+                            <label for="cv">CV (PDF) :</label>
+                            <input type="file" name="cv" accept=".pdf" required>
+                            <label for="lettre_motivation">Lettre de motivation (PDF) :</label>
+                            <input type="file" name="lettre_motivation" accept=".pdf" required>
                             <button type="submit" class="btn-primary">Postuler</button>
                         </form>
                     </div>
