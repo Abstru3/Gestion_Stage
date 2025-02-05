@@ -6,19 +6,24 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ./Gestion_Stage/app/views/auth/login.php");
+    header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
 
 // Récupérer les statistiques et les données pour l'administration
-$total_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total_users = $pdo->query("SELECT (SELECT COUNT(*) FROM etudiants) + (SELECT COUNT(*) FROM entreprises)")->fetchColumn();
 $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchColumn();
 $total_applications = $pdo->query("SELECT COUNT(*) FROM candidatures")->fetchColumn();
-$total_students = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'étudiant'")->fetchColumn();
-$total_companies = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'entreprise'")->fetchColumn();
+$total_students = $pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
+$total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
 
 // Récupérer la liste des utilisateurs
-$users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("
+    SELECT id, email, 'etudiant' as role FROM etudiants
+    UNION ALL
+    SELECT id, email, 'entreprise' as role FROM entreprises
+    ORDER BY id DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 

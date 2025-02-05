@@ -5,7 +5,8 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'etudiant') {
+// Update this line to use the 'etudiants' table instead of a generic 'users' table
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'etudiant') {
     header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
@@ -41,3 +42,4 @@ if ($stmt->rowCount() > 0) {
 header("Location: /Gestion_Stage/app/views/panels/student_panel.php");
 exit();
 ?>
+

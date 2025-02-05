@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 // Vérifier si l'utilisateur est connecté et est une entreprise
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'entreprise') {
     header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
@@ -29,13 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "La date de fin doit être postérieure à la date de début.";
     } else {
         // Vérifier si l'entreprise associée à l'utilisateur existe
-        $stmt = $pdo->prepare("SELECT id FROM entreprises WHERE user_id = ?");
+        /*$stmt = $pdo->prepare("SELECT id FROM entreprises WHERE user_id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $entreprise_id = $stmt->fetchColumn();
 
         if (!$entreprise_id) {
             $error = "L'entreprise associée à ce compte n'existe pas.";
-        } else {
+        } else {*/
             // Gestion du logo : téléchargement et vérification
             $logo_path = null;
             if ($logo['error'] == UPLOAD_ERR_OK) {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
                 // Insérer l'offre de stage avec le bon entreprise_id, lieu, mode_stage, et logo
                 $stmt = $pdo->prepare("INSERT INTO offres_stages (entreprise_id, titre, description, date_debut, date_fin, lieu, mode_stage, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $result = $stmt->execute([$entreprise_id, $titre, $description, $date_debut, $date_fin, $lieu, $mode_stage, $logo_path]);
+                $result = $stmt->execute([$_SESSION['user_id'], $titre, $description, $date_debut, $date_fin, $lieu, $mode_stage, $logo_path]);
 
                 if ($result) {
                     $success = "L'offre de stage a été publiée avec succès.";
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } catch (PDOException $e) {
                 $error = "Erreur de base de données : " . $e->getMessage();
             }
-        }
+        //}
     }
 }
 
@@ -159,3 +159,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </main>
 </body>
 </html>
+

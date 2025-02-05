@@ -5,7 +5,8 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
+// Update this line to use the 'entreprises' table instead of a generic 'users' table
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'entreprise') {
     header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
@@ -75,3 +76,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </main>
 </body>
 </html>
+
