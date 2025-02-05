@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     <nav>
         <ul>
-            <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></li>
+            <li><a class="index-button" href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></li>
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
         </ul>
     </nav>
