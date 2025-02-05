@@ -6,10 +6,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email']; // Utilisation de l'email au lieu de username
+    $identifier = $_POST['identifier'];
     $password = $_POST['password'];
 
-    $user = login($pdo, $email, $password);
+    $user = login($pdo, $identifier, $password);
 
     if ($user) {
         $_SESSION['user_id'] = $user['id'];
@@ -22,9 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         exit();
     } else {
-        $error = "Email ou mot de passe incorrect.";
+        $error = "Identifiant ou mot de passe incorrect.";
     }
-    
 }
 ?>
 
@@ -42,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h1>Connexion</h1>
         <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
         <form action="" method="post">
-            <label for="email">Email :</label>
-            <input type="email" id="email" name="email" required>
+            <label for="identifier">Email ou nom d'utilisateur :</label>
+            <input type="text" id="identifier" name="identifier" required>
 
             <label for="password">Mot de passe :</label>
             <input type="password" id="password" name="password" required>

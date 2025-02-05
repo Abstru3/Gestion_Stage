@@ -1,22 +1,24 @@
 <?php
 
 // Fonction de connexion
-function login($pdo, $email, $password) {
-    try {
-        $email = htmlspecialchars($email);
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+function login($pdo, $identifier, $password) {
+    // Vérifier d'abord dans la table etudiants
+    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE (email = :identifier OR username = :identifier)");
+    $stmt->execute(['identifier' => $identifier]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            return $user;
-        }
-
-        return false;
-    } catch (Exception $e) {
-        error_log($e->getMessage());
-        return false;
+    if (!$user) {
+        // Si pas trouvé dans etudiants, vérifier dans entreprises
+        $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE (email = :identifier OR username = :identifier)");
+        $stmt->execute(['identifier' => $identifier]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    if ($user && password_verify($password, $user['password'])) {
+        return $user;
+    }
+
+    return false;
 }
 
 
