@@ -21,6 +21,15 @@ if (!$user) {
     header("Location: /Gestion_Stage/app/views/auth/login.php");
     exit();
 }
+
+// Préparer le message de bienvenue en fonction du type d'utilisateur
+if ($_SESSION['role'] == 'etudiant') {
+    $welcome_message = $user['nom'] . ' ' . $user['prenom'];
+} elseif ($_SESSION['role'] == 'entreprise') {
+    $welcome_message = $user['nom']; // Assuming 'nom' is the company name for enterprises
+} else {
+    $welcome_message = 'Administrateur';
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +41,7 @@ if (!$user) {
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
 </head>
 <body>
-   <h1>Bienvenue, <?php echo htmlspecialchars($user['nom'] . ' ' . $user['prenom']); ?></h1>
+   <h1>Bienvenue, <?php echo htmlspecialchars($welcome_message); ?></h1>
 
     <nav>
         <ul>
@@ -52,3 +61,4 @@ if (!$user) {
     <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
 </body>
 </html>
+

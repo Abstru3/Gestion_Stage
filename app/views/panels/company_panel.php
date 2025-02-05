@@ -10,26 +10,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     exit();
 }
 
-// Récupérer l'ID de l'entreprise associée à l'utilisateur connecté
-$stmt = $pdo->prepare("SELECT id FROM entreprises WHERE user_id = ?");
+// Récupérer les offres de stage de l'entreprise
+$stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
-$entreprise_id = $stmt->fetchColumn();
+$offres = $stmt->fetchAll();
 
-if (!$entreprise_id) {
-    die("Erreur : aucune entreprise associée à cet utilisateur.");
-}
-
-// Supprimer une offre
-if (isset($_POST['delete_offre'])) {
-    $offre_id = $_POST['offre_id'];
-    $stmt = $pdo->prepare("DELETE FROM offres_stages WHERE id = ? AND entreprise_id = ?");
-    $stmt->execute([$offre_id, $entreprise_id]);
-}
-
-// Récupérer les offres de stage publiées par l'entreprise
-$stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ? ORDER BY date_debut DESC");
-$stmt->execute([$entreprise_id]);
-$internships = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -50,37 +35,32 @@ $internships = $stmt->fetchAll();
     <nav>
         <ul>
             <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
-            <li><a href="/Gestion_Stage/app/views/internships/post_internship.php">Publier une offre</a></li>
+            <li><a href="/Gestion_Stage/app/views/profile.php">Mon profil</a></li>
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
         </ul>
     </nav>
 
     <main class="container">
         <h2>Mes offres de stages</h2>
-        <?php if (empty($internships)): ?>
+        <?php if (empty($offres)): ?>
             <p>Vous n'avez pas encore publié d'offres de stage.</p>
         <?php else: ?>
-            <?php foreach ($internships as $internship): ?>
-                <div class="card">
-                    <div class="card-header">
-                        <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                    </div>
-                    <div class="card-body">
-                        <p><?php echo htmlspecialchars($internship['description']); ?></p>
-                        <p>Date de début: <?php echo $internship['date_debut']; ?></p>
-                        <p>Date de fin: <?php echo $internship['date_fin']; ?></p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?php echo $internship['id']; ?>" class="btn-primary">Voir les candidatures</a>
-                        <a href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?php echo $internship['id']; ?>" class="btn-warning">Modifier</a>
-                        <form action="" method="post" style="display: inline;">
-                            <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
-                            <button type="submit" name="delete_offre" class="btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">Supprimer</button>
-                        </form>
-                    </div>
-                </div>
+            <ul>
+            <?php foreach ($offres as $offre): ?>
+                <li>
+                    <h3><?php echo htmlspecialchars($offre['titre']); ?></h3>
+                    <p><?php echo htmlspecialchars($offre['description']); ?></p>
+                    <p>Date de début: <?php echo $offre['date_debut']; ?></p>
+                    <p>Date de fin: <?php echo $offre['date_fin']; ?></p>
+                    <a href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?php echo $offre['id']; ?>">Modifier</a>
+                    <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?php echo $offre['id']; ?>">Voir les candidatures</a>
+                </li>
             <?php endforeach; ?>
+            </ul>
         <?php endif; ?>
+
+        <a href="/Gestion_Stage/app/views/internships/post_internship.php" class="btn-primary">Publier une nouvelle offre de stage</a>
     </main>
 </body>
 </html>
+
