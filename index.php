@@ -140,6 +140,6 @@ $recent_internships = get_internships($pdo);
 
     </script>
 
-    <script src="../public/assets/js/script.js"></script> <!-- Mise à jour du chemin -->
+    <script src="./public/assets/js/script.js"></script> <!-- Mise à jour du chemin -->
 </body>
 </html>
