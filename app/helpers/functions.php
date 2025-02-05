@@ -21,8 +21,6 @@ function login($pdo, $identifier, $password) {
     return false;
 }
 
-
-
 // Fonction d'inscription
 function register($pdo, $username, $password, $email, $role) {
     try {
@@ -45,16 +43,11 @@ function register($pdo, $username, $password, $email, $role) {
 }
 
 // Fonction pour récupérer un utilisateur par son ID
-function get_user($pdo, $user_id, $role = null) {
+function get_user($pdo, $user_id, $table) {
     try {
-        if ($role) {
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = ?");
-            $stmt->execute([$user_id, $role]);
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->execute([$user_id]);
-        }
-        return $stmt->fetch();
+        $stmt = $pdo->prepare("SELECT * FROM $table WHERE id = ?");
+        $stmt->execute([$user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         error_log($e->getMessage());
         return false;
