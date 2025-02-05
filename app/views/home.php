@@ -113,8 +113,9 @@ if ($_SESSION['role'] == 'etudiant') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord</title>
+    <title>NeversStage - Mon espace</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container">

@@ -46,8 +46,9 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panneau Étudiant</title>
+    <title>NeversStage - Panneau Étudiant</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <header>
@@ -58,7 +59,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     
     <nav>
         <ul>
-            <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
+            <li><a href="/Gestion_Stage/app/views/home.php">🏠 Mon espace</a></li>
             <li><a href="/Gestion_Stage/app/views/profile.php">📋 Mon profil</a></li>
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
         </ul>

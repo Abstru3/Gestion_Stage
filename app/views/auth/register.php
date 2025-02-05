@@ -267,6 +267,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             Déjà inscrit ? <a href="login.php">Se connecter</a>
         </p>
     </div>
+
+    <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             updateForm();
