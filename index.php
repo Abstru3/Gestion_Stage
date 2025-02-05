@@ -28,7 +28,7 @@ $recent_internships = get_internships($pdo);
                     <a href="./app/views/home.php" class="btn btn-workspace"><i class="fas fa-user"></i> Mon Espace</a>
                     <a href="./app/views/auth/logout.php" class="btn btn-disconnect"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                     <?php if ($_SESSION['role'] === 'admin'): ?>
-                        <a href="./app/views/panels/admin_panel.php" class="nav-link"><i class="fas fa-cogs"></i> Panel Admin</a>
+                        <a href="./app/views/panels/admin_panel.php" class="btn btn-admin"><i class="fas fa-cogs"></i> Panel Admin</a>
                     <?php endif; ?>
                 <?php else: ?>
                     <a href="./app/views/auth/login.php" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Connexion</a>

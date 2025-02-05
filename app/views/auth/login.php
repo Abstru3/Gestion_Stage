@@ -51,5 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
         <p class="link-button">Pas encore inscrit ? <a href="/Gestion_Stage/app/views/auth/register.php">S'inscrire</a></p>
     </div>
+
+    <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
 </body>
 </html>

@@ -42,7 +42,7 @@ $users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetc
         <a href="#" class="navbar-brand text-center text-light">Admin Panel</a>
         <a href="#statistiques" class="active">Statistiques</a>
         <a href="#utilisateurs">Utilisateurs</a>
-        <a href="/Gestion_Stage/app/views/home.php">Accueil</a>
+        <a href="/Gestion_Stage/app/views/home.php">Espace personnel</a>
         <a href="/Gestion_Stage/app/views/auth/logout.php">Se déconnecter</a>
     </div>
 
@@ -147,7 +147,7 @@ $users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetc
             </script>
 
             <p class="text-center mt-4">
-                <a href="/Gestion_Stage/app/views/home.php" class="btn btn-primary">Retour à l'accueil</a>
+                <a href="/Gestion_Stage/app/views/home.php" class="btn btn-primary">Espace personnel</a>
             </p>
         </div>
     </div>
@@ -172,7 +172,7 @@ $users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetc
         });
     </script>
 
-    <div class="container mt-4">
+    <!-- <div class="container mt-4">
     <h1 class="text-center mb-4">Gestion des Rôles des Utilisateurs</h1>
 
     <div class="card p-4 shadow mt-4">
@@ -224,8 +224,7 @@ $users = $pdo->query("SELECT id, email, role FROM users ORDER BY id DESC")->fetc
             </tbody>
         </table>
     </div>
-</div>
-
+</div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

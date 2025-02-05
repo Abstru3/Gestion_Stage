@@ -39,5 +39,7 @@ $user = get_user($pdo, $_SESSION['user_id']);
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
         </ul>
     </nav>
+
+    <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
 </body>
 </html>

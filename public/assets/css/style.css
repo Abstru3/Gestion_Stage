@@ -1,3 +1,14 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --secondary-color-hover: #4ea8e4;
+    --accent-color-hover: #f26858;
+    --text-color: #333;
+    --light-gray: #f5f6fa;
+    --border-radius: 8px;
+}
+
 /* Base */
 * {
     margin: 0;
@@ -177,6 +188,23 @@ th {
 .btn-primary:hover {
     background: #2980b9;
     text-decoration: none;
+}
+
+.index-button {
+    position: fixed;
+    bottom: 2%;
+    left: 1%;
+    background: var(--secondary-color);
+    color: white;
+    transition: background 0.2s ease;
+    padding: 7px;
+    border-radius: 4px;
+}
+
+.index-button:hover {
+    text-decoration: none;
+    background: var(--secondary-color-hover);
+    transition: background 0.2s ease;
 }
 
 /* Responsive */

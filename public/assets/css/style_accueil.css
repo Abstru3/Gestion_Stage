@@ -179,7 +179,8 @@ body {
 }
 
 .btn-register,
-.btn-disconnect {
+.btn-disconnect,
+.btn-admin {
     background: var(--accent-color);
     color: white;
     transition: background 0.2s ease;
@@ -188,14 +189,13 @@ body {
 .btn-login:hover,
 .btn-workspace:hover {
     background: var(--secondary-color-hover);
-    color: white;
     transition: background 0.2s ease;
 }
 
 .btn-register:hover,
-.btn-disconnect:hover {
+.btn-disconnect:hover,
+.btn-admin:hover {
     background: var(--accent-color-hover);
-    color: white;
     transition: background 0.2s ease;
 }
 

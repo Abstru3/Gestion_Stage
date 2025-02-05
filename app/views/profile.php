@@ -41,6 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <button type="submit">Mettre à jour le profil</button>
     </form>
-    <p><a href="home.php">Retour à l'accueil</a></p>
+    <p><a class="index-button" href="home.php">Retour à l'accueil</a></p>
 </body>
 </html>
