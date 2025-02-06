@@ -67,36 +67,42 @@ $recent_internships = get_internships($pdo);
         </section>
 
         <section class="recent-offers">
-    <h2>Dernières offres de stages</h2>
-    <div class="offers-grid">
-        <?php if (!empty($recent_internships)): ?>
-            
-            <?php foreach ($recent_internships as $internship): ?>
-                <div class="offer-card">
-                    <div class="offer-header">
-                        <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                        <span class="company-name">
-                            <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
-                        </span>
-                    </div>
-                    <div class="offer-body">
-                        <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
-                        <div class="offer-details">
-                            <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
-                            <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>
-                            <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+        <h2>Dernières offres de stages</h2>
+        <div class="offers-grid">
+            <?php if (!empty($recent_internships)): ?>
+                
+                <?php foreach ($recent_internships as $internship): ?>
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="offer-header-content">
+                                <div>
+                                    <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
+                                    <span class="company-name">
+                                        <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
+                                    </span>
+                                </div>
+                                <?php if (!empty($internship['logo'])): ?>
+                                    <!-- <img src="/Gestion_Stage/<?php echo htmlspecialchars($internship['logo']); ?>" alt="Logo de l'entreprise" class="company-logo"> -->
+                                <?php endif; ?>
+                            </div>
                         </div>
-
+                        <div class="offer-body">
+                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
+                            <div class="offer-details">
+                                <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
+                                <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>
+                                <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+                            </div>
+                        </div>
+                        <div class="offer-footer">
+                            <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
+                        </div>
                     </div>
-                    <div class="offer-footer">
-                        <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>Aucune offre de stage disponible pour le moment.</p>
-        <?php endif; ?>
-    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Aucune offre de stage disponible pour le moment.</p>
+            <?php endif; ?>
+        </div>
     <div class="see-more">
         <a href="stages.php" class="btn btn-primary">Voir toutes les offres</a>
     </div>
@@ -115,7 +121,7 @@ $recent_internships = get_internships($pdo);
                 <ul>
                     <li><a href="stages.php">Offres de stages</a></li>
                     <li><a href="entreprises.php">Entreprises</a></li>
-                    <li><a href="contact.php">Contact</a></li>
+                    <li><a href="./app/views/a_propos.php">À propos</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -140,6 +146,6 @@ $recent_internships = get_internships($pdo);
 
     </script>
 
-    <script src="./public/assets/js/script.js"></script> <!-- Mise à jour du chemin -->
+    <script src="./public/assets/js/script.js"></script>
 </body>
 </html>
