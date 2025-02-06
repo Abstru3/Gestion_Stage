@@ -132,7 +132,7 @@ if ($_SESSION['role'] == 'etudiant') {
         <h1>Bienvenue, <?= htmlspecialchars($welcome_message) ?></h1>
         <nav>
     <ul>
-        <li><a href="profile.php">📋 Mon profil</a></li>
+        <li><a href="profile.php">👤 Mon profil</a></li>
         <?php if ($_SESSION['role'] == 'etudiant'): ?>
             <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
             <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>

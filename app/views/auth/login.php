@@ -38,9 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title>NeversStage - Connexion</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_login.css">
+    <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container">

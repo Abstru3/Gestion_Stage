@@ -43,14 +43,15 @@ $update_stmt->execute([':user_id' => $user_id]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boîte de réception</title>
+    <title>NeversStage - Boîte de réception</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container">
         <h1>Boîte de réception</h1>
         <?php if ($role === 'entreprise'): ?>
-            <a href="/Gestion_Stage/app/message/send-message.php" class="button">Envoyer un nouveau message</a>
+            <a href="/Gestion_Stage/app/message/send-message.php" class="btn button">Envoyer un nouveau message</a>
         <?php endif; ?>
         
         <?php if (empty($messages)): ?>
@@ -74,7 +75,7 @@ $update_stmt->execute([':user_id' => $user_id]);
             </ul>
         <?php endif; ?>
         
-        <a href="/Gestion_Stage/app/views/home.php">Retour à l'accueil</a>
+        <a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a>
     </div>
 </body>
 </html>

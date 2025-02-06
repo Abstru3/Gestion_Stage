@@ -120,7 +120,7 @@ $recent_internships = get_internships($pdo);
             </div>
             <div class="footer-section">
                 <h3>Contact</h3>
-                <p><i class="fas fa-envelope"></i> contact@stagespro.fr</p>
+                <p><i class="fas fa-envelope"></i> contact@neversstage.fr</p>
                 <p><i class="fas fa-phone"></i> +33 1 23 45 67 89</p>
             </div>
         </div>

@@ -61,8 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voir les candidatures</title>
+    <title>NeversStage - Voir les candidatures</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <h1>Candidatures pour l'offre de stage</h1>
@@ -105,6 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </ul>
     <?php endif; ?>
 
-    <p><a href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></p>
+    <p><a class="index-button" href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></p>
 </body>
 </html>

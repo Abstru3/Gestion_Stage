@@ -18,8 +18,9 @@ $roles = $stmt_roles->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Rôles - Panel Admin</title>
+    <title>NeversStage - Gestion des Rôles</title>
     <link rel="stylesheet" href="assets/css/style_admin.css">
+    <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container mt-5">

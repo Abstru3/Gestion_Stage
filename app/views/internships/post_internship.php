@@ -83,8 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publier une offre de stage</title>
+    <title>NeversStage - Publier une offre de stage</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <header>
@@ -95,9 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     <nav>
         <ul>
-            <li><a class="index-button" href="/Gestion_Stage/app/views/panels/company_panel.php">Retour au panneau entreprise</a></li>
-            <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">Gérer les candidatures</a></li>
-            <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
+            <li><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a></li>
+            <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">📋 Gérer les candidatures</a></li>
+            <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
         </ul>
     </nav>
 

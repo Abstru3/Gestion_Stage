@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Mettre à jour le profil</button>
         </form>
 
-        <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'accueil</a></p>
+        <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a></p>
     </div>
 </body>
 </html>

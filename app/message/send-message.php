@@ -58,8 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Envoyer un Message</title>
+    <title>NeversStage - Envoyer un message</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container">
@@ -81,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <button type="submit">Envoyer le message</button>
         </form>
-        <a href="/Gestion_Stage/app/message/inbox.php">Retour à la boîte de réception</a>
+        <a class="index-button" href="/Gestion_Stage/app/message/inbox.php">Retour à la boîte de réception</a>
     </div>
 </body>
 </html>
