@@ -356,39 +356,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             formContent.innerHTML = commonFields + specificFields;
         }
 
-<<<<<<< Updated upstream
-        <form action="" method="post">
-            <div class="form-section">
-                <div class="form-group">
-                    <label for="role">Je suis :</label>
-                    <select id="role" name="role" required onchange="updateForm()">
-                        <option value="etudiant" <?= (isset($_POST['role']) && $_POST['role'] == "etudiant") ? "selected" : "" ?>>Un étudiant</option>
-                        <option value="entreprise" <?= (isset($_POST['role']) && $_POST['role'] == "entreprise") ? "selected" : "" ?>>Une entreprise</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="dynamic-form-content"></div>
-            
-            <input type="hidden" name="honeypot">
-            <button type="submit">Créer mon compte</button>
-        </form>
-
-        <p class="link-button">
-            Déjà inscrit ? <a href="login.php">Se connecter</a>
-        </p>
-    </div>
-
-    <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            updateForm();
-        });
-=======
         // Initial call to update the form based on the role selected
         updateForm();
->>>>>>> Stashed changes
     </script>
 </body>
 </html>

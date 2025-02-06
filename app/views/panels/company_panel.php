@@ -24,7 +24,6 @@ $offres = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panneau Entreprise</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
-    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_company_panel.css">
 </head>
 <body>
     <header>
@@ -35,15 +34,9 @@ $offres = $stmt->fetchAll();
     
     <nav>
         <ul>
-<<<<<<< Updated upstream
-            <li><a href="/Gestion_Stage/app/views/home.php">Mon espace</a></li>
-            <li><a href="/Gestion_Stage/app/views/profile.php">Mon profil</a></li>
-            <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
-=======
             <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
             <li><a href="/Gestion_Stage/app/views/profile.php">📋 Mon profil</a></li>
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
->>>>>>> Stashed changes
         </ul>
     </nav>
 
@@ -54,22 +47,20 @@ $offres = $stmt->fetchAll();
         <?php else: ?>
             <ul>
             <?php foreach ($offres as $offre): ?>
-                <li class="company-offer">
+                <li>
                     <h3><?php echo htmlspecialchars($offre['titre']); ?></h3>
                     <p><?php echo htmlspecialchars($offre['description']); ?></p>
                     <p>Date de début: <?php echo $offre['date_debut']; ?></p>
                     <p>Date de fin: <?php echo $offre['date_fin']; ?></p>
-                    <a class="modify-btn" href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?php echo $offre['id']; ?>">Modifier</a>
-                    <a class="see-btn" href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?php echo $offre['id']; ?>">Voir les candidatures</a>
+                    <a href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?php echo $offre['id']; ?>">Modifier</a>
+                    <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?php echo $offre['id']; ?>">Voir les candidatures</a>
                 </li>
             <?php endforeach; ?>
             </ul>
         <?php endif; ?>
 
-        <a href="/Gestion_Stage/app/views/internships/post_internship.php" class="btn btn-primary">Publier une nouvelle offre de stage</a>
+        <a href="/Gestion_Stage/app/views/internships/post_internship.php" class="btn-primary">Publier une nouvelle offre de stage</a>
     </main>
-
-    <p><a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a></p>
 </body>
 </html>
 
