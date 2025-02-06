@@ -35,9 +35,15 @@ $offres = $stmt->fetchAll();
     
     <nav>
         <ul>
+<<<<<<< Updated upstream
             <li><a href="/Gestion_Stage/app/views/home.php">Mon espace</a></li>
             <li><a href="/Gestion_Stage/app/views/profile.php">Mon profil</a></li>
             <li><a href="/Gestion_Stage/app/views/auth/logout.php">Déconnexion</a></li>
+=======
+            <li><a href="/Gestion_Stage/app/views/home.php">Accueil</a></li>
+            <li><a href="/Gestion_Stage/app/views/profile.php">📋 Mon profil</a></li>
+            <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
+>>>>>>> Stashed changes
         </ul>
     </nav>
 

@@ -1,7 +1,17 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-session_start();
+
+// Débogage : afficher les informations de session
+error_log("Session data in home.php: " . print_r($_SESSION, true));
+
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
+    error_log("User not logged in, redirecting to login page");
+    header("Location: /Gestion_Stage/app/views/auth/login.php");
+    exit();
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
@@ -121,19 +131,22 @@ if ($_SESSION['role'] == 'etudiant') {
     <div class="container">
         <h1>Bienvenue, <?= htmlspecialchars($welcome_message) ?></h1>
         <nav>
-            <ul>
-                <li><a href="profile.php">📋 Mon profil</a></li>
-                <?php if ($_SESSION['role'] == 'etudiant'): ?>
-                    <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
-                <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
-                    <li><a href="/Gestion_Stage/app/views/internships/post_internship.php">➕ Publier une offre</a></li>
-                    <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">📋 Gérer candidatures</a></li>
-                <?php elseif ($_SESSION['role'] == 'admin'): ?>
-                    <li><a href="/Gestion_Stage/app/views/panels/admin_panel.php">🛠️ Panel Admin</a></li>
-                <?php endif; ?>
-                <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
-            </ul>
-        </nav>
+    <ul>
+        <li><a href="profile.php">📋 Mon profil</a></li>
+        <?php if ($_SESSION['role'] == 'etudiant'): ?>
+            <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
+            <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>
+        <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
+            <li><a href="/Gestion_Stage/app/views/internships/post_internship.php">➕ Publier une offre</a></li>
+            <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">📋 Gérer candidatures</a></li>
+            <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>
+        <?php elseif ($_SESSION['role'] == 'admin'): ?>
+            <li><a href="/Gestion_Stage/app/views/panels/admin_panel.php">🛠️ Panel Admin</a></li>
+        <?php endif; ?>
+        <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
+    </ul>
+</nav>
+
 
         <div class="dashboard-grid">
             <?php if ($_SESSION['role'] == 'etudiant'): ?>

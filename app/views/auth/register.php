@@ -2,24 +2,35 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-// Définition des constantes pour les messages d'erreur
-define('ERROR_REQUIRED_FIELDS', "Tous les champs doivent être remplis.");
+// Redirection si déjà connecté
+if (isset($_SESSION['user_id'])) {
+    header('Location: dashboard.php');
+    exit();
+}
+
+// Définition des constantes pour les messages
+define('ERROR_REQUIRED_FIELDS', "Tous les champs obligatoires doivent être remplis.");
 define('ERROR_INVALID_EMAIL', "Adresse email invalide.");
 define('ERROR_EMAIL_EXISTS', "Cet email est déjà utilisé.");
+define('ERROR_USERNAME_EXISTS', "Ce nom d'utilisateur est déjà utilisé.");
 define('ERROR_PASSWORD_REQUIREMENTS', "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.");
 define('ERROR_PASSWORD_MISMATCH', "Les mots de passe ne correspondent pas.");
 define('ERROR_INVALID_SIRET', "Le numéro SIRET doit contenir exactement 14 chiffres.");
+define('ERROR_INVALID_PHONE', "Le format du numéro de téléphone est invalide.");
+define('ERROR_INVALID_URL', "L'URL du site web n'est pas valide.");
+define('ERROR_FIELD_TOO_LONG', "Le champ %s ne doit pas dépasser %d caractères.");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $username = trim(htmlspecialchars($_POST['username'] ?? ''));
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_STRING);
-    $honeypot = filter_input(INPUT_POST, 'honeypot', FILTER_SANITIZE_STRING);
+    $role = trim(htmlspecialchars($_POST['role'] ?? ''));
+    $honeypot = $_POST['honeypot'] ?? '';
     $errors = [];
 
     // Vérification du champ honeypot (anti-robots)
@@ -32,16 +43,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = ERROR_REQUIRED_FIELDS;
     }
 
+    // Vérification des longueurs maximales
+    $maxLengths = [
+        'username' => 100,
+        'email' => 255,
+        'nom' => 50,
+        'prenom' => 50,
+        'nom_entreprise' => 100,
+        'description' => 1000,
+        'adresse_facturation' => 255,
+        'nom_contact' => 100,
+        'telephone' => 20,
+        'site_web' => 255
+    ];
+
+    foreach ($maxLengths as $field => $maxLength) {
+        if (!empty($_POST[$field]) && strlen($_POST[$field]) > $maxLength) {
+            $errors[] = sprintf(ERROR_FIELD_TOO_LONG, $field, $maxLength);
+        }
+    }
+
     // Vérification de l'email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = ERROR_INVALID_EMAIL;
     }
 
-    // Vérification de l'unicité de l'email
-    $stmt = $pdo->prepare("SELECT id FROM " . ($role === 'etudiant' ? 'etudiants' : 'entreprises') . " WHERE email = ?");
-    $stmt->execute([$email]);
-    if ($stmt->fetch()) {
+    // Vérification de l'unicité de l'email et du username
+    $stmt_email = $pdo->prepare("SELECT 'etudiant' as type FROM etudiants WHERE email = ? 
+                                UNION SELECT 'entreprise' as type FROM entreprises WHERE email = ?");
+    $stmt_email->execute([$email, $email]);
+    
+    $stmt_username = $pdo->prepare("SELECT 'etudiant' as type FROM etudiants WHERE username = ? 
+                                   UNION SELECT 'entreprise' as type FROM entreprises WHERE username = ?");
+    $stmt_username->execute([$username, $username]);
+
+    if ($stmt_email->fetch()) {
         $errors[] = ERROR_EMAIL_EXISTS;
+    }
+    if ($stmt_username->fetch()) {
+        $errors[] = ERROR_USERNAME_EXISTS;
     }
 
     // Vérification du mot de passe
@@ -49,7 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = ERROR_PASSWORD_REQUIREMENTS;
     }
 
-    // Vérification de la confirmation du mot de passe
     if ($password !== $confirm_password) {
         $errors[] = ERROR_PASSWORD_MISMATCH;
     }
@@ -62,42 +101,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo->beginTransaction();
 
             if ($role === 'etudiant') {
-                $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_STRING);
-                $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_STRING);
+                $nom = trim(htmlspecialchars($_POST['nom'] ?? ''));
+                $prenom = trim(htmlspecialchars($_POST['prenom'] ?? ''));
 
                 if (empty($nom) || empty($prenom)) {
                     throw new Exception(ERROR_REQUIRED_FIELDS);
                 }
 
-                $stmt = $pdo->prepare("INSERT INTO etudiants (username, email, password, nom, prenom) VALUES (?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO etudiants (username, email, password, nom, prenom) 
+                                     VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$username, $email, $hashed_password, $nom, $prenom]);
-            } elseif ($role === 'entreprise') {
-                $nom_entreprise = filter_input(INPUT_POST, 'nom_entreprise', FILTER_SANITIZE_STRING);
-                $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
-                $adresse_facturation = filter_input(INPUT_POST, 'adresse_facturation', FILTER_SANITIZE_STRING);
-                $nom_contact = filter_input(INPUT_POST, 'nom_contact', FILTER_SANITIZE_STRING);
-                $telephone = filter_input(INPUT_POST, 'telephone', FILTER_SANITIZE_STRING);
-                $site_web = filter_input(INPUT_POST, 'site_web', FILTER_SANITIZE_URL);
-                $tva_intracommunautaire = filter_input(INPUT_POST, 'tva_intracommunautaire', FILTER_SANITIZE_STRING);
-                $siret = filter_input(INPUT_POST, 'siret', FILTER_SANITIZE_STRING);
 
+            } elseif ($role === 'entreprise') {
+                $nom_entreprise = trim(htmlspecialchars($_POST['nom_entreprise'] ?? ''));
+                $description = trim(htmlspecialchars($_POST['description'] ?? ''));
+                $adresse_facturation = trim(htmlspecialchars($_POST['adresse_facturation'] ?? ''));
+                $nom_contact = trim(htmlspecialchars($_POST['nom_contact'] ?? ''));
+                $telephone = trim(htmlspecialchars($_POST['telephone'] ?? ''));
+                $site_web = filter_input(INPUT_POST, 'site_web', FILTER_SANITIZE_URL);
+                $tva_intracommunautaire = trim(htmlspecialchars($_POST['tva_intracommunautaire'] ?? ''));
+                $siret = trim(htmlspecialchars($_POST['siret'] ?? ''));
+
+                // Validations supplémentaires
                 if (empty($nom_entreprise) || empty($description) || empty($adresse_facturation) || empty($siret)) {
                     throw new Exception(ERROR_REQUIRED_FIELDS);
                 }
 
-                // Vérification du format SIRET
                 if (!preg_match('/^[0-9]{14}$/', $siret)) {
                     throw new Exception(ERROR_INVALID_SIRET);
                 }
 
-                $stmt = $pdo->prepare("INSERT INTO entreprises (username, email, password, nom, description, adresse_facturation, nom_contact, telephone, site_web, tva_intracommunautaire, siret) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$username, $email, $hashed_password, $nom_entreprise, $description, $adresse_facturation, $nom_contact, $telephone, $site_web, $tva_intracommunautaire, $siret]);
+                if (!empty($telephone) && !preg_match("/^[0-9]{10}$/", str_replace(' ', '', $telephone))) {
+                    throw new Exception(ERROR_INVALID_PHONE);
+                }
+
+                if (!empty($site_web) && !filter_var($site_web, FILTER_VALIDATE_URL)) {
+                    throw new Exception(ERROR_INVALID_URL);
+                }
+
+                $stmt = $pdo->prepare("INSERT INTO entreprises (username, email, password, nom, description, 
+                                     adresse_facturation, nom_contact, telephone, site_web, 
+                                     tva_intracommunautaire, siret) 
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $username, $email, $hashed_password, $nom_entreprise, $description,
+                    $adresse_facturation, $nom_contact, $telephone, $site_web,
+                    $tva_intracommunautaire, $siret
+                ]);
             }
 
             $pdo->commit();
-            $_SESSION['success'] = "Inscription réussie ! Connectez-vous.";
+            $_SESSION['success'] = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
             header("Location: login.php");
             exit();
+
         } catch (Exception $e) {
             $pdo->rollBack();
             $errors[] = $e->getMessage();
@@ -113,22 +170,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription - Gestion des Stages</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_register.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Créer un compte</h1>
+        
+        <?php if (!empty($errors)): ?>
+            <div class="errors">
+                <?php foreach ($errors as $error): ?>
+                    <p><?php echo htmlspecialchars($error); ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="" method="post" novalidate>
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="role">Je suis :</label>
+                    <select id="role" name="role" required onchange="updateForm()">
+                        <option value="etudiant" <?= (isset($_POST['role']) && $_POST['role'] == "etudiant") ? "selected" : "" ?>>Un étudiant</option>
+                        <option value="entreprise" <?= (isset($_POST['role']) && $_POST['role'] == "entreprise") ? "selected" : "" ?>>Une entreprise</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="dynamic-form-content"></div>
+            
+            <input type="hidden" name="honeypot">
+            <button type="submit">Créer mon compte</button>
+        </form>
+
+        <p class="link-button">
+            Déjà inscrit ? <a href="login.php">Se connecter</a>
+        </p>
+    </div>
+
     <script>
         function updateForm() {
             const role = document.getElementById("role").value;
             const formContent = document.getElementById("dynamic-form-content");
 
-            // Récupérer les valeurs précédentes avec PHP
-            const email = `<?= htmlspecialchars($_POST['email'] ?? '') ?>`;
-            const username = `<?= htmlspecialchars($_POST['username'] ?? '') ?>`;
-            const nom = `<?= htmlspecialchars($_POST['nom'] ?? '') ?>`;
-            const prenom = `<?= htmlspecialchars($_POST['prenom'] ?? '') ?>`;
-            const nom_entreprise = `<?= htmlspecialchars($_POST['nom_entreprise'] ?? '') ?>`;
-            const description = `<?= htmlspecialchars($_POST['description'] ?? '') ?>`;
-            const adresse_facturation = `<?= htmlspecialchars($_POST['adresse_facturation'] ?? '') ?>`;
-            const nom_contact = `<?= htmlspecialchars($_POST['nom_contact'] ?? '') ?>`;
-            const telephone = `<?= htmlspecialchars($_POST['telephone'] ?? '') ?>`;
-            const site_web = `<?= htmlspecialchars($_POST['site_web'] ?? '') ?>`;
+            // Récupération des valeurs précédentes
+            const previousValues = {
+                email: <?= json_encode(htmlspecialchars($_POST['email'] ?? '')) ?>,
+                username: <?= json_encode(htmlspecialchars($_POST['username'] ?? '')) ?>,
+                nom: <?= json_encode(htmlspecialchars($_POST['nom'] ?? '')) ?>,
+                prenom: <?= json_encode(htmlspecialchars($_POST['prenom'] ?? '')) ?>,
+                nom_entreprise: <?= json_encode(htmlspecialchars($_POST['nom_entreprise'] ?? '')) ?>,
+                description: <?= json_encode(htmlspecialchars($_POST['description'] ?? '')) ?>,
+                adresse_facturation: <?= json_encode(htmlspecialchars($_POST['adresse_facturation'] ?? '')) ?>,
+                nom_contact: <?= json_encode(htmlspecialchars($_POST['nom_contact'] ?? '')) ?>,
+                telephone: <?= json_encode(htmlspecialchars($_POST['telephone'] ?? '')) ?>,
+                site_web: <?= json_encode(htmlspecialchars($_POST['site_web'] ?? '')) ?>,
+                siret: <?= json_encode(htmlspecialchars($_POST['siret'] ?? '')) ?>
+            };
 
             // Champs communs
             const commonFields = `
@@ -136,14 +231,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <h2>Informations de connexion</h2>
                     <div class="form-group">
                         <label for="email">Email professionnel :</label>
-                        <input type="email" id="email" name="email" required value="${email}"
-                               placeholder="votre.email@exemple.com">
+                        <input type="email" id="email" name="email" required 
+                               value="${previousValues.email}"
+                               placeholder="votre.email@exemple.com"
+                               maxlength="255">
                     </div>
                     
                     <div class="form-group">
                         <label for="username">Nom d'utilisateur :</label>
-                        <input type="text" id="username" name="username" required value="${username}"
-                               placeholder="Choisissez un nom d'utilisateur">
+                        <input type="text" id="username" name="username" required 
+                               value="${previousValues.username}"
+                               placeholder="Choisissez un nom d'utilisateur"
+                               maxlength="100">
                     </div>
 
                     <div class="form-group">
@@ -169,14 +268,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <h2>Informations personnelles</h2>
                         <div class="form-group">
                             <label for="nom">Nom :</label>
-                            <input type="text" id="nom" name="nom" required value="${nom}"
-                                   placeholder="Votre nom de famille">
+                            <input type="text" id="nom" name="nom" required 
+                                   value="${previousValues.nom}"
+                                   placeholder="Votre nom de famille"
+                                   maxlength="50">
                         </div>
 
                         <div class="form-group">
                             <label for="prenom">Prénom :</label>
-                            <input type="text" id="prenom" name="prenom" required value="${prenom}"
-                                   placeholder="Votre prénom">
+                            <input type="text" id="prenom" name="prenom" required 
+                                   value="${previousValues.prenom}"
+                                   placeholder="Votre prénom"
+                                   maxlength="50">
                         </div>
                     </div>
                 `;
@@ -186,45 +289,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <h2>Informations de l'entreprise</h2>
                         <div class="form-group">
                             <label for="nom_entreprise">Raison sociale :</label>
-                            <input type="text" id="nom_entreprise" name="nom_entreprise" required value="${nom_entreprise}"
-                                   placeholder="Nom de votre entreprise">
+                            <input type="text" id="nom_entreprise" name="nom_entreprise" required 
+                                   value="${previousValues.nom_entreprise}"
+                                   placeholder="Nom de votre entreprise"
+                                   maxlength="100">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Présentation de l'entreprise :</label>
                             <textarea id="description" name="description" required 
-                                    placeholder="Décrivez brièvement votre entreprise">${description}</textarea>
+                                    placeholder="Décrivez brièvement votre entreprise"
+                                    maxlength="1000">${previousValues.description}</textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="adresse_facturation">Adresse de facturation :</label>
                             <input type="text" id="adresse_facturation" name="adresse_facturation" 
-                                   required value="${adresse_facturation}" placeholder="Adresse complète">
+                                   required value="${previousValues.adresse_facturation}" 
+                                   placeholder="Adresse complète"
+                                   maxlength="255">
                         </div>
 
-                        <div class="form-group">
-                            <label for="nom_contact">Personne à contacter :</label>
-                            <input type="text" id="nom_contact" name="nom_contact" 
-                                   value="${nom_contact}" placeholder="Nom et prénom">
-                        </div>
-
-                        <div class="form-group">
+                                                <div class="form-group">
                             <label for="siret">SIRET :</label>
                             <input type="text" id="siret" name="siret" required 
-                                   value="<?= htmlspecialchars($_POST['siret'] ?? '') ?>" 
-                                   placeholder="Numéro SIRET (14 chiffres)">
+                                   value="${previousValues.siret}" 
+                                   placeholder="Numéro SIRET (14 chiffres)"
+                                   maxlength="14">
                         </div>
 
                         <div class="form-group">
-                            <label for="telephone">Téléphone :</label>
+                            <label for="nom_contact">Nom du contact :</label>
+                            <input type="text" id="nom_contact" name="nom_contact" 
+                                   value="${previousValues.nom_contact}" 
+                                   placeholder="Nom du contact au sein de l'entreprise" 
+                                   maxlength="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telephone">Numéro de téléphone :</label>
                             <input type="tel" id="telephone" name="telephone" 
-                                   value="${telephone}" placeholder="01 23 45 67 89">
+                                   value="${previousValues.telephone}" 
+                                   placeholder="Numéro de téléphone" 
+                                   maxlength="20">
                         </div>
 
                         <div class="form-group">
-                            <label for="site_web">Site Web :</label>
+                            <label for="site_web">Site web :</label>
                             <input type="url" id="site_web" name="site_web" 
-                                   value="${site_web}" placeholder="https://www.exemple.com">
+                                   value="${previousValues.site_web}" 
+                                   placeholder="www.votre-site.com" 
+                                   maxlength="255">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tva_intracommunautaire">Numéro de TVA intracommunautaire :</label>
+                            <input type="text" id="tva_intracommunautaire" name="tva_intracommunautaire" 
+                                   value="${previousValues.tva_intracommunautaire}" 
+                                   placeholder="Numéro de TVA" 
+                                   maxlength="20">
                         </div>
                     </div>
                 `;
@@ -232,20 +355,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             formContent.innerHTML = commonFields + specificFields;
         }
-    </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Créer un compte</h1>
-        
-        <?php if (!empty($errors)): ?>
-            <div class="errors">
-                <?php foreach ($errors as $error): ?>
-                    <p><?php echo htmlspecialchars($error); ?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
 
+<<<<<<< Updated upstream
         <form action="" method="post">
             <div class="form-section">
                 <div class="form-group">
@@ -274,6 +385,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         document.addEventListener('DOMContentLoaded', function() {
             updateForm();
         });
+=======
+        // Initial call to update the form based on the role selected
+        updateForm();
+>>>>>>> Stashed changes
     </script>
 </body>
 </html>

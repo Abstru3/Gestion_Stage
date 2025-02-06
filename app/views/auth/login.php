@@ -14,6 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
+        $_SESSION['username'] = $user['username']; // Ajoutez cette ligne
+
+        // Ajoutez ces lignes pour le débogage
+        error_log("User logged in: " . print_r($_SESSION, true));
 
         if ($_SESSION['role'] == 'admin') {
             header("Location: /Gestion_Stage/app/views/panels/admin_panel.php");
@@ -23,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     } else {
         $error = "Identifiant ou mot de passe incorrect.";
+        // Ajoutez cette ligne pour le débogage
+        error_log("Login failed for user: " . $identifier);
     }
 }
 ?>
