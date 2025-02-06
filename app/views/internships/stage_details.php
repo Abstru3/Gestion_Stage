@@ -28,10 +28,11 @@ if (!$internship) {
     <title><?php echo htmlspecialchars($internship['titre']); ?> - Détails du Stage</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_stage_details.css">
 </head>
 <body>
     <header>
-        <a href="/Gestion_Stage/index.php" class="btn btn-back"><i class="fas fa-arrow-left"></i> Retour</a>
+        
     </header>
 
     <main>
@@ -51,8 +52,9 @@ if (!$internship) {
         </section>
     </main>
 
+    <a href="/Gestion_Stage/index.php" class="btn index-button"><i class="fas fa-arrow-left"></i> Retour</a>
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
+        <p class="rights-reserved">&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
     </footer>
 </body>
 </html>

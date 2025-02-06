@@ -1,0 +1,42 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --secondary-color-hover: #4ea8e4;
+    --accent-color-hover: #f26858;
+    --text-color: #333;
+    --light-gray: #f5f6fa;
+    --border-radius: 8px;
+}
+
+.modify-btn,
+.see-btn {
+    padding: 5px;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+}
+
+.modify-btn:hover,
+.see-btn:hover {
+    transition: background-color 0.2s ease;
+    background-color: var(--secondary-color-hover);
+    color: white;
+    text-decoration: none;
+}
+
+.company-offer {
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    background-color: #fafafa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.company-offer:hover {
+    transition: background-color 0.3s ease;
+    background-color: #f3f3f3;
+}

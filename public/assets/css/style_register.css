@@ -144,7 +144,7 @@ button:hover {
     left: 1%;
     background: var(--secondary-color);
     color: white;
-    transition: background 0.2s ease;
+    transition: background-color 0.2s ease;
     padding: 7px;
     border-radius: 4px;
 }
@@ -152,5 +152,5 @@ button:hover {
 .index-button:hover {
     text-decoration: none;
     background: var(--secondary-color-hover);
-    transition: background 0.2s ease;
+    transition: background-color 0.2s ease;
 }

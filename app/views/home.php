@@ -225,7 +225,7 @@ if ($_SESSION['role'] == 'etudiant') {
             </div>
         </div>
 
-        <a href="/Gestion_Stage/index.php" class="btn btn-secondary">Retour menu</a>
+        <p><a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a></p>
     </div>
 </body>
 </html>

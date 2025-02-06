@@ -89,7 +89,7 @@ $recent_internships = get_internships($pdo);
 
                     </div>
                     <div class="offer-footer">
-                        <a href="/Gestion_Stage/app/views/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
+                        <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
                     </div>
                 </div>
             <?php endforeach; ?>
