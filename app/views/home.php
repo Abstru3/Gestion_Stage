@@ -126,6 +126,7 @@ if ($_SESSION['role'] == 'etudiant') {
     <title>NeversStage - Mon espace</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -147,98 +148,138 @@ if ($_SESSION['role'] == 'etudiant') {
     </ul>
 </nav>
 
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="notification success">
+        <?= htmlspecialchars($_SESSION['success']) ?>
+        <?php unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
 
-        <div class="dashboard-grid">
-            <?php if ($_SESSION['role'] == 'etudiant'): ?>
-                <div class="dashboard-card">
-                    <h3>Mes Candidatures</h3>
-                    <p>Total : <?= $dashboard_data['total_candidatures'] ?></p>
-                    <p>En cours : <?= $dashboard_data['candidatures_en_cours'] ?></p>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Dernières Candidatures</h3>
-                    <ul class="dashboard-list">
-                        <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
-                            <li>
-                                <?= htmlspecialchars($candidature['titre']) ?> - 
-                                <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
-                                    <?= $candidature['statut'] ?>
-                                </span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Offres Recommandées</h3>
-                    <ul class="dashboard-list">
-                        <?php foreach($dashboard_data['offres_recommandees'] as $offre): ?>
-                            <li>
-                                <?= htmlspecialchars($offre['titre']) ?> 
-                                <small>(<?= date('d/m/Y', strtotime($offre['date_debut'])) ?> - <?= date('d/m/Y', strtotime($offre['date_fin'])) ?>)</small>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
-                <div class="dashboard-card">
-                    <h3>Mes Offres</h3>
-                    <p>Total : <?= $dashboard_data['total_offres'] ?></p>
-                    <p>Candidatures : <?= $dashboard_data['candidatures_recues'] ?></p>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Dernières Candidatures</h3>
-                    <ul class="dashboard-list">
-                        <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
-                            <li>
-                                <?= htmlspecialchars($candidature['nom'] . ' ' . $candidature['prenom']) ?> 
-                                - <?= htmlspecialchars($candidature['titre']) ?>
-                                <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
-                                    <?= $candidature['statut'] ?>
-                                </span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php elseif ($_SESSION['role'] == 'admin'): ?>
-                <div class="dashboard-card">
-                    <h3>Utilisateurs</h3>
-                    <p>Étudiants : <?= $dashboard_data['total_etudiants'] ?></p>
-                    <p>Entreprises : <?= $dashboard_data['total_entreprises'] ?></p>
-                    <p>Offres : <?= $dashboard_data['offres_actives'] ?></p>
-                    <p>Candidatures : <?= $dashboard_data['candidatures_totales'] ?></p>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Derniers Utilisateurs</h3>
-                    <ul class="dashboard-list">
-                        <?php foreach($dashboard_data['derniers_utilisateurs'] as $utilisateur): ?>
-                            <li>
-                                <?= htmlspecialchars($utilisateur['type']) ?> : 
-                                <?= htmlspecialchars($utilisateur['nom'] . ' ' . $utilisateur['prenom']) ?>
-                                <small>(<?= date('d/m/Y', strtotime($utilisateur['date_inscription'])) ?>)</small>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Dernières Offres</h3>
-                    <ul class="dashboard-list">
-                        <?php foreach($dashboard_data['dernieres_offres'] as $offre): ?>
-                            <li>
-                                <?= htmlspecialchars($offre['titre']) ?> 
-                                <small>par <?= htmlspecialchars($offre['entreprise']) ?></small>
-                                <br><small><?= date('d/m/Y', strtotime($offre['date_debut'])) ?></small>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
+<?php if (isset($_SESSION['error'])): ?>
+    <div class="notification error">
+        <?= htmlspecialchars($_SESSION['error']) ?>
+        <?php unset($_SESSION['error']); ?>
+    </div>
+<?php endif; ?>
+
+
+    <div class="dashboard-grid">
+        <?php if ($_SESSION['role'] == 'etudiant'): ?>
             <div class="dashboard-card">
-                <h3>Date</h3>
-                <p><?= strftime('%A %d %B %Y') ?></p>
+                <h3>Mes Candidatures</h3>
+                <p>Total : <?= $dashboard_data['total_candidatures'] ?></p>
+                <p>En cours : <?= $dashboard_data['candidatures_en_cours'] ?></p>
             </div>
+            <div class="dashboard-card">
+                <h3>Dernières Candidatures</h3>
+                <ul class="dashboard-list">
+                    <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
+                        <li>
+                            <?= htmlspecialchars($candidature['titre']) ?> - 
+                            <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
+                                <?= $candidature['statut'] ?>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div class="dashboard-card">
+                <h3>Offres Recommandées</h3>
+                <ul class="dashboard-list">
+                    <?php foreach($dashboard_data['offres_recommandees'] as $offre): ?>
+                        <li>
+                            <?= htmlspecialchars($offre['titre']) ?> 
+                            <small>(<?= date('d/m/Y', strtotime($offre['date_debut'])) ?> - <?= date('d/m/Y', strtotime($offre['date_fin'])) ?>)</small>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
+            <div class="dashboard-card">
+                <h3>Mes Offres</h3>
+                <p>Total : <?= $dashboard_data['total_offres'] ?></p>
+                <p>Candidatures : <?= $dashboard_data['candidatures_recues'] ?></p>
+            </div>
+            <div class="dashboard-card">
+                <h3>Dernières Candidatures</h3>
+                <ul class="dashboard-list">
+                    <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
+                        <li>
+                            <?= htmlspecialchars($candidature['nom'] . ' ' . $candidature['prenom']) ?> 
+                            - <?= htmlspecialchars($candidature['titre']) ?>
+                            <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
+                                <?= $candidature['statut'] ?>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php elseif ($_SESSION['role'] == 'admin'): ?>
+            <div class="dashboard-card">
+                <h3>Utilisateurs</h3>
+                <p>Étudiants : <?= $dashboard_data['total_etudiants'] ?></p>
+                <p>Entreprises : <?= $dashboard_data['total_entreprises'] ?></p>
+                <p>Offres : <?= $dashboard_data['offres_actives'] ?></p>
+                <p>Candidatures : <?= $dashboard_data['candidatures_totales'] ?></p>
+            </div>
+            <div class="dashboard-card">
+                <h3>Derniers Utilisateurs</h3>
+                <ul class="dashboard-list">
+                    <?php foreach($dashboard_data['derniers_utilisateurs'] as $utilisateur): ?>
+                        <li>
+                            <?= htmlspecialchars($utilisateur['type']) ?> : 
+                            <?= htmlspecialchars($utilisateur['nom'] . ' ' . $utilisateur['prenom']) ?>
+                            <small>(<?= date('d/m/Y', strtotime($utilisateur['date_inscription'])) ?>)</small>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div class="dashboard-card">
+                <h3>Dernières Offres</h3>
+                <ul class="dashboard-list">
+                    <?php foreach($dashboard_data['dernieres_offres'] as $offre): ?>
+                        <li>
+                            <?= htmlspecialchars($offre['titre']) ?> 
+                            <small>par <?= htmlspecialchars($offre['entreprise']) ?></small>
+                            <br><small><?= date('d/m/Y', strtotime($offre['date_debut'])) ?></small>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+        <div class="dashboard-card">
+            <h3>Date</h3>
+            <p><?= strftime('%A %d %B %Y') ?></p>
         </div>
+    </div>
 
         <p><a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a></p>
     </div>
+
+    <button class="feedback-button" onclick="document.getElementById('feedback-modal').style.display='block'">
+        <i class="fas fa-comment-alt"></i>
+    </button>
+
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('feedback-modal').style.display='none'">&times;</span>
+            <h2>Votre avis compte</h2>
+            <p>Donnez votre avis sur notre site.</p>
+            <form action="/Gestion_Stage/app/views/feedback/submit_feedback.php" method="post">
+                <input type="hidden" name="user_name" value="<?= htmlspecialchars($welcome_message) ?>">
+                <input type="hidden" name="role" value="<?= htmlspecialchars($_SESSION['role']) ?>">
+                <textarea name="feedback" placeholder="Votre avis..." required></textarea>
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('feedback-modal')) {
+                document.getElementById('feedback-modal').style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

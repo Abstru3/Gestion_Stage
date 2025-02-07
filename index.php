@@ -94,7 +94,7 @@ $recent_internships = get_internships($pdo);
                             <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
-                                <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>
+                                <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
                                 <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
                             </div>
                         </div>

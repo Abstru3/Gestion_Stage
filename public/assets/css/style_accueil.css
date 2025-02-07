@@ -211,8 +211,15 @@ body {
 }
 
 .btn-details {
-    background: var(--secondary-color);
+    background-color: var(--secondary-color);
     color: white;
+    transition: background-color 0.2s ease;
+}
+
+.btn-details:hover {
+    background-color: var(--secondary-color-hover);
+    color: white;
+    transition: background-color 0.2s ease;
 }
 
 .see-more {

@@ -1,3 +1,19 @@
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
+
+try {
+    $feedbacks = $pdo->query("
+        SELECT feedback, user_name, role, date
+        FROM feedback
+        ORDER BY RAND()
+        LIMIT 5
+    ")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Erreur lors de l'exécution de la requête : " . $e->getMessage());
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -67,12 +83,11 @@
     <section class="testimonials-section">
         <h2>Témoignages</h2>
         <div class="testimonials">
-            <div class="testimonial">
-                <p>"Avis" - John Doe, étudiant</p>
-            </div>
-            <div class="testimonial">
-                <p>"Avis" - John Doe, professseur</p>
-            </div>
+            <?php foreach ($feedbacks as $feedback): ?>
+                <div class="testimonial">
+                    <p>"<?php echo htmlspecialchars($feedback['feedback']); ?>" - <?php echo htmlspecialchars($feedback['user_name']); ?>, <?php echo htmlspecialchars($feedback['role']); ?> (<?php echo date('d/m/Y', strtotime($feedback['date'])); ?>)</p>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 
