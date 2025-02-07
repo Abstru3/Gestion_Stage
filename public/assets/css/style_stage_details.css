@@ -1,3 +1,14 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --secondary-color-hover: #4ea8e4;
+    --accent-color-hover: #f26858;
+    --text-color: #333;
+    --light-gray: #f5f6fa;
+    --border-radius: 8px;
+}
+
 .rights-reserved {
     position: fixed;
     bottom: 2%;
@@ -17,13 +28,41 @@
 
 .offer-details {
     transition: background-color 0.2s ease;
-    background-color: rgb(246, 246, 246);
+    background-color: rgb(255, 255, 255);
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     padding: 5px;
     border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.offer-infos {
+    left: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 5px;
 }
 
 .offer-details:hover {
     transition: background-color 0.2s ease;
-    background-color: rgb(235, 235, 235);
+    background-color: rgb(243, 243, 243);
+}
+
+.offer-details .fas {
+    color: var(--secondary-color);
+    padding: 5px;
+}
+
+.apply {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.apply:hover {
+    background-color: #eeeeee;
+    transition: background-color 0.2s ease;
 }

@@ -2,6 +2,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
+
+$isStudent = isset($_SESSION['role']) && $_SESSION['role'] === 'etudiant';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
@@ -12,7 +14,12 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
-$stmt = $pdo->prepare("SELECT *, DATEDIFF(date_fin, date_debut) AS duree FROM offres_stages WHERE id = ?");
+$stmt = $pdo->prepare("
+    SELECT o.*, e.nom AS nom_entreprise, DATEDIFF(o.date_fin, o.date_debut) AS duree 
+    FROM offres_stages o
+    JOIN entreprises e ON o.entreprise_id = e.id
+    WHERE o.id = ?
+");
 $stmt->execute([$id]);
 $internship = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -37,19 +44,30 @@ if (!$internship) {
     </header>
 
     <main>
+        <h1><?php echo htmlspecialchars($internship['titre']); ?></h1>
         <section class="offer-details">
-            <h1><?php echo htmlspecialchars($internship['titre']); ?></h1>
-            <p><strong>Entreprise :</strong> <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Inconnue'); ?></p>
-            <p><strong>Description :</strong> <?php echo nl2br(htmlspecialchars($internship['description'])); ?></p>
-            <p><strong>Date de début :</strong> <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></p>
-            <p><strong>Lieu :</strong> <?php echo htmlspecialchars($internship['lieu']); ?></p>
-            <p><strong>Mode :</strong> <?php echo htmlspecialchars($internship['mode_stage']); ?></p>
-            <p><strong>Durée :</strong> 
-                <?php 
-                echo ($internship['duree'] !== null) ? $internship['duree'] . ' jours' : 'Non spécifiée'; 
-                ?>
-            </p>
-            <a href="postuler.php?id=<?php echo $internship['id']; ?>" class="btn btn-apply">Postuler</a>
+            <div class="offer-infos">
+                <p><strong><i class="fas fa-building"></i> Entreprise :</strong> <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Inconnue'); ?></p>
+                <p><strong><i class="fas fa-info-circle"></i> Description :</strong> <?php echo nl2br(htmlspecialchars($internship['description'])); ?></p>
+                <p><strong><i class="fas fa-calendar-alt"></i> Date de début :</strong> <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></p>
+                <p><strong><i class="fas fa-map-marker-alt"></i> Lieu :</strong> <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></p>
+                <p><strong><i class="fas fa-globe"></i> Mode :</strong> <?php echo htmlspecialchars($internship['mode_stage']); ?></p>
+                <p><strong><i class="fas fa-hourglass-half"></i> Durée :</strong> 
+                    <?php 
+                    echo ($internship['duree'] !== null) ? $internship['duree'] . ' jours' : 'Non spécifiée'; 
+                    ?>
+                </p>
+            </div>
+            <?php if ($isStudent): ?>
+            <form class="apply" action="/Gestion_Stage/app/views/internships/apply.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
+                <label for="cv">CV (PDF) :</label>
+                <input type="file" name="cv" accept=".pdf" required>
+                <label for="lettre_motivation">Lettre de motivation (PDF) :</label>
+                <input type="file" name="lettre_motivation" accept=".pdf" required>
+                <button type="submit" class="btn btn-apply">Postuler</button>
+            </form>
+            <?php endif; ?>
         </section>
     </main>
 

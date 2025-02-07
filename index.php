@@ -5,6 +5,10 @@ error_reporting(E_ALL);
 session_start();
 require_once './app/config/database.php';
 require_once './app/helpers/functions.php';
+$total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
+$total_students = $pdo->query("SELECT COUNT(*) FROM etudiants WHERE role='etudiant'")->fetchColumn();
+$total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchColumn();
+
 $recent_internships = get_internships($pdo);
 ?>
 <!DOCTYPE html>
@@ -51,17 +55,17 @@ $recent_internships = get_internships($pdo);
         <section class="stats-section">
             <div class="stat-card">
                 <i class="fas fa-briefcase"></i>
-                <h3>500+</h3>
+                <h3><?php echo $total_internships; ?></h3>
                 <p>Offres de stages</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-building"></i>
-                <h3>200+</h3>
+                <h3><?php echo $total_companies; ?></h3>
                 <p>Entreprises</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-user-graduate"></i>
-                <h3>1000+</h3>
+                <h3><?php echo $total_students; ?></h3>
                 <p>Étudiants</p>
             </div>
         </section>
@@ -113,7 +117,7 @@ $recent_internships = get_internships($pdo);
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>À propos</h3>
+                <h3>Informations</h3>
                 <p>NeversStage est votre plateforme de référence pour trouver le stage qui correspond à vos aspirations professionnelles.</p>
             </div>
             <div class="footer-section">
