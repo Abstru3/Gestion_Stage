@@ -55,20 +55,44 @@ $recent_internships = get_internships($pdo);
         <section class="stats-section">
             <div class="stat-card">
                 <i class="fas fa-briefcase"></i>
-                <h3><?php echo $total_internships; ?></h3>
+                <h3 id="total-internships"><?php echo $total_internships; ?></h3>
                 <p>Offres de stages</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-building"></i>
-                <h3><?php echo $total_companies; ?></h3>
+                <h3 id="total-companies"><?php echo $total_companies; ?></h3>
                 <p>Entreprises</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-user-graduate"></i>
-                <h3><?php echo $total_students; ?></h3>
+                <h3 id="total-students"><?php echo $total_students; ?></h3>
                 <p>Étudiants</p>
             </div>
         </section>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function animateCounter(id, start, end, duration) {
+                const element = document.getElementById(id);
+                let startTime = null;
+
+                function updateCounter(currentTime) {
+                    if (!startTime) startTime = currentTime;
+                    const progress = currentTime - startTime;
+                    const value = Math.min(Math.floor(progress / duration * (end - start) + start), end);
+                    element.textContent = value;
+                    if (value < end) {
+                        requestAnimationFrame(updateCounter);
+                    }
+                }
+
+                requestAnimationFrame(updateCounter);
+            }
+
+            animateCounter('total-internships', 0, <?php echo $total_internships; ?>, 500);
+            animateCounter('total-companies', 0, <?php echo $total_companies; ?>, 500);
+            animateCounter('total-students', 0, <?php echo $total_students; ?>, 500);
+        });
+        </script>
 
         <section class="recent-offers">
         <h2>Dernières offres de stages</h2>

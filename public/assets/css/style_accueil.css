@@ -116,6 +116,13 @@ body {
     margin-bottom: 1rem;
 }
 
+.stat-card h3 {
+    font-size: 25px;
+    font-weight: bold;
+    margin: 0;
+    transition: all 0.1s ease;
+}
+
 /* Offres récentes */
 .recent-offers {
     padding: 4rem 5%;
