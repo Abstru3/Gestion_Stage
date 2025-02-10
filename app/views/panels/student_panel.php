@@ -10,6 +10,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'etudiant') {
     exit();
 }
 
+function formatStatus($status) {
+    switch ($status) {
+        case 'en_attente':
+            return 'En attente';
+        case 'accepte':
+            return 'Acceptée';
+        case 'refuse':
+            return 'Refusée';
+        default:
+            return ucfirst($status);
+    }
+}
+
 $search = $_GET['search'] ?? '';
 $sort = $_GET['sort'] ?? 'date_debut';
 $order = $_GET['order'] ?? 'ASC';
@@ -120,7 +133,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
                         <h3><?php echo htmlspecialchars($application['titre']); ?></h3>
                     </div>
                     <div class="card-body">
-                        <p>Statut: <?php echo $application['statut']; ?></p>
+                        <p>Statut: <?php echo formatStatus($application['statut']); ?></p>
                         <p>Date de candidature: <?php echo $application['date_candidature']; ?></p>
                     </div>
                 </div>

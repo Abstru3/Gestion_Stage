@@ -1,0 +1,65 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --secondary-color-hover: #4ea8e4;
+    --accent-color-hover: #f26858;
+    --text-color: #333;
+    --light-gray: #f5f6fa;
+    --border-radius: 8px;
+}
+
+.btn-CV, .btn-lettre {
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-CV:hover, .btn-lettre:hover {
+    background-color: var(--secondary-color-hover);
+    transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+strong {
+    font-weight: bold;
+}
+
+strong i {
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+
+.btn-accept {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+}
+
+.btn-accept:hover {
+    background-color: #218838;
+    transition: background-color 0.3s;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-reject:hover {
+    background-color: #c82333;
+    transition: background-color 0.3s;
+}
