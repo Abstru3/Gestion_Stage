@@ -10,6 +10,7 @@ $total_students = $pdo->query("SELECT COUNT(*) FROM etudiants WHERE role='etudia
 $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchColumn();
 
 $recent_internships = get_internships($pdo);
+$recent_internships = array_slice($recent_internships, 0, 4);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -45,8 +46,12 @@ $recent_internships = get_internships($pdo);
             <h2>Trouvez le stage parfait pour votre avenir professionnel</h2>
             <p>Connectez-vous avec les meilleures entreprises et découvrez des opportunités exceptionnelles</p>
             <div class="search-box">
-                <input type="text" placeholder="Rechercher un stage..." id="search-input">
-                <button class="search-btn"><i class="fas fa-search"></i></button>
+                <form id="search-form" action="/Gestion_Stage/app/views/internships/all_internships.php" method="get">
+                    <input type="text" name="search" placeholder="Rechercher un stage..." id="search-input">
+                    <input type="hidden" name="sort" value="date_debut">
+                    <input type="hidden" name="order" value="ASC">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                </form>
             </div>
         </div>
     </header>
@@ -115,7 +120,7 @@ $recent_internships = get_internships($pdo);
                             </div>
                         </div>
                         <div class="offer-body">
-                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
+                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 100)) . '...'; ?></p>
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                                 <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
@@ -132,7 +137,7 @@ $recent_internships = get_internships($pdo);
             <?php endif; ?>
         </div>
     <div class="see-more">
-        <a href="stages.php" class="btn btn-primary">Voir toutes les offres</a>
+    <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-primary">Voir toutes les offres</a>
     </div>
 </section>
 

@@ -31,3 +31,17 @@ function validateRegistrationForm() {
 
     return true;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.getElementById('search-input');
+
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const searchQuery = searchInput.value.trim();
+        if (searchQuery) {
+            const url = `/Gestion_Stage/app/views/internships/all_internships.php?search=${encodeURIComponent(searchQuery)}&sort=date_debut&order=ASC`;
+            window.location.href = url;
+        }
+    });
+});

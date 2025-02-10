@@ -53,6 +53,10 @@ body {
 }
 
 /* Hero Section */
+form {
+    width: 100%;
+}
+
 .hero-section {
     text-align: center;
     padding: 4rem 1rem;
@@ -76,6 +80,7 @@ body {
     padding: 1rem;
     border: none;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
+    width: 80%;
 }
 
 .search-btn {
@@ -190,7 +195,8 @@ body {
 }
 
 .btn-login,
-.btn-workspace {
+.btn-workspace,
+.btn-primary {
     background: var(--secondary-color);
     color: white;
     transition: background-color 0.2s ease;
@@ -205,7 +211,8 @@ body {
 }
 
 .btn-login:hover,
-.btn-workspace:hover {
+.btn-workspace:hover,
+.btn-primary:hover {
     background: var(--secondary-color-hover);
     transition: background-color 0.2s ease;
 }

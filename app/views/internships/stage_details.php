@@ -71,9 +71,6 @@ if (!$internship) {
         </section>
     </main>
 
-    <a href="/Gestion_Stage/index.php" class="btn index-button"><i class="fas fa-arrow-left"></i> Retour</a>
-    <footer>
-        <p class="rights-reserved">&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
-    </footer>
+    <a href="/Gestion_Stage/index.php" class="btn index-button"><i class="fas fa-arrow-left"></i> Retour au menu</a>
 </body>
 </html>
