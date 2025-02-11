@@ -83,7 +83,7 @@ body {
     padding: 1.25rem;
     background: var(--bg-color);
     border-radius: var(--radius);
-    margin-bottom: var(--reply-box-height); /* Ajuster la marge pour la zone de réponse */
+    margin-bottom: 5rem; /* Ajuster la marge pour la zone de réponse */
 }
 
 .messages {
@@ -148,24 +148,24 @@ body {
 /* Zone de réponse améliorée */
 .reply-box {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
     background: white;
     padding: 0.75rem 1.5rem;
-    border-radius: 0;
+    border-radius: var(--radius);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
     transition: box-shadow var(--transition-duration) ease;
     display: flex;
-    align-items: center; /* Alignement vertical */
+    align-items: center;
     gap: 1rem;
-    height: var(--reply-box-height); /* Hauteur fixe */
+    min-height: 4rem; /* Hauteur minimale */
 }
 
 .reply-box textarea {
     flex: 1;
-    min-height: 2.5rem; /* Ajuster la hauteur minimale */
-    max-height: 5rem;
+    min-height: 2.5rem;
+    max-height: 8rem;
     padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
@@ -174,6 +174,7 @@ body {
     font-size: 1rem;
     line-height: 1.6;
     transition: all var(--transition-duration) ease;
+    overflow-y: auto; /* Ajout du défilement si le contenu dépasse */
 }
 
 .reply-box .button {
@@ -190,10 +191,9 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-duration) ease;
-    height: 2.5rem; /* Ajuster la hauteur du bouton */
 }
 
-/* Ajoutez ces styles CSS */
+/* Style pour message vide */
 .empty-message {
     text-align: center;
     padding: 20px;
@@ -208,15 +208,17 @@ body {
     color: #999;
 }
 
-/* Ajoutez ces styles dans style_message.css */
+/* Conversations */
 .conversations {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+/* Modifier les styles des conversations */
 .conversation-item {
     border-bottom: 1px solid #edf2f7;
+    transition: background-color var(--transition-duration) ease;
 }
 
 .conversation-item a {
@@ -224,12 +226,16 @@ body {
     padding: 15px;
     text-decoration: none;
     color: #2d3748;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-duration) ease;
 }
 
-.conversation-item.active a,
-.conversation-item a:hover {
-    background-color: #edf2f7;
+/* Modifier les styles pour l'état actif et hover */
+.conversation-item.active {
+    background-color: var(--hover-bg);
+}
+
+.conversation-item:hover:not(.active) a {
+    background-color: rgba(241, 245, 249, 0.5);
 }
 
 .avatar {
@@ -270,7 +276,7 @@ body {
     color: #718096;
 }
 
-/* Ajouter ces styles dans /Gestion_Stage/public/assets/css/style_message.css */
+/* Status */
 .status {
     display: inline-block;
     padding: 4px 8px;
@@ -289,14 +295,12 @@ body {
 }
 
 .status.en_attente {
-    text-align: center;
     background-color: #fff7ed;
     color: #9a3412;
     border: 1px solid #fed7aa;
 }
 
 .status.refusee {
-    text-align: center;
     background-color: #fef2f2;
     color: #991b1b;
     border: 1px solid #fecaca;
@@ -320,7 +324,7 @@ body {
     margin-bottom: 2px;
 }
 
-/* Responsive amélioré */
+/* Responsive */
 @media (max-width: 1024px) {
     .inbox-container {
         margin: 1.5rem;
@@ -338,7 +342,7 @@ body {
         margin: 0;
         padding: 1.25rem;
         gap: 1.5rem;
-        min-height: auto; /* Supprimer la hauteur minimale */
+        min-height: auto;
     }
 
     .conversation-list {
@@ -353,24 +357,24 @@ body {
     }
 
     .reply-box {
-        position: relative; /* Retour au positionnement relatif */
+        position: relative;
         bottom: auto;
         left: auto;
         right: auto;
         margin: 1rem 0;
-        flex-direction: row; /* Alignement horizontal */
-        align-items: center;
-        gap: 0.75rem;
-        height: auto; /* Supprimer la hauteur fixe */
+        flex-direction: column; /* Empiler sur les petits écrans */
+        align-items: stretch;
+        min-height: auto; /* Retirer la hauteur minimale */
+        gap: 0.75rem; /* Ajout d'un espacement entre les éléments */
     }
 
     .reply-box textarea {
-        width: 100%; /* La zone de texte prend toute la largeur */
-        min-height: 2rem;
+        width: 100%;
+        min-height: 4rem; /* Augmenter la hauteur minimale sur les petits écrans */
     }
 
     .reply-box .button {
-        width: auto; /* Le bouton s'adapte au contenu */
+        width: 100%;
     }
 }
 
@@ -390,5 +394,17 @@ body {
 
     .reply-box .button {
         width: 100%;
+    }
+
+    .message-content {
+        padding: 0.75rem; /* Réduire le padding pour plus d'espace */
+    }
+
+    .messages-container {
+        padding: 0.75rem; /* Réduire le padding pour plus d'espace */
+    }
+
+    .message {
+        padding: 0.75rem; /* Réduire le padding pour plus d'espace */
     }
 }

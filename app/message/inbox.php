@@ -315,6 +315,36 @@ $(document).ready(function() {
         initializeMessageForm();
         setInterval(loadMessages, 50000);
     }
+
+    // Ajouter ce code dans la section <script> de inbox.php
+    // Fonction pour mettre à jour la classe active
+    function updateActiveConversation() {
+        const currentUrl = new URL(window.location.href);
+        const etudiantId = currentUrl.searchParams.get('etudiant_id');
+        const entrepriseId = currentUrl.searchParams.get('entreprise_id');
+
+        // Supprimer la classe active de toutes les conversations
+        $('.conversation-item').removeClass('active');
+
+        // Ajouter la classe active à la conversation sélectionnée
+        if (etudiantId) {
+            $(`.conversation-item a[href*="etudiant_id=${etudiantId}"]`).parent().addClass('active');
+        } else if (entrepriseId) {
+            $(`.conversation-item a[href*="entreprise_id=${entrepriseId}"]`).parent().addClass('active');
+        }
+    }
+
+    // Mettre à jour lors du clic sur une conversation
+    $(document).on('click', '.conversation-item a', function(e) {
+        e.preventDefault();
+        const href = $(this).attr('href');
+        window.history.pushState({}, '', href);
+        updateActiveConversation();
+        loadMessages();
+    });
+
+    // Mettre à jour au chargement de la page
+    updateActiveConversation();
 });
 </script>
 
