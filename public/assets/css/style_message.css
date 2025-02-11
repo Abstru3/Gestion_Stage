@@ -22,12 +22,18 @@
     box-sizing: border-box;
 }
 
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
 body {
     font-family: var(--font-family);
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 /* Container principal */
@@ -40,6 +46,7 @@ body {
     border-radius: var(--radius);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
     min-height: 70vh;
+    height: auto;
     position: relative;
 }
 
@@ -73,7 +80,30 @@ body {
     flex-direction: column;
     flex: 1;
     padding: 1.5rem;
+    overflow: hidden;
+    position: relative; /* Ajout pour le positionnement absolu du reply-box */
+    height: calc(70vh - 100px); /* Hauteur fixe avec espace pour la marge */
+}
+
+/* Messages Container */
+.messages-container {
+    flex: 1;
+    padding: 1.25rem;
+    background: var(--bg-color);
+    border-radius: var(--radius);
+    margin-bottom: 5rem;
+    height: calc(100% - 80px);
+}
+
+/* Liste des messages */
+.messages {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
     overflow-y: auto;
+    padding-right: 10px;
 }
 
 /* Messages */
@@ -84,6 +114,8 @@ body {
     background: var(--bg-color);
     border-radius: var(--radius);
     margin-bottom: 5rem; /* Ajuster la marge pour la zone de réponse */
+    min-height: 200px; /* Hauteur minimale pour éviter l'effondrement */
+    max-height: 60vh; /* Hauteur maximale pour le conteneur de messages */
 }
 
 .messages {
@@ -145,27 +177,25 @@ body {
     word-wrap: break-word;
 }
 
-/* Zone de réponse améliorée */
 .reply-box {
+    display: flex;
+    align-items: center; /* Centre les éléments verticalement */
+    justify-content: space-between; /* Espace entre les éléments */
     position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
     background: white;
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
-    transition: box-shadow var(--transition-duration) ease;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-height: 4rem; /* Hauteur minimale */
+    margin: 1rem;
 }
 
 .reply-box textarea {
     flex: 1;
     min-height: 2.5rem;
-    max-height: 8rem;
+    max-height: 5rem;
     height: 2.5rem;
     padding: 0.5rem;
     border: 1px solid var(--border-color);
@@ -175,13 +205,15 @@ body {
     font-size: 1rem;
     line-height: 1.6;
     transition: all var(--transition-duration) ease;
-    overflow-y: auto; /* Ajout du défilement si le contenu dépasse */
+    overflow-y: hidden;
+    margin-right: 1rem; /* Ajouter une marge à droite */
 }
 
 .reply-box .button {
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* Centre le contenu du bouton */
     gap: 0.625rem;
     padding: 0.5rem 1rem;
     background-color: var(--primary-color);
@@ -296,12 +328,14 @@ body {
 }
 
 .status.en_attente {
+    text-align: center;
     background-color: #fff7ed;
     color: #9a3412;
     border: 1px solid #fed7aa;
 }
 
 .status.refusee {
+    text-align: center;
     background-color: #fef2f2;
     color: #991b1b;
     border: 1px solid #fecaca;
@@ -366,7 +400,7 @@ body {
     .message-content {
         flex: 1;
         padding: 1rem;
-        overflow: hidden; /* Empêcher le débordement */
+        overflow: hidden;
         position: relative;
         display: flex;
         flex-direction: column;

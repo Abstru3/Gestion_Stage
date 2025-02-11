@@ -16,56 +16,59 @@ $role = $_SESSION['role'];
 $selected_etudiant_id = isset($_GET['etudiant_id']) ? intval($_GET['etudiant_id']) : null;
 $selected_entreprise_id = isset($_GET['entreprise_id']) ? intval($_GET['entreprise_id']) : null;
 
+// Define prefixes based on role
+$exp_prefix = $role === 'etudiant' ? 'E' : 'C';
+$dest_prefix = $role === 'etudiant' ? 'C' : 'E';
+$prefixed_user_id = $exp_prefix . $user_id;
+
 try {
     if (!isset($pdo)) {
-        throw new Exception("Connexion à la base de données non établie.");
+        throw new Exception("Database connection not established.");
     }
 
-    // Requête SQL pour récupérer les messages
+    // Query to get messages based on role
     if ($role === 'etudiant') {
         if (!$selected_entreprise_id) {
-            echo "<p class='empty-message'><i class='fas fa-comments'></i> Sélectionnez une entreprise pour afficher les messages</p>";
+            echo "<p class='empty-message'><i class='fas fa-comments'></i> Select a conversation to show messages</p>";
             exit;
         }
         
         $query = "SELECT m.*,
                     CASE 
-                        WHEN m.expediteur_id = :user_id THEN 'Vous'
+                        WHEN m.expediteur_id = :prefixed_user_id THEN 'You'
                         ELSE e.nom 
-                    END as expediteur_nom,
-                    e.id as entreprise_id
-             FROM messages m
+                    END as expediteur_nom
+                FROM messages m
+                LEFT JOIN entreprises e ON CONCAT('C', e.id) = m.expediteur_id
+                WHERE (m.expediteur_id = :prefixed_user_id AND m.destinataire_id = CONCAT('C', :entreprise_id))
+                OR (m.expediteur_id = CONCAT('C', :entreprise_id) AND m.destinataire_id = :prefixed_user_id)
+                ORDER BY m.date_envoi ASC";
 
-             LEFT JOIN entreprises e ON e.id = CASE 
-                 WHEN m.expediteur_id = :user_id THEN m.destinataire_id
-                 ELSE m.expediteur_id 
-             END
-             WHERE (m.expediteur_id = :user_id AND m.destinataire_id = :selected_entreprise_id)
-             OR (m.expediteur_id = :selected_entreprise_id AND m.destinataire_id = :user_id)
-             ORDER BY m.date_envoi ASC";
         $params = [
-            ':user_id' => $user_id,
-            ':selected_entreprise_id' => $selected_entreprise_id
+            ':prefixed_user_id' => $prefixed_user_id,
+            ':entreprise_id' => $selected_entreprise_id
         ];
-    } else {
+
+    } else { // entreprise
         if (!$selected_etudiant_id) {
-            echo "<p class='empty-message'><i class='fas fa-comments'></i> Sélectionnez un étudiant pour afficher les messages</p>";
+            echo "<p class='empty-message'><i class='fas fa-comments'></i> Select a student to show messages</p>";
             exit;
         }
-        
+
         $query = "SELECT m.*,
                     CASE 
-                        WHEN m.expediteur_id = :user_id THEN 'Vous'
+                        WHEN m.expediteur_id = :prefixed_user_id THEN 'You'
                         ELSE CONCAT(e.nom, ' ', e.prenom)
-                    END as expediteur_nom 
-             FROM messages m
-             LEFT JOIN etudiants e ON e.id = :selected_etudiant_id
-             WHERE (m.expediteur_id = :user_id AND m.destinataire_id = :selected_etudiant_id)
-             OR (m.expediteur_id = :selected_etudiant_id AND m.destinataire_id = :user_id)
-             ORDER BY m.date_envoi ASC";
+                    END as expediteur_nom
+                FROM messages m
+                LEFT JOIN etudiants e ON CONCAT('E', e.id) = m.expediteur_id
+                WHERE (m.expediteur_id = :prefixed_user_id AND m.destinataire_id = CONCAT('E', :etudiant_id))
+                OR (m.expediteur_id = CONCAT('E', :etudiant_id) AND m.destinataire_id = :prefixed_user_id)
+                ORDER BY m.date_envoi ASC";
+
         $params = [
-            ':user_id' => $user_id,
-            ':selected_etudiant_id' => $selected_etudiant_id
+            ':prefixed_user_id' => $prefixed_user_id,
+            ':etudiant_id' => $selected_etudiant_id
         ];
     }
 
@@ -73,14 +76,13 @@ try {
     $stmt->execute($params);
     $messages = $stmt->fetchAll();
 
-    // Affichage des messages
     if (empty($messages)) {
-        echo "<p class='empty-message'><i class='fas fa-envelope-open'></i> Aucun message dans votre boîte de réception.</p>";
+        echo "<p class='empty-message'><i class='fas fa-envelope-open'></i> No messages in this conversation.</p>";
     } else {
         echo '<ul class="messages">';
         foreach ($messages as $message) {
-            $message_class = $message['expediteur_id'] == $user_id ? 'sent' : 'received';
-            echo '<li class="message ' . $message_class . ' ' . ($message['statut'] === 'non_lu' ? 'unread' : '') . '">';
+            $messageClass = $message['expediteur_id'] === $prefixed_user_id ? 'sent' : 'received';
+            echo '<li class="message ' . $messageClass . ' ' . ($message['statut'] === 'non_lu' ? 'unread' : '') . '">';
             echo '<div class="message-header">';
             echo '<span class="sender"><i class="fas fa-user"></i> ' . htmlspecialchars($message['expediteur_nom']) . '</span>';
             echo '<span class="date"><i class="far fa-clock"></i> ' . date('d/m/Y H:i', strtotime($message['date_envoi'])) . '</span>';
@@ -91,7 +93,7 @@ try {
         echo '</ul>';
     }
 } catch (Exception $e) {
-    echo "<p>Erreur : " . $e->getMessage() . "</p>";
+    echo "<p class='error'>Error: " . $e->getMessage() . "</p>";
 }
 ?>
 

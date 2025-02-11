@@ -16,6 +16,15 @@ $selected_entreprise_id = isset($_GET['entreprise_id']) ? intval($_GET['entrepri
 $selected_etudiant_id = isset($_GET['etudiant_id']) ? intval($_GET['etudiant_id']) : null;
 $messages = [];
 
+// Modifier la façon dont nous gérons les IDs
+if ($role === 'etudiant') {
+    $user_prefix = 'E';  // E pour Étudiant
+    $contact_prefix = 'C'; // C pour Company/Entreprise
+} else {
+    $user_prefix = 'C';  // C pour Company/Entreprise
+    $contact_prefix = 'E'; // E pour Étudiant
+}
+
 // Au début du fichier, après les includes, ajoutez :
 if ($role === 'entreprise') {
     // Récupérer uniquement les étudiants qui ont candidaté aux offres de l'entreprise
@@ -29,8 +38,8 @@ if ($role === 'entreprise') {
                        INNER JOIN candidatures c ON e.id = c.etudiant_id
                        INNER JOIN offres_stages os ON c.offre_id = os.id
                        LEFT JOIN messages m ON (
-                           (m.expediteur_id = e.id AND m.destinataire_id = :user_id)
-                           OR (m.expediteur_id = :user_id AND m.destinataire_id = e.id)
+                           (m.expediteur_id = CONCAT('E', e.id) AND m.destinataire_id = CONCAT('C', :user_id))
+                           OR (m.expediteur_id = CONCAT('C', :user_id) AND m.destinataire_id = CONCAT('E', e.id))
                        )
                        WHERE os.entreprise_id = :user_id
                        GROUP BY e.id
@@ -45,7 +54,7 @@ if ($role === 'entreprise') {
     $etudiant_stmt->execute([':user_id' => $user_id]);
     $etudiants = $etudiant_stmt->fetchAll();
 } else {
-    // Pour les étudiants, remplacer la requête par :
+    // Remplacer la requête pour les étudiants
     $entreprise_query = "SELECT DISTINCT e.*, 
                             MAX(m.date_envoi) as dernier_message,
                             c.statut as statut_candidature,
@@ -54,8 +63,8 @@ if ($role === 'entreprise') {
                      LEFT JOIN offres_stages os ON e.id = os.entreprise_id
                      LEFT JOIN candidatures c ON os.id = c.offre_id AND c.etudiant_id = :user_id
                      LEFT JOIN messages m ON (
-                         (m.expediteur_id = e.id AND m.destinataire_id = :user_id)
-                         OR (m.expediteur_id = :user_id AND m.destinataire_id = e.id)
+                         (m.expediteur_id = CONCAT('E', :user_id) AND m.destinataire_id = CONCAT('C', e.id))
+                         OR (m.expediteur_id = CONCAT('C', e.id) AND m.destinataire_id = CONCAT('E', :user_id))
                      )
                      WHERE 
                          (c.statut = 'acceptee' OR m.id IS NOT NULL)
@@ -147,17 +156,14 @@ $messages = [];
 if ($role === 'etudiant' && $selected_entreprise_id) {
     $query = "SELECT m.*,
                     CASE 
-                        WHEN m.expediteur_id = :user_id THEN 'Vous'
+                        WHEN m.expediteur_id = CONCAT('E', :user_id) THEN 'Vous'
                         ELSE e.nom 
                     END as expediteur_nom,
                     e.id as entreprise_id
              FROM messages m
-             LEFT JOIN entreprises e ON e.id = CASE 
-                 WHEN m.expediteur_id = :user_id THEN m.destinataire_id
-                 ELSE m.expediteur_id 
-             END
-             WHERE (m.expediteur_id = :user_id AND m.destinataire_id = :entreprise_id)
-             OR (m.expediteur_id = :entreprise_id AND m.destinataire_id = :user_id)
+             LEFT JOIN entreprises e ON SUBSTRING(m.expediteur_id, 2) = e.id 
+             WHERE (m.expediteur_id = CONCAT('E', :user_id) AND m.destinataire_id = CONCAT('C', :entreprise_id))
+             OR (m.expediteur_id = CONCAT('C', :entreprise_id) AND m.destinataire_id = CONCAT('E', :user_id))
              ORDER BY m.date_envoi ASC";
     
     $stmt = $pdo->prepare($query);
@@ -167,16 +173,17 @@ if ($role === 'etudiant' && $selected_entreprise_id) {
     ]);
     $messages = $stmt->fetchAll();
     $entreprise_id = $selected_entreprise_id;
+
 } elseif ($role === 'entreprise' && $selected_etudiant_id) {
     $query = "SELECT m.*,
                     CASE 
-                        WHEN m.expediteur_id = :user_id THEN 'Vous'
+                        WHEN m.expediteur_id = CONCAT('C', :user_id) THEN 'Vous'
                         ELSE CONCAT(e.nom, ' ', e.prenom)
                     END as expediteur_nom
              FROM messages m
-             LEFT JOIN etudiants e ON e.id = :selected_etudiant_id
-             WHERE (m.expediteur_id = :user_id AND m.destinataire_id = :selected_etudiant_id)
-             OR (m.expediteur_id = :selected_etudiant_id AND m.destinataire_id = :user_id)
+             LEFT JOIN etudiants e ON SUBSTRING(m.expediteur_id, 2) = e.id
+             WHERE (m.expediteur_id = CONCAT('C', :user_id) AND m.destinataire_id = CONCAT('E', :selected_etudiant_id))
+             OR (m.expediteur_id = CONCAT('E', :selected_etudiant_id) AND m.destinataire_id = CONCAT('C', :user_id))
              ORDER BY m.date_envoi ASC";
     
     $stmt = $pdo->prepare($query);

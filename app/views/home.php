@@ -272,7 +272,13 @@ if ($_SESSION['role'] == 'etudiant') {
         <?php endif; ?>
         <div class="dashboard-card">
             <h3>Date</h3>
-            <p><?= strftime('%A %d %B %Y') ?></p>
+            <p>
+                <i class="far fa-clock"></i>
+                <?php
+                    setlocale(LC_TIME, 'fr_FR.UTF-8');
+                    echo strftime('%A %d %B %Y');
+                ?>
+            </p>
         </div>
     </div>
 
