@@ -12,6 +12,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 
 $offre_id = $_GET['offre_id'] ?? 0;
 
+// Récupérer les informations de l'offre de stage
+$stmt = $pdo->prepare("SELECT titre, description FROM offres_stages WHERE id = ?");
+$stmt->execute([$offre_id]);
+$offre = $stmt->fetch();
+
 // Récupérer les candidatures pour l'offre spécifiée
 $stmt = $pdo->prepare("SELECT c.id, c.statut, c.cv, c.lettre_motivation, e.nom, e.prenom, e.email 
                       FROM candidatures c 
@@ -54,37 +59,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <h1>Candidatures pour l'offre de stage</h1>
 
+    <?php if ($offre): ?>
+        <h2><?php echo htmlspecialchars($offre['titre']); ?></h2>
+        <p class="desc"><strong>Description : </strong><?php echo htmlspecialchars($offre['description']); ?></p>
+    <?php endif; ?>
+
     <?php if (empty($applications)): ?>
         <p>Aucune candidature pour cette offre de stage.</p>
     <?php else: ?>
         <ul>
-        <?php foreach ($applications as $application): ?>
-            <li>
-                <h3><?php echo htmlspecialchars($application['nom'] . ' ' . $application['prenom']); ?></h3>
-                <p><strong><i class="fas fa-envelope"></i> Email:</strong> <?php echo htmlspecialchars($application['email']); ?></p>
-                <p><strong><i class="fas fa-info-circle"></i> Statut actuel:</strong> <?php echo $application['statut']; ?></p>
-                
-                <!-- Affichage du CV -->
-                <?php if (!empty($application['cv'])): ?>
-                    <p><strong><i class="fas fa-file-alt"></i> CV:</strong> <a class="btn-CV" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['cv']); ?>" target="_blank">Voir le CV</a></p>
-                <?php else: ?>
-                    <p><strong><i class="fas fa-file-alt"></i> CV:</strong> CV non fourni</p>
-                <?php endif; ?>
+            <?php foreach ($applications as $application): ?>
+                <li>
+                    <div class="application-info">
+                        <h3><?php echo htmlspecialchars($application['nom'] . ' ' . $application['prenom']); ?></h3>
+                        <p><strong><i class="fas fa-envelope"></i> Email:</strong> <?php echo htmlspecialchars($application['email']); ?></p>
+                        <p>
+                            <strong><i class="fas fa-info-circle"></i> Statut actuel:</strong>
+                            <?php
+                            $statut = $application['statut'];
+                            $statut_class = '';
+                            $statut_text = '';
+                            switch ($statut) {
+                                case 'en_attente':
+                                    $statut_class = 'statut-en-attente';
+                                    $statut_text = 'En attente';
+                                    break;
+                                case 'acceptee':
+                                    $statut_class = 'statut-acceptee';
+                                    $statut_text = 'Accepté';
+                                    break;
+                                case 'refusee':
+                                    $statut_class = 'statut-refusee';
+                                    $statut_text = 'Refusé';
+                                    break;
+                            }
+                            ?>
+                            <span class="<?php echo $statut_class; ?>"><?php echo htmlspecialchars($statut_text); ?></span>
+                        </p>
 
-                <!-- Affichage de la lettre de motivation -->
-                <?php if (!empty($application['lettre_motivation'])): ?>
-                    <p><strong><i class="fas fa-file-alt"></i> Lettre de motivation:</strong> <a class="btn-lettre" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['lettre_motivation']); ?>" target="_blank">Voir la lettre</a></p>
-                <?php else: ?>
-                    <p><strong><i class="fas fa-file-alt"></i> Lettre de motivation:</strong> Lettre de motivation non fournie</p>
-                <?php endif; ?>
+                        <!-- Affichage du CV -->
+                        <?php if (!empty($application['cv'])): ?>
+                            <p><strong><i class="fas fa-file-alt"></i> CV:</strong> <a class="btn-CV" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['cv']); ?>" target="_blank">Voir le CV</a></p>
+                        <?php else: ?>
+                            <p><strong><i class="fas fa-file-alt"></i> CV:</strong> CV non fourni</p>
+                        <?php endif; ?>
 
-                <form action="" method="post">
-                    <input type="hidden" name="candidature_id" value="<?php echo $application['id']; ?>">
-                    <button type="submit" name="action" value="accepter" class="btn-accept">Accepter</button>
-                    <button type="submit" name="action" value="refuser" class="btn-reject">Refuser</button>
-                </form>
-            </li>
-        <?php endforeach; ?>
+                        <!-- Affichage de la lettre de motivation -->
+                        <?php if (!empty($application['lettre_motivation'])): ?>
+                            <p><strong><i class="fas fa-file-alt"></i> Lettre de motivation:</strong> <a class="btn-lettre" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['lettre_motivation']); ?>" target="_blank">Voir la lettre</a></p>
+                        <?php else: ?>
+                            <p><strong><i class="fas fa-file-alt"></i> Lettre de motivation:</strong> Lettre de motivation non fournie</p>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <?php if ($application['statut'] == 'en_attente'): ?>
+                            <form action="" method="post">
+                                <input type="hidden" name="candidature_id" value="<?php echo $application['id']; ?>">
+                                <button type="submit" name="action" value="accepter" class="btn-accept">Accepter</button>
+                                <button type="submit" name="action" value="refuser" class="btn-reject">Refuser</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                </li>
+            <?php endforeach; ?>
         </ul>
     <?php endif; ?>
 

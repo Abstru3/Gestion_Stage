@@ -9,15 +9,63 @@
     --border-radius: 8px;
 }
 
-.btn-CV, .btn-lettre {
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    justify-content: space-between; /* Distribute items evenly */
+}
+
+li {
+    background-color: white;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    width: calc(50% - 10px); /* Two items per row with a small gap */
+    margin-bottom: 20px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    display: flex; /* Use flexbox for layout within each list item */
+    align-items: center; /* Vertically align items */
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+li:hover {
+    background-color: rgb(245, 245, 245);
+    transform: translateY(-5px);
+}
+
+li > div:first-child {
+    flex-grow: 1; /* Allow the info div to take up remaining space */
+}
+
+.btn-CV,
+.btn-lettre {
     background-color: var(--secondary-color);
     border-radius: 5px;
     color: white;
     padding: 5px;
     transition: background-color 0.3s;
+    text-align: center;
+    display: inline-block;
 }
 
-.btn-CV:hover, .btn-lettre:hover {
+.btn-CV:hover,
+.btn-lettre:hover {
     background-color: var(--secondary-color-hover);
     transition: background-color 0.3s;
     text-decoration: none;
@@ -62,4 +110,50 @@ strong i {
 .btn-reject:hover {
     background-color: #c82333;
     transition: background-color 0.3s;
+}
+
+.index-button {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+.index-button:hover {
+    background-color: var(--secondary-color-hover);
+    transition: background-color 0.3s;
+}
+
+.application-info p {
+    margin-top: 5px;
+}
+
+.desc {
+    margin-bottom: 10px;
+}
+
+.statut-en-attente {
+    color: orange;
+    background-color: rgba(255, 166, 0, 0.092);
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.statut-acceptee {
+    color: green;
+    background-color: rgba(34, 255, 0, 0.092);
+    border-radius: 5px;
+    padding: 3px;
+}
+
+.statut-refusee {
+    color: red;
+    background-color: rgba(255, 0, 0, 0.092);
+    border-radius: 5px;
+    padding: 3px;
 }

@@ -140,5 +140,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
             <?php endforeach; ?>
         <?php endif; ?>
     </main>
+
+    <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a></p>
 </body>
 </html>
