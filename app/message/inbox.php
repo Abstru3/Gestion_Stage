@@ -476,13 +476,13 @@ $(document).ready(function() {
             <input type="hidden" name="destinataire_id" value="<?php echo htmlspecialchars($selected_etudiant_id); ?>">
         <?php endif; ?>
         <textarea name="contenu" placeholder="Écrire un message..." required></textarea>
-        <button type="submit" class="button">
+        <button type="submit" class="button send-btn">
             <i class="fas fa-paper-plane"></i> Envoyer
         </button>
     </form>
 </div>
 
     </div>
-    <p><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>
+    <p class="index-button"><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>
 </body>
 </html>
