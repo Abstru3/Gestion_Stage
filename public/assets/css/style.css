@@ -312,6 +312,10 @@ th {
     color: #28a745;
 }
 
+.text-refuse {
+    color: red;
+}
+
 /* Bouton retour */
 .btn {
     display: inline-block;

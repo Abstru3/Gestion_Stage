@@ -12,6 +12,20 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit();
 }
 
+// Fonction pour formater les statuts
+function formatStatus($status) {
+    switch ($status) {
+        case 'en_attente':
+            return 'En attente';
+        case 'acceptee':
+            return 'Acceptée';
+        case 'refusee':
+            return 'Refusée';
+        default:
+            return ucfirst($status);
+    }
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
@@ -47,9 +61,10 @@ $dashboard_data = [];
 if ($_SESSION['role'] == 'etudiant') {
     // Dernières candidatures et offres récentes
     $stmt_candidatures = $pdo->prepare("
-        SELECT c.statut, o.titre, o.date_debut, o.date_fin 
+        SELECT c.statut, o.titre, o.date_debut, o.date_fin, e.nom as entreprise_nom
         FROM candidatures c 
         JOIN offres_stages o ON c.offre_id = o.id 
+        JOIN entreprises e ON o.entreprise_id = e.id
         WHERE c.etudiant_id = ? 
         ORDER BY c.date_candidature DESC 
         LIMIT 3
@@ -82,7 +97,7 @@ if ($_SESSION['role'] == 'etudiant') {
         JOIN etudiants e ON c.etudiant_id = e.id
         WHERE o.entreprise_id = ? 
         ORDER BY c.date_candidature DESC 
-        LIMIT 5
+        LIMIT 3
     ");
     $stmt_candidatures->execute([$_SESSION['user_id']]);
     $dernieres_candidatures = $stmt_candidatures->fetchAll(PDO::FETCH_ASSOC);
@@ -171,16 +186,20 @@ if ($_SESSION['role'] == 'etudiant') {
                 <p>En cours : <?= $dashboard_data['candidatures_en_cours'] ?></p>
             </div>
             <div class="dashboard-card">
-                <h3>Dernières Candidatures</h3>
+            <h3>Dernières Candidatures</h3>
                 <ul class="dashboard-list">
-                    <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
-                        <li>
-                            <?= htmlspecialchars($candidature['titre']) ?> - 
-                            <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
-                                <?= $candidature['statut'] ?>
-                            </span>
-                        </li>
-                    <?php endforeach; ?>
+                    <?php if (empty($dashboard_data['dernieres_candidatures'])): ?>
+                        <li>Aucune candidatures récentes</li>
+                    <?php else: ?>
+                        <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
+                            <li>
+                                <?= htmlspecialchars($candidature['entreprise_nom']) . ' - ' . htmlspecialchars($candidature['titre']) . ' - '?>
+                                <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : ($candidature['statut'] == 'refusee' ? 'text-refuse' : 'text-success') ?>">
+                                    <?= formatStatus($candidature['statut']) ?>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
             </div>
             <div class="dashboard-card">
@@ -203,15 +222,19 @@ if ($_SESSION['role'] == 'etudiant') {
             <div class="dashboard-card">
                 <h3>Dernières Candidatures</h3>
                 <ul class="dashboard-list">
-                    <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
-                        <li>
-                            <?= htmlspecialchars($candidature['nom'] . ' ' . $candidature['prenom']) ?> 
-                            - <?= htmlspecialchars($candidature['titre']) ?>
-                            <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : 'text-success' ?>">
-                                <?= $candidature['statut'] ?>
-                            </span>
-                        </li>
-                    <?php endforeach; ?>
+                    <?php if (empty($dashboard_data['dernieres_candidatures'])): ?>
+                        <li>Aucune candidatures récentes</li>
+                    <?php else: ?>
+                        <?php foreach($dashboard_data['dernieres_candidatures'] as $candidature): ?>
+                            <li>
+                                <?= htmlspecialchars($candidature['nom'] . ' ' . $candidature['prenom']) ?> 
+                                - <?= htmlspecialchars($candidature['titre']) . ' - '?>
+                                <span class="<?= $candidature['statut'] == 'en_attente' ? 'text-warning' : ($candidature['statut'] == 'refusee' ? 'text-refuse' : 'text-success') ?>">
+                                    <?= formatStatus($candidature['statut']) ?>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
             </div>
         <?php elseif ($_SESSION['role'] == 'admin'): ?>

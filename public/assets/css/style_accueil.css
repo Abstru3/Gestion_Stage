@@ -55,6 +55,7 @@ body {
 /* Hero Section */
 form {
     width: 100%;
+    display: contents;
 }
 
 .hero-section {

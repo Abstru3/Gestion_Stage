@@ -360,5 +360,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Initial call to update the form based on the role selected
         updateForm();
     </script>
+
+    <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
 </body>
 </html>
