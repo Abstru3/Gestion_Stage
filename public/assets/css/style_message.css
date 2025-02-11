@@ -289,12 +289,14 @@ body {
 }
 
 .status.en_attente {
+    text-align: center;
     background-color: #fff7ed;
     color: #9a3412;
     border: 1px solid #fed7aa;
 }
 
 .status.refusee {
+    text-align: center;
     background-color: #fef2f2;
     color: #991b1b;
     border: 1px solid #fecaca;
