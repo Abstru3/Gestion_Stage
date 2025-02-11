@@ -313,7 +313,7 @@ $(document).ready(function() {
         new URLSearchParams(window.location.search).get('etudiant_id')) {
         loadMessages();
         initializeMessageForm();
-        setInterval(loadMessages, 5000);
+        setInterval(loadMessages, 50000);
     }
 });
 </script>
@@ -335,8 +335,23 @@ $(document).ready(function() {
                         <div class="info">
                             <span class="name"><?php echo htmlspecialchars($etudiant['nom_complet']); ?></span>
                             <span class="offer-title"><?php echo htmlspecialchars($etudiant['titre_offre']); ?></span>
-                            <span class="status <?php echo $etudiant['statut_candidature']; ?>">
-                                <?php echo ucfirst($etudiant['statut_candidature']); ?>
+                            <span class="status <?php echo strtolower($etudiant['statut_candidature']); ?>">
+                                <?php 
+                                $statut = strtolower($etudiant['statut_candidature']);
+                                switch($statut) {
+                                    case 'acceptee':
+                                        echo '<i class="fas fa-check-circle"></i> Acceptée';
+                                        break;
+                                    case 'en_attente':
+                                        echo '<i class="fas fa-clock"></i> En attente';
+                                        break;
+                                    case 'refusee':
+                                        echo '<i class="fas fa-times-circle"></i> Refusée';
+                                        break;
+                                    default:
+                                        echo ucfirst($statut);
+                                }
+                                ?>
                             </span>
                             <?php if ($etudiant['dernier_message']): ?>
                                 <span class="last-message">

@@ -12,6 +12,8 @@
     --message-received: #ffffff;
     --transition-duration: 0.2s;
     --font-family: 'Nunito', sans-serif;
+    --sidebar-width: 300px;
+    --reply-box-height: 4rem; /* Hauteur fixe pour la zone de réponse */
 }
 
 * {
@@ -25,6 +27,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 /* Container principal */
@@ -32,19 +35,20 @@ body {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 1.5rem;
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2.5rem;
+    display: flex;
     background: white;
     border-radius: var(--radius);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-    transition: box-shadow var(--transition-duration) ease;
+    min-height: 70vh;
+    position: relative;
 }
 
 /* Liste des conversations */
 .conversation-list {
+    width: var(--sidebar-width);
     border-right: 1px solid var(--border-color);
-    padding-right: 1.5rem;
+    padding: 1.5rem;
+    overflow-y: auto;
 }
 
 .conversation-list select {
@@ -63,89 +67,23 @@ body {
     border-color: var(--primary-color);
 }
 
-
 /* Zone des messages */
 .message-content {
     display: flex;
     flex-direction: column;
-}
-/* Ajoutez ces styles dans votre fichier CSS */
-.conversation-list {
-    width: 250px;
-    border-right: 1px solid #e2e8f0;
-    padding: 20px;
-    background: white;
-    height: 100%;
+    flex: 1;
+    padding: 1.5rem;
     overflow-y: auto;
 }
 
-.entreprises-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.entreprise-item {
-    margin-bottom: 10px;
-}
-
-.entreprise-item a {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    text-decoration: none;
-    color: #1a202c;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.entreprise-item a:hover {
-    background-color: #f7fafc;
-}
-
-.entreprise-item.active a {
-    background-color: #e2e8f0;
-}
-
-.entreprise-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #e2e8f0;
-}
-
-.entreprise-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.entreprise-avatar i {
-    font-size: 20px;
-    color: #718096;
-}
-
-.entreprise-info {
-    flex: 1;
-}
-
-.entreprise-name {
-    font-weight: 500;
-    display: block;
-    margin-bottom: 2px;
-}
+/* Messages */
 .messages-container {
     flex-grow: 1;
     overflow-y: auto;
     padding: 1.25rem;
     background: var(--bg-color);
     border-radius: var(--radius);
-    margin-bottom: 1rem;
+    margin-bottom: var(--reply-box-height); /* Ajuster la marge pour la zone de réponse */
 }
 
 .messages {
@@ -209,21 +147,26 @@ body {
 
 /* Zone de réponse améliorée */
 .reply-box {
-    position: sticky;
+    position: absolute;
     bottom: 0;
+    left: 0;
+    right: 0;
     background: white;
-    padding: 1.25rem;
-    border-radius: var(--radius);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
-    margin-top: auto;
     transition: box-shadow var(--transition-duration) ease;
+    display: flex;
+    align-items: center; /* Alignement vertical */
+    gap: 1rem;
+    height: var(--reply-box-height); /* Hauteur fixe */
 }
 
 .reply-box textarea {
-    width: 100%;
-    min-height: 100px;
-    max-height: 200px;
-    padding: 1rem;
+    flex: 1;
+    min-height: 2.5rem; /* Ajuster la hauteur minimale */
+    max-height: 5rem;
+    padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
     resize: vertical;
@@ -233,11 +176,12 @@ body {
     transition: all var(--transition-duration) ease;
 }
 
-.button {
+.reply-box .button {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
-    padding: 0.875rem 2rem;
+    padding: 0.5rem 1rem;
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -246,6 +190,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-duration) ease;
+    height: 2.5rem; /* Ajuster la hauteur du bouton */
 }
 
 /* Ajoutez ces styles CSS */
@@ -325,6 +270,54 @@ body {
     color: #718096;
 }
 
+/* Ajouter ces styles dans /Gestion_Stage/public/assets/css/style_message.css */
+.status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 6px;
+    text-transform: capitalize;
+}
+
+.status.acceptee {
+    text-align: center;
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.status.en_attente {
+    background-color: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+}
+
+.status.refusee {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.conversation-item .info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.conversation-item .name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.conversation-item .offer-title {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
 /* Responsive amélioré */
 @media (max-width: 1024px) {
     .inbox-container {
@@ -339,17 +332,18 @@ body {
 
 @media (max-width: 768px) {
     .inbox-container {
-        grid-template-columns: 1fr;
+        flex-direction: column;
         margin: 0;
         padding: 1.25rem;
         gap: 1.5rem;
-        height: auto;
+        min-height: auto; /* Supprimer la hauteur minimale */
     }
 
     .conversation-list {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding: 1rem;
+        width: 100%;
     }
 
     .message {
@@ -357,9 +351,24 @@ body {
     }
 
     .reply-box {
-        margin: 0;
-        border-radius: 0;
-        box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.06);
+        position: relative; /* Retour au positionnement relatif */
+        bottom: auto;
+        left: auto;
+        right: auto;
+        margin: 1rem 0;
+        flex-direction: row; /* Alignement horizontal */
+        align-items: center;
+        gap: 0.75rem;
+        height: auto; /* Supprimer la hauteur fixe */
+    }
+
+    .reply-box textarea {
+        width: 100%; /* La zone de texte prend toute la largeur */
+        min-height: 2rem;
+    }
+
+    .reply-box .button {
+        width: auto; /* Le bouton s'adapte au contenu */
     }
 }
 
@@ -372,8 +381,12 @@ body {
         max-width: 100%;
     }
 
-    .button {
+    .reply-box {
+        flex-direction: column; /* Empiler sur les très petits écrans */
+        align-items: stretch; /* Étirer les éléments */
+    }
+
+    .reply-box .button {
         width: 100%;
-        justify-content: center;
     }
 }
