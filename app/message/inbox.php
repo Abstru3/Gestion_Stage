@@ -218,11 +218,11 @@ if ($role === 'etudiant' && $conversation_id) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <h1 align="center" >Boîte de réception</h1>
+    <h1>Boîte de réception</h1>
     <script>
 $(document).ready(function() {
     function scrollToBottom() {
-        const messageContainer = document.querySelector('.message-content');
+        const messageContainer = document.querySelector('.messages');
         if (messageContainer) {
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
@@ -245,7 +245,6 @@ $(document).ready(function() {
                 success: function(response) {
                     $('#messageContent').html(response);
                     scrollToBottom();
-                    // Réinitialiser le gestionnaire d'événements du formulaire
                     initializeMessageForm();
                 }
             });
@@ -254,7 +253,6 @@ $(document).ready(function() {
         }
     }
 
-    // Remplacer la fonction initializeMessageForm() dans inbox.php par :
     function initializeMessageForm() {
         $('#messageForm').off('submit');
         
@@ -270,12 +268,7 @@ $(document).ready(function() {
                 destinataireId = new URLSearchParams(window.location.search).get('etudiant_id');
             }
             
-            console.log('Role:', '<?php echo $role; ?>');
-            console.log('destinataireId:', destinataireId);
-            console.log('contenu:', contenu);
-            
             if (!destinataireId || !contenu) {
-                console.log('Données manquantes - destinataireId:', destinataireId, 'contenu:', contenu);
                 alert('Veuillez écrire un message');
                 return;
             }
@@ -292,15 +285,12 @@ $(document).ready(function() {
                     if (response.success) {
                         form[0].reset();
                         loadMessages();
+                        setTimeout(scrollToBottom, 100); // Ajouter un petit délai
                     } else {
-                        console.log('Erreur serveur:', response);
                         alert('Erreur lors de l\'envoi du message: ' + (response.message || ''));
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log('Réponse complète:', xhr.responseText);
-                    console.error('Erreur AJAX:', error);
-                    console.log('Status:', status);
                     alert('Erreur lors de l\'envoi du message');
                 }
             });
@@ -323,7 +313,6 @@ $(document).ready(function() {
         setInterval(loadMessages, 50000);
     }
 
-    // Ajouter ce code dans la section <script> de inbox.php
     // Fonction pour mettre à jour la classe active
     function updateActiveConversation() {
         const currentUrl = new URL(window.location.href);
@@ -429,8 +418,29 @@ $(document).ready(function() {
                                         <span class="offer-title"><?php echo htmlspecialchars($entreprise['titre_offre']); ?></span>
                                     <?php endif; ?>
                                     <?php if ($entreprise['statut_candidature']): ?>
-                                        <span class="status <?php echo $entreprise['statut_candidature']; ?>">
-                                            <?php echo ucfirst($entreprise['statut_candidature']); ?>
+                                        <span class="status <?php echo strtolower($entreprise['statut_candidature']); ?>">
+                                            <?php 
+                                            $statut = strtolower($entreprise['statut_candidature']);
+                                            switch($statut) {
+                                                case 'acceptee':
+                                                    echo '<i class="fas fa-check-circle"></i> Acceptée';
+                                                    break;
+                                                case 'en_attente':
+                                                    echo '<i class="fas fa-clock"></i> En attente';
+                                                    break;
+                                                case 'refusee':
+                                                    echo '<i class="fas fa-times-circle"></i> Refusée';
+                                                    break;
+                                                default:
+                                                    echo ucfirst($statut);
+                                            }
+                                            ?>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if ($entreprise['dernier_message']): ?>
+                                        <span class="last-message">
+                                            <i class="far fa-clock"></i>
+                                            <?php echo date('d/m/Y H:i', strtotime($entreprise['dernier_message'])); ?>
                                         </span>
                                     <?php endif; ?>
                                 </div>
@@ -443,7 +453,7 @@ $(document).ready(function() {
     <?php endif; ?>
 </div>
         
-        <div class="message-content" id="messageContent" style="height: 400px; overflow-y: auto;">
+        <div class="message-content" id="messageContent">
     <?php if ($role === 'etudiant' && !$selected_entreprise_id): ?>
         <p class="empty-message"><i class="fas fa-comments"></i> Sélectionnez une conversation pour afficher les messages</p>
     <?php elseif ($role === 'entreprise' && !$selected_etudiant_id): ?>
