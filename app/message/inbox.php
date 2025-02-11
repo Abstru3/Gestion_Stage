@@ -23,7 +23,8 @@ if ($role === 'entreprise') {
                               CONCAT(e.nom, ' ', e.prenom) as nom_complet,
                               MAX(m.date_envoi) as dernier_message,
                               c.statut as statut_candidature,
-                              os.titre as titre_offre
+                              os.titre as titre_offre,
+                              MIN(m.conversation_id) as conversation_id
                        FROM etudiants e
                        INNER JOIN candidatures c ON e.id = c.etudiant_id
                        INNER JOIN offres_stages os ON c.offre_id = os.id
@@ -33,20 +34,48 @@ if ($role === 'entreprise') {
                        )
                        WHERE os.entreprise_id = :user_id
                        GROUP BY e.id
-                       ORDER BY dernier_message DESC, c.date_candidature DESC";
-    
+                       ORDER BY CASE 
+                           WHEN MAX(m.date_envoi) IS NULL THEN 1 
+                           ELSE 0 
+                       END, 
+                       MAX(m.date_envoi) DESC, 
+                       c.date_candidature DESC";
+
     $etudiant_stmt = $pdo->prepare($etudiant_query);
     $etudiant_stmt->execute([':user_id' => $user_id]);
     $etudiants = $etudiant_stmt->fetchAll();
 } else {
-    // Récupérer toutes les entreprises qui ont des messages avec l'étudiant
+    // Pour les étudiants, remplacer la requête par :
     $entreprise_query = "SELECT DISTINCT e.*, 
-                                MAX(m.date_envoi) as dernier_message 
-                         FROM entreprises e
-                         INNER JOIN messages m ON (m.expediteur_id = e.id OR m.destinataire_id = e.id)
-                         WHERE m.expediteur_id = :user_id OR m.destinataire_id = :user_id
-                         GROUP BY e.id
-                         ORDER BY dernier_message DESC";
+                            MAX(m.date_envoi) as dernier_message,
+                            c.statut as statut_candidature,
+                            os.titre as titre_offre
+                     FROM entreprises e
+                     LEFT JOIN offres_stages os ON e.id = os.entreprise_id
+                     LEFT JOIN candidatures c ON os.id = c.offre_id AND c.etudiant_id = :user_id
+                     LEFT JOIN messages m ON (
+                         (m.expediteur_id = e.id AND m.destinataire_id = :user_id)
+                         OR (m.expediteur_id = :user_id AND m.destinataire_id = e.id)
+                     )
+                     WHERE 
+                         (c.statut = 'acceptee' OR m.id IS NOT NULL)
+                         AND e.id IN (
+                             SELECT DISTINCT entreprise_id 
+                             FROM offres_stages 
+                             WHERE id IN (
+                                 SELECT offre_id 
+                                 FROM candidatures 
+                                 WHERE etudiant_id = :user_id
+                             )
+                         )
+                     GROUP BY e.id
+                     ORDER BY CASE 
+                         WHEN MAX(m.date_envoi) IS NULL THEN 1 
+                         ELSE 0 
+                     END,
+                     MAX(m.date_envoi) DESC, 
+                     c.date_candidature DESC";
+    
     $entreprise_stmt = $pdo->prepare($entreprise_query);
     $entreprise_stmt->execute([':user_id' => $user_id]);
     $entreprises = $entreprise_stmt->fetchAll();
@@ -184,74 +213,109 @@ if ($role === 'etudiant' && $conversation_id) {
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <h1 align="center" >Boîte de réception</h1>
     <script>
-    $(document).ready(function() {
-        function scrollToBottom() {
-            const messageContainer = document.querySelector('.message-content');
+$(document).ready(function() {
+    function scrollToBottom() {
+        const messageContainer = document.querySelector('.message-content');
+        if (messageContainer) {
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
+    }
 
-        function loadMessages() {
-            // Récupérer l'ID de l'URL ou du select
-            const entrepriseId = new URLSearchParams(window.location.search).get('entreprise_id');
-            const etudiantId = new URLSearchParams(window.location.search).get('etudiant_id');
-            
-            if ((etudiantId && '<?php echo $role; ?>' === 'entreprise') || 
-                (entrepriseId && '<?php echo $role; ?>' === 'etudiant')) {
-                $.ajax({
-                    url: 'load_messages.php',
-                    method: 'GET',
-                    data: { 
-                        entreprise_id: entrepriseId,
-                        etudiant_id: etudiantId
-                    },
-                    success: function(response) {
-                        $('#messageContent').html(response);
-                        scrollToBottom();
-                    }
-                });
-            }
+    function loadMessages() {
+        const entrepriseId = new URLSearchParams(window.location.search).get('entreprise_id');
+        const etudiantId = new URLSearchParams(window.location.search).get('etudiant_id');
+        
+        if ((etudiantId && '<?php echo $role; ?>' === 'entreprise') || 
+            (entrepriseId && '<?php echo $role; ?>' === 'etudiant')) {
+            $('.reply-section').show();
+            $.ajax({
+                url: 'load_messages.php',
+                method: 'GET',
+                data: { 
+                    entreprise_id: entrepriseId,
+                    etudiant_id: etudiantId
+                },
+                success: function(response) {
+                    $('#messageContent').html(response);
+                    scrollToBottom();
+                    // Réinitialiser le gestionnaire d'événements du formulaire
+                    initializeMessageForm();
+                }
+            });
+        } else {
+            $('.reply-section').hide();
         }
+    }
 
-        // Gérer le clic sur un étudiant ou une entreprise
-        $('.conversation-item a').click(function(e) {
-            e.preventDefault();
-            const href = $(this).attr('href');
-            window.history.pushState({}, '', href);
-            loadMessages();
-        });
-
-        $('#messageForm').submit(function(e) {
+    // Remplacer la fonction initializeMessageForm() dans inbox.php par :
+    function initializeMessageForm() {
+        $('#messageForm').off('submit');
+        
+        $('#messageForm').on('submit', function(e) {
             e.preventDefault();
             const form = $(this);
-            const currentUrl = window.location.href; // Sauvegarder l'URL actuelle
+            const contenu = form.find('textarea[name="contenu"]').val();
+            let destinataireId;
+            
+            if ('<?php echo $role; ?>' === 'etudiant') {
+                destinataireId = new URLSearchParams(window.location.search).get('entreprise_id');
+            } else {
+                destinataireId = new URLSearchParams(window.location.search).get('etudiant_id');
+            }
+            
+            console.log('Role:', '<?php echo $role; ?>');
+            console.log('destinataireId:', destinataireId);
+            console.log('contenu:', contenu);
+            
+            if (!destinataireId || !contenu) {
+                console.log('Données manquantes - destinataireId:', destinataireId, 'contenu:', contenu);
+                alert('Veuillez écrire un message');
+                return;
+            }
             
             $.ajax({
                 url: 'send_message.php',
                 method: 'POST',
-                data: form.serialize(),
+                data: {
+                    destinataire_id: destinataireId,
+                    contenu: contenu
+                },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
                         form[0].reset();
-                        loadMessages(); // Recharger les messages
+                        loadMessages();
                     } else {
-                        alert('Erreur lors de l\'envoi du message');
+                        console.log('Erreur serveur:', response);
+                        alert('Erreur lors de l\'envoi du message: ' + (response.message || ''));
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    console.log('Réponse complète:', xhr.responseText);
+                    console.error('Erreur AJAX:', error);
+                    console.log('Status:', status);
                     alert('Erreur lors de l\'envoi du message');
                 }
             });
         });
+    }
 
-        // Charger les messages initialement si une conversation est sélectionnée
-        if (new URLSearchParams(window.location.search).get('entreprise_id') || 
-            new URLSearchParams(window.location.search).get('etudiant_id')) {
-            loadMessages();
-            // Rafraîchir les messages toutes les 5 secondes
-            setInterval(loadMessages, 5000);
-        }
+    // Gérer le clic sur une conversation
+    $(document).on('click', '.conversation-item a', function(e) {
+        e.preventDefault();
+        const href = $(this).attr('href');
+        window.history.pushState({}, '', href);
+        loadMessages();
     });
+
+    // Initialisation au chargement de la page
+    if (new URLSearchParams(window.location.search).get('entreprise_id') || 
+        new URLSearchParams(window.location.search).get('etudiant_id')) {
+        loadMessages();
+        initializeMessageForm();
+        setInterval(loadMessages, 5000);
+    }
+});
 </script>
 
 </head>
@@ -286,29 +350,44 @@ if ($role === 'etudiant' && $conversation_id) {
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <h3>Conversations avec les entreprises</h3>
-        <ul class="conversations">
-            <?php foreach ($entreprises as $entreprise): ?>
-                <li class="conversation-item <?php echo $selected_entreprise_id == $entreprise['id'] ? 'active' : ''; ?>">
-                    <a href="?entreprise_id=<?php echo $entreprise['id']; ?>">
-                        <div class="avatar">
-                            <?php if ($entreprise['logo']): ?>
-                                <img src="/Gestion_Stage/public/uploads/logos/<?php echo htmlspecialchars($entreprise['logo']); ?>" 
-                                     alt="Logo <?php echo htmlspecialchars($entreprise['nom']); ?>">
-                            <?php else: ?>
-                                <i class="fas fa-building"></i>
-                            <?php endif; ?>
-                        </div>
-                        <div class="info">
-                            <span class="name"><?php echo htmlspecialchars($entreprise['nom']); ?></span>
-                            <span class="last-message">
-                                <?php echo date('d/m/Y H:i', strtotime($entreprise['dernier_message'])); ?>
-                            </span>
-                        </div>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <!-- Remplacer la section d'affichage des entreprises par : -->
+        <?php if ($role === 'etudiant'): ?>
+            <h3>Mes conversations</h3>
+            <ul class="conversations">
+                <?php if (empty($entreprises)): ?>
+                    <li class="empty-conversations">
+                        <i class="fas fa-info-circle"></i>
+                        Aucune conversation disponible
+                    </li>
+                <?php else: ?>
+                    <?php foreach ($entreprises as $entreprise): ?>
+                        <li class="conversation-item <?php echo $selected_entreprise_id == $entreprise['id'] ? 'active' : ''; ?>">
+                            <a href="?entreprise_id=<?php echo $entreprise['id']; ?>">
+                                <div class="avatar">
+                                    <?php if ($entreprise['logo']): ?>
+                                        <img src="/Gestion_Stage/public/uploads/logos/<?php echo htmlspecialchars($entreprise['logo']); ?>" 
+                                             alt="Logo <?php echo htmlspecialchars($entreprise['nom']); ?>">
+                                    <?php else: ?>
+                                        <i class="fas fa-building"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="info">
+                                    <span class="name"><?php echo htmlspecialchars($entreprise['nom']); ?></span>
+                                    <?php if ($entreprise['titre_offre']): ?>
+                                        <span class="offer-title"><?php echo htmlspecialchars($entreprise['titre_offre']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($entreprise['statut_candidature']): ?>
+                                        <span class="status <?php echo $entreprise['statut_candidature']; ?>">
+                                            <?php echo ucfirst($entreprise['statut_candidature']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
         
@@ -343,26 +422,21 @@ if ($role === 'etudiant' && $conversation_id) {
     <?php endif; ?>
 </div>
 
-<!-- Zone de réponse -->
-<div class="reply-section">
-    <?php if ($role === 'entreprise' && !empty($selected_etudiant_id)): ?>
-        <form id="messageForm" class="reply-box">
-            <input type="hidden" name="destinataire_id" value="<?php echo $selected_etudiant_id; ?>">
-            <textarea name="contenu" placeholder="Écrire un message..." required></textarea>
-            <button type="submit" class="button">
-                <i class="fas fa-paper-plane"></i> Envoyer
-            </button>
-        </form>
-    <?php elseif ($role === 'etudiant' && isset($entreprise_id)): ?>
-        <form id="messageForm" class="reply-box">
-            <input type="hidden" name="destinataire_id" value="<?php echo $entreprise_id; ?>">
-            <textarea name="contenu" placeholder="Écrire un message..." required></textarea>
-            <button type="submit" class="button">
-                <i class="fas fa-paper-plane"></i> Envoyer
-            </button>
-        </form>
-    <?php endif; ?>
+<!-- Modifier la section reply-section -->
+<div class="reply-section" style="display: none;">
+    <form id="messageForm" class="reply-box">
+        <?php if ($role === 'etudiant'): ?>
+            <input type="hidden" name="destinataire_id" value="<?php echo htmlspecialchars($selected_entreprise_id); ?>">
+        <?php else: ?>
+            <input type="hidden" name="destinataire_id" value="<?php echo htmlspecialchars($selected_etudiant_id); ?>">
+        <?php endif; ?>
+        <textarea name="contenu" placeholder="Écrire un message..." required></textarea>
+        <button type="submit" class="button">
+            <i class="fas fa-paper-plane"></i> Envoyer
+        </button>
+    </form>
 </div>
+
     </div>
     <p><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>
 </body>

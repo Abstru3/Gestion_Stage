@@ -35,7 +35,11 @@ try {
                     END as expediteur_nom,
                     e.id as entreprise_id
              FROM messages m
-             LEFT JOIN entreprises e ON e.id = :selected_entreprise_id
+
+             LEFT JOIN entreprises e ON e.id = CASE 
+                 WHEN m.expediteur_id = :user_id THEN m.destinataire_id
+                 ELSE m.expediteur_id 
+             END
              WHERE (m.expediteur_id = :user_id AND m.destinataire_id = :selected_entreprise_id)
              OR (m.expediteur_id = :selected_entreprise_id AND m.destinataire_id = :user_id)
              ORDER BY m.date_envoi ASC";
