@@ -1,0 +1,239 @@
+:root {
+    --primary-color: #2563EB; /* Bleu plus moderne */
+    --secondary-color: #4A5568; /* Gris bleuté */
+    --success-color: #48BB78; /* Vert vif */
+    --error-color: #E53E3E;
+    --border-color: #CBD5E0; /* Gris très clair */
+    --text-color: #2D3748; /* Gris foncé */
+    --bg-light: #F7FAFC; /* Blanc cassé */
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Ombre légère */
+    --transition-duration: 0.3s;
+    --font-family: 'Nunito', sans-serif; /* Police moderne */
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-light);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 750px;
+    background: #FFFFFF;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: var(--box-shadow);
+    transition: box-shadow var(--transition-duration);
+    margin: 2rem auto;
+}
+
+/* Progress Steps */
+.steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding: 0 0.5rem;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color var(--transition-duration), color var(--transition-duration), transform var(--transition-duration);
+}
+
+.step.active {
+    background-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.step-connector {
+    height: 4px;
+    width: calc(33.33% - 1rem);
+    background-color: var(--border-color);
+    transition: background-color var(--transition-duration);
+}
+
+.step-connector.active {
+    background-color: var(--primary-color);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Ajoutez ces styles pour les champs obligatoires */
+label[for*="*"]::after,
+label:has(+ input[required])::after,
+label:has(+ select[required])::after,
+label:has(+ textarea[required])::after {
+    content: '*';
+    color: #E53E3E;
+    margin-left: 4px;
+}
+
+small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+}
+
+input:invalid,
+textarea:invalid,
+select:invalid {
+    border-color: var(--error-color);
+}
+
+input:invalid:focus,
+textarea:invalid:focus,
+select:invalid:focus {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color var(--transition-duration), box-shadow var(--transition-duration);
+}
+
+select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: white;
+    font-size: 1rem;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+}
+
+/* Navigation Buttons */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+}
+
+button {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-duration), transform var(--transition-duration), box-shadow var(--transition-duration);
+    box-shadow: var(--box-shadow);
+}
+
+button[type="button"] {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+button[type="submit"] {
+    background-color: var (--success-color);
+    color: white;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .container {
+        padding: 2rem;
+    }
+
+    .steps {
+        padding: 0;
+    }
+
+    .step {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .step-connector {
+        width: calc(33.33% - 0.5rem);
+    }
+}
+
+/* Error Messages */
+.error {
+    color: var(--error-color);
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: rgba(229, 62, 62, 0.1);
+    border: 1px solid var(--error-color);
+    font-size: 1rem;
+}
+
+/* Success Messages */
+.success {
+    color: var(--success-color);
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: rgba(72, 187, 120, 0.1);
+    border: 1px solid var(--success-color);
+    font-size: 1rem;
+}
+
+/* Ajouter ces styles */
+.hidden {
+    display: none;
+}
+
+optgroup {
+    font-weight: bold;
+}
