@@ -171,6 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>NeversStage - Inscription</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_register.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -248,15 +249,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <div class="form-group">
                         <label for="password">Mot de passe :</label>
-                        <input type="password" id="password" name="password" required 
-                               placeholder="8 caractères minimum">
+                        <div class="password-input-container">
+                            <input type="password" id="password" name="password" required 
+                                   placeholder="8 caractères minimum">
+                            <span class="password-toggle" onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
                         <small>Minimum 8 caractères, une majuscule et un chiffre</small>
                     </div>
 
                     <div class="form-group">
                         <label for="confirm_password">Confirmation du mot de passe :</label>
-                        <input type="password" id="confirm_password" name="confirm_password" 
-                               required placeholder="Confirmez votre mot de passe">
+                        <div class="password-input-container">
+                            <input type="password" id="confirm_password" name="confirm_password" 
+                                   required placeholder="Confirmez votre mot de passe">
+                            <span class="password-toggle" onclick="togglePassword('confirm_password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -359,6 +370,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Initial call to update the form based on the role selected
         updateForm();
+
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const icon = passwordInput.parentElement.querySelector('.password-toggle i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
     </script>
 
     <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>

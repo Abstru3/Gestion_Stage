@@ -63,7 +63,7 @@ label {
 }
 
 input, select, textarea {
-    width: 100%;
+    width: 92%;
     padding: 0.8rem;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -153,4 +153,47 @@ button:hover {
     text-decoration: none;
     background: var(--secondary-color-hover);
     transition: background-color 0.2s ease;
+}
+
+/* Ajouter après les styles existants */
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #718096;
+    transition: color 0.2s ease;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.password-toggle:hover {
+    color: var(--secondary-color);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.password-input-container input {
+    width: 85%;
+    padding-right: 40px; /* Espace pour l'icône */
+}
+
+.password-input-container input:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.password-input-container input:focus + .password-toggle {
+    color: var(--secondary-color);
 }

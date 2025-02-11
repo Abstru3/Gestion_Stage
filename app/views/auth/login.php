@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_login.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -51,8 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="identifier">Email ou nom d'utilisateur :</label>
             <input type="text" id="identifier" name="identifier" required>
 
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" required>
+            <div class="password-container">
+                <label for="password">Mot de passe :</label>
+                <div class="password-input-container">
+                    <input type="password" id="password" name="password" required>
+                    <span class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+            </div>
 
             <button type="submit">Se connecter</button>
         </form>
@@ -60,5 +68,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.querySelector('.password-toggle i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
