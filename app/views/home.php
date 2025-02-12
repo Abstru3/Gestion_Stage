@@ -94,13 +94,37 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
     $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
 
+    // Ajout de la requête pour les candidatures mises à jour
+    $stmt_candidatures_updated = $pdo->prepare("
+        SELECT c.id, c.statut, c.date_modification, o.titre, e.nom as entreprise_nom 
+        FROM candidatures c
+        JOIN offres_stages o ON c.offre_id = o.id
+        JOIN entreprises e ON o.entreprise_id = e.id
+        WHERE c.etudiant_id = :user_id 
+        AND c.statut IN ('acceptee', 'refusee')
+        AND (c.date_lecture IS NULL OR c.date_modification > c.date_lecture)
+        ORDER BY c.date_modification DESC
+    ");
+    $stmt_candidatures_updated->execute(['user_id' => $_SESSION['user_id']]);
+    $candidatures_updated = $stmt_candidatures_updated->fetchAll(PDO::FETCH_ASSOC);
+
+    // À ajouter quand l'utilisateur consulte ses candidatures
+    $update_stmt = $pdo->prepare("
+        UPDATE candidatures 
+        SET date_lecture = CURRENT_TIMESTAMP 
+        WHERE etudiant_id = ? AND date_lecture IS NULL
+    ");
+    $update_stmt->execute([$_SESSION['user_id']]);
+
     $dashboard_data = [
         'total_candidatures' => $pdo->query("SELECT COUNT(*) FROM candidatures WHERE etudiant_id = {$_SESSION['user_id']}")->fetchColumn(),
         'candidatures_en_cours' => $pdo->query("SELECT COUNT(*) FROM candidatures WHERE etudiant_id = {$_SESSION['user_id']} AND statut = 'en_attente'")->fetchColumn(),
         'dernieres_candidatures' => $dernieres_candidatures,
         'offres_recommandees' => $offres_recommandees,
         'messages_non_lus' => $messages_non_lus,
-        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages'))
+        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages')),
+        'candidatures_updated' => $candidatures_updated,
+        'total_candidatures_updated' => count($candidatures_updated)
     ];
     
 } elseif ($_SESSION['role'] == 'entreprise') {
@@ -129,12 +153,40 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
     $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
 
+    // Ajout de la requête pour les nouvelles candidatures
+    $stmt_new_applications = $pdo->prepare("
+        SELECT COUNT(*) as count_new, o.titre
+        FROM candidatures c
+        JOIN offres_stages o ON c.offre_id = o.id
+        WHERE o.entreprise_id = :user_id
+        AND c.date_lecture IS NULL
+        GROUP BY o.id
+    ");
+    $stmt_new_applications->execute(['user_id' => $_SESSION['user_id']]);
+    $new_applications = $stmt_new_applications->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ajouter cette requête dans la section entreprise
+    $stmt_pending_applications = $pdo->prepare("
+        SELECT COUNT(*) as count_pending, o.titre, o.id as offre_id
+        FROM candidatures c
+        JOIN offres_stages o ON c.offre_id = o.id
+        WHERE o.entreprise_id = :user_id
+        AND c.statut = 'en_attente'
+        GROUP BY o.id, o.titre
+    ");
+    $stmt_pending_applications->execute(['user_id' => $_SESSION['user_id']]);
+    $pending_applications = $stmt_pending_applications->fetchAll(PDO::FETCH_ASSOC);
+
     $dashboard_data = [
         'total_offres' => $pdo->query("SELECT COUNT(*) FROM offres_stages WHERE entreprise_id = {$_SESSION['user_id']}")->fetchColumn(),
         'candidatures_recues' => $pdo->query("SELECT COUNT(*) FROM candidatures c JOIN offres_stages o ON c.offre_id = o.id WHERE o.entreprise_id = {$_SESSION['user_id']}")->fetchColumn(),
         'dernieres_candidatures' => $dernieres_candidatures,
         'messages_non_lus' => $messages_non_lus,
-        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages'))
+        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages')),
+        'new_applications' => $new_applications,
+        'total_new_applications' => array_sum(array_column($new_applications, 'count_new')),
+        'pending_applications' => $pending_applications,
+        'total_pending_applications' => array_sum(array_column($pending_applications, 'count_pending'))
     ];
 } elseif ($_SESSION['role'] == 'admin') {
     // Statistiques détaillées et dernières activités
@@ -312,21 +364,89 @@ if ($_SESSION['role'] == 'etudiant') {
         <?php if (in_array($_SESSION['role'], ['etudiant', 'entreprise'])): ?>
     <div class="dashboard-card">
         <h3>Notifications</h3>
-        <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
-            <p>Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)</p>
-            <ul class="dashboard-list">
-                <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+        <ul class="dashboard-list">
+            <?php if ($_SESSION['role'] == 'etudiant'): ?>
+                <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
                     <li>
-                        <a href="/Gestion_Stage/app/message/inbox.php?<?= $_SESSION['role'] === 'etudiant' ? 'entreprise_id=' : 'etudiant_id=' ?><?= $message['id'] ?>">
-                            <?= htmlspecialchars($message['expediteur_nom']) ?>
-                            <span class="notification-badge"><?= $message['nb_messages'] ?></span>
-                        </a>
+                        <i class="fas fa-envelope"></i>
+                        Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
+                        <ul>
+                            <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+                                <li>
+                                    <a href="/Gestion_Stage/app/message/inbox.php?entreprise_id=<?= $message['id'] ?>">
+                                        <?= htmlspecialchars($message['expediteur_nom']) ?>
+                                        <span class="notification-badge"><?= $message['nb_messages'] ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php else: ?>
-            <p>Vous n'avez aucun nouveau message</p>
-        <?php endif; ?>
+                <?php endif; ?>
+
+                <?php if ($dashboard_data['total_candidatures_updated'] > 0): ?>
+                    <li>
+                        <i class="fas fa-bell"></i>
+                        Mises à jour de vos candidatures:
+                        <ul>
+                            <?php foreach ($dashboard_data['candidatures_updated'] as $candidature): ?>
+                                <li>
+                                    <a href="/Gestion_Stage/app/views/panels/student_panel.php" 
+                                       onclick="event.preventDefault(); markAsReadAndRedirect(<?= $candidature['id'] ?>, this.href);">
+                                        <?= htmlspecialchars($candidature['entreprise_nom']) ?> - 
+                                        <?= htmlspecialchars($candidature['titre']) ?> : 
+                                        <span class="status-<?= $candidature['statut'] ?>">
+                                            <?= formatStatus($candidature['statut']) ?>
+                                        </span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+            <?php else: /* Entreprise */ ?>
+                <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
+                        <ul>
+                            <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+                                <li>
+                                    <a href="/Gestion_Stage/app/message/inbox.php?etudiant_id=<?= $message['id'] ?>">
+                                        <?= htmlspecialchars($message['expediteur_nom']) ?>
+                                        <span class="notification-badge"><?= $message['nb_messages'] ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <?php if ($dashboard_data['total_pending_applications'] > 0): ?>
+                    <li>
+                        <i class="fas fa-clock"></i>
+                        Candidatures en attente:
+                        <ul>
+                            <?php foreach ($dashboard_data['pending_applications'] as $application): ?>
+                                <li>
+                                    <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?= $application['offre_id'] ?>" style="color: #000;">
+                                        <?= htmlspecialchars($application['titre']) ?>
+                                        <span class="notification-badge pending"><?= $application['count_pending'] ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if (!$dashboard_data['total_messages_non_lus'] && 
+                    !($dashboard_data['total_candidatures_updated'] ?? 0) && 
+                    !($dashboard_data['total_new_applications'] ?? 0) && 
+                    !($dashboard_data['total_pending_applications'] ?? 0)): ?>
+                <li>Aucune nouvelle notification</li>
+            <?php endif; ?>
+        </ul>
     </div>
 <?php endif; ?>
     </div>
@@ -358,6 +478,38 @@ if ($_SESSION['role'] == 'etudiant') {
                 document.getElementById('feedback-modal').style.display = 'none';
             }
         }
-    </script>
+
+        function markAsRead(candidatureId) {
+            fetch('/Gestion_Stage/app/helpers/mark_candidature_read.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'candidature_id=' + candidatureId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+        }
+
+        function markAsReadAndRedirect(candidatureId, redirectUrl) {
+            fetch('/Gestion_Stage/app/helpers/mark_candidature_read.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'candidature_id=' + candidatureId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+</script>
 </body>
 </html>

@@ -286,6 +286,10 @@ th {
     margin-top: 10px;
 }
 
+.dashboard-grid li {
+    list-style: none;
+}
+
 /* Liste des candidatures */
 .dashboard-list {
     padding: 0;
@@ -300,6 +304,7 @@ th {
     margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
 }
 
 .dashboard-list li:hover {
@@ -308,16 +313,28 @@ th {
 
 .dashboard-list a {
     text-decoration: none;
-    color: var(--secondary-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 5px 0;
+    color: #000;
 }
 
 .dashboard-list a:hover {
-    color: var(--secondary-color-hover);
+    color: #007bff;
     text-decoration: none;
+}
+
+.dashboard-list ul li {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dashboard-list i {
+    margin-right: 8px;
+    color: #666;
 }
 
 .notification-badge {
@@ -331,6 +348,11 @@ th {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.notification-badge.pending {
+    background-color: #ffc107;  /* Couleur jaune pour "en attente" */
+    color: #ffffff;
 }
 
 /* Statut des candidatures */
