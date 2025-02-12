@@ -29,26 +29,26 @@ if ($role === 'etudiant') {
 if ($role === 'entreprise') {
     // Récupérer uniquement les étudiants qui ont candidaté aux offres de l'entreprise
     $etudiant_query = "SELECT DISTINCT e.*, 
-                              CONCAT(e.nom, ' ', e.prenom) as nom_complet,
-                              MAX(m.date_envoi) as dernier_message,
-                              c.statut as statut_candidature,
-                              os.titre as titre_offre,
-                              MIN(m.conversation_id) as conversation_id
-                       FROM etudiants e
-                       INNER JOIN candidatures c ON e.id = c.etudiant_id
-                       INNER JOIN offres_stages os ON c.offre_id = os.id
-                       LEFT JOIN messages m ON (
-                           (m.expediteur_id = CONCAT('E', e.id) AND m.destinataire_id = CONCAT('C', :user_id))
-                           OR (m.expediteur_id = CONCAT('C', :user_id) AND m.destinataire_id = CONCAT('E', e.id))
-                       )
-                       WHERE os.entreprise_id = :user_id
-                       GROUP BY e.id
-                       ORDER BY CASE 
-                           WHEN MAX(m.date_envoi) IS NULL THEN 1 
-                           ELSE 0 
-                       END, 
-                       MAX(m.date_envoi) DESC, 
-                       c.date_candidature DESC";
+    CONCAT(e.nom, ' ', e.prenom) as nom_complet,
+    MAX(m.date_envoi) as dernier_message,
+    c.statut as statut_candidature,
+    os.titre as titre_offre,
+    MIN(m.conversation_id) as conversation_id,
+    COUNT(DISTINCT CASE 
+        WHEN m.statut = 'non_lu' 
+        AND m.expediteur_id = CONCAT('E', e.id) 
+        AND m.destinataire_id = CONCAT('C', :user_id) 
+        THEN m.id 
+    END) as messages_non_lus
+FROM etudiants e
+INNER JOIN candidatures c ON e.id = c.etudiant_id
+INNER JOIN offres_stages os ON c.offre_id = os.id
+LEFT JOIN messages m ON (
+    m.expediteur_id = CONCAT('E', e.id) 
+    AND m.destinataire_id = CONCAT('C', :user_id)
+)
+WHERE os.entreprise_id = :user_id
+GROUP BY e.id";
 
     $etudiant_stmt = $pdo->prepare($etudiant_query);
     $etudiant_stmt->execute([':user_id' => $user_id]);
@@ -56,34 +56,34 @@ if ($role === 'entreprise') {
 } else {
     // Remplacer la requête pour les étudiants
     $entreprise_query = "SELECT DISTINCT e.*, 
-                            MAX(m.date_envoi) as dernier_message,
-                            c.statut as statut_candidature,
-                            os.titre as titre_offre
-                     FROM entreprises e
-                     LEFT JOIN offres_stages os ON e.id = os.entreprise_id
-                     LEFT JOIN candidatures c ON os.id = c.offre_id AND c.etudiant_id = :user_id
-                     LEFT JOIN messages m ON (
-                         (m.expediteur_id = CONCAT('E', :user_id) AND m.destinataire_id = CONCAT('C', e.id))
-                         OR (m.expediteur_id = CONCAT('C', e.id) AND m.destinataire_id = CONCAT('E', :user_id))
-                     )
-                     WHERE 
-                         (c.statut = 'acceptee' OR m.id IS NOT NULL)
-                         AND e.id IN (
-                             SELECT DISTINCT entreprise_id 
-                             FROM offres_stages 
-                             WHERE id IN (
-                                 SELECT offre_id 
-                                 FROM candidatures 
-                                 WHERE etudiant_id = :user_id
-                             )
-                         )
-                     GROUP BY e.id
-                     ORDER BY CASE 
-                         WHEN MAX(m.date_envoi) IS NULL THEN 1 
-                         ELSE 0 
-                     END,
-                     MAX(m.date_envoi) DESC, 
-                     c.date_candidature DESC";
+    MAX(m.date_envoi) as dernier_message,
+    c.statut as statut_candidature,
+    os.titre as titre_offre,
+    COUNT(DISTINCT CASE 
+        WHEN m.statut = 'non_lu' 
+        AND m.expediteur_id = CONCAT('C', e.id) 
+        AND m.destinataire_id = CONCAT('E', :user_id) 
+        THEN m.id 
+    END) as messages_non_lus
+FROM entreprises e
+LEFT JOIN offres_stages os ON e.id = os.entreprise_id
+LEFT JOIN candidatures c ON os.id = c.offre_id AND c.etudiant_id = :user_id
+LEFT JOIN messages m ON (
+    m.expediteur_id = CONCAT('C', e.id) 
+    AND m.destinataire_id = CONCAT('E', :user_id)
+)
+WHERE 
+    (c.statut = 'acceptee' OR m.id IS NOT NULL)
+    AND e.id IN (
+        SELECT DISTINCT entreprise_id 
+        FROM offres_stages 
+        WHERE id IN (
+            SELECT offre_id 
+            FROM candidatures 
+            WHERE etudiant_id = :user_id
+        )
+    )
+GROUP BY e.id";
     
     $entreprise_stmt = $pdo->prepare($entreprise_query);
     $entreprise_stmt->execute([':user_id' => $user_id]);
@@ -204,6 +204,35 @@ if ($role === 'etudiant' && $conversation_id) {
 } else {
     $can_reply = false;
 }
+
+// Dans le fichier inbox.php, après la récupération des messages
+if ($role === 'etudiant' && $selected_entreprise_id) {
+    // Marquer les messages comme lus
+    $update_query = "UPDATE messages 
+                    SET statut = 'lu' 
+                    WHERE expediteur_id = CONCAT('C', :entreprise_id)
+                    AND destinataire_id = CONCAT('E', :user_id)
+                    AND statut = 'non_lu'";
+    
+    $update_stmt = $pdo->prepare($update_query);
+    $update_stmt->execute([
+        ':entreprise_id' => $selected_entreprise_id,
+        ':user_id' => $user_id
+    ]);
+} elseif ($role === 'entreprise' && $selected_etudiant_id) {
+    // Marquer les messages comme lus
+    $update_query = "UPDATE messages 
+                    SET statut = 'lu' 
+                    WHERE expediteur_id = CONCAT('E', :etudiant_id)
+                    AND destinataire_id = CONCAT('C', :user_id)
+                    AND statut = 'non_lu'";
+    
+    $update_stmt = $pdo->prepare($update_query);
+    $update_stmt->execute([
+        ':etudiant_id' => $selected_etudiant_id,
+        ':user_id' => $user_id
+    ]);
+}
 ?>
 
 <!DOCTYPE html>
@@ -302,7 +331,12 @@ $(document).ready(function() {
         e.preventDefault();
         const href = $(this).attr('href');
         window.history.pushState({}, '', href);
+        
+        // Supprimer la notification de la conversation cliquée
+        $(this).find('.notification-badge').remove();
+        
         loadMessages();
+        updateActiveConversation();
     });
 
     // Initialisation au chargement de la page
@@ -359,7 +393,14 @@ $(document).ready(function() {
                             <i class="fas fa-user-graduate"></i>
                         </div>
                         <div class="info">
-                            <span class="name"><?php echo htmlspecialchars($etudiant['nom_complet']); ?></span>
+                            <span class="name">
+                                <?php echo htmlspecialchars($etudiant['nom_complet']); ?>
+                                <?php if ($etudiant['messages_non_lus'] > 0): ?>
+                                    <span class="notification-badge">
+                                        <?php echo $etudiant['messages_non_lus'] > 9 ? '9+' : $etudiant['messages_non_lus']; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </span>
                             <span class="offer-title"><?php echo htmlspecialchars($etudiant['titre_offre']); ?></span>
                             <span class="status <?php echo strtolower($etudiant['statut_candidature']); ?>">
                                 <?php 
@@ -413,7 +454,14 @@ $(document).ready(function() {
                                     <?php endif; ?>
                                 </div>
                                 <div class="info">
-                                    <span class="name"><?php echo htmlspecialchars($entreprise['nom']); ?></span>
+                                    <span class="name">
+<?php echo htmlspecialchars($entreprise['nom']); ?>
+                                        <?php if ($entreprise['messages_non_lus'] > 0): ?>
+                                            <span class="notification-badge">
+                                                <?php echo $entreprise['messages_non_lus'] > 9 ? '9+' : $entreprise['messages_non_lus']; ?>
+                                            </span>
+                                        <?php endif; ?>
+</span>
                                     <?php if ($entreprise['titre_offre']): ?>
                                         <span class="offer-title"><?php echo htmlspecialchars($entreprise['titre_offre']); ?></span>
                                     <?php endif; ?>

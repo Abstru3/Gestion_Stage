@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  localhost
--- Généré le :  Mar 11 Février 2025 à 08:32
+-- Généré le :  Mer 12 Février 2025 à 08:50
 -- Version du serveur :  5.7.11
 -- Version de PHP :  7.2.7
 
@@ -41,9 +41,14 @@ CREATE TABLE `candidatures` (
 --
 
 INSERT INTO `candidatures` (`id`, `etudiant_id`, `offre_id`, `statut`, `date_candidature`, `cv`, `lettre_motivation`) VALUES
-(3, 1, 30, 'acceptee', '2025-02-05 15:05:22', '67a37022928cc.pdf', '67a3702292f3b.pdf'),
-(4, 5, 32, 'acceptee', '2025-02-06 14:47:56', '67a4bd8c3e8aa.pdf', '67a4bd8c3f09a.pdf'),
-(5, 5, 33, 'en_attente', '2025-02-07 09:36:51', '67a5c62396937.pdf', '67a5c62396d5a.pdf');
+(3, 1, 30, 'en_attente', '2025-02-05 15:05:22', '67a37022928cc.pdf', '67a3702292f3b.pdf'),
+(4, 5, 32, 'refusee', '2025-02-06 14:47:56', '67a4bd8c3e8aa.pdf', '67a4bd8c3f09a.pdf'),
+(5, 5, 33, 'en_attente', '2025-02-07 09:36:51', '67a5c62396937.pdf', '67a5c62396d5a.pdf'),
+(6, 6, 32, 'acceptee', '2025-02-11 09:36:22', '67ab0c069b15a.pdf', '67ab0c069b856.pdf'),
+(7, 7, 32, 'en_attente', '2025-02-11 09:43:33', '67ab0db579039.pdf', '67ab0db579a84.pdf'),
+(8, 8, 31, 'en_attente', '2025-02-11 19:34:47', '67ab984784244.pdf', '67ab984784909.pdf'),
+(9, 8, 32, 'acceptee', '2025-02-11 19:35:09', '67ab985d1eada.pdf', '67ab985d1eebe.pdf'),
+(10, 9, 33, 'refusee', '2025-02-11 19:39:17', '67ab995549559.pdf', '67ab9955498d9.pdf');
 
 -- --------------------------------------------------------
 
@@ -133,7 +138,11 @@ INSERT INTO `etudiants` (`id`, `nom`, `prenom`, `date_naissance`, `adresse`, `vi
 (2, 'Koraqi', 'Besjan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin', 'raqii@gmail.com', '$2y$10$QUo31Cnq3k5YPDzaLjGyn.z1D9rWD5DalNBYzSibwyDMz7EiLnvYq', 'admin', NULL, '2025-02-06 09:29:04', NULL),
 (3, 'Koraqi', 'Besjan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'f', 'i@gmail.com', '$2y$10$X37ad9GrOp8thMeGE49EU.lX4IZXdegAILB0k3nEeWxUcEKCnRFie', 'etudiant', NULL, '2025-02-06 09:53:40', NULL),
 (4, 'Henriot', 'Léo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Administrateur', 'admin@admin.fr', '$2y$10$X4QuNJya8RiQO8Dyt/eMFubDEILmzXM0.tcZeirRBtOE3TFPUQezu', 'admin', NULL, '2025-02-06 13:31:37', NULL),
-(5, 'Amo', 'Gus', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Amogus', 'amog.us@mail.fr', '$2y$10$gMeexfysIdkjRsXHwwq7EO/SKReE3e97FKePpQOPTTSztG3Ykak96', 'etudiant', NULL, '2025-02-06 13:45:13', NULL);
+(5, 'Amo', 'Gus', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Amogus', 'amog.us@mail.fr', '$2y$10$gMeexfysIdkjRsXHwwq7EO/SKReE3e97FKePpQOPTTSztG3Ykak96', 'etudiant', NULL, '2025-02-06 13:45:13', NULL),
+(6, 'm5wc', '8594', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm5wc', 'm5wc@gmail.com', '$2y$10$fWULE5e7z3KOCtyorD9/BOiLT45LgyIqdtlapSZ.Yl5FagNViAdG2', 'etudiant', NULL, '2025-02-11 08:35:02', NULL),
+(7, 'Henriot', 'Léo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'LeoH_', 'leo.henriot58@gmail.com', '$2y$10$GiRhAKllqofO2y.i6atVeeumv7x28j8JQpo1wmPg6erUv/LSMmW6q', 'etudiant', NULL, '2025-02-11 08:43:02', NULL),
+(8, 'Etudiant', 'Nevers', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'etudiant58', 'etudiant@exemple.fr', '$2y$10$vVCFOs0DPcyAhQtvGu1lQ.7WS8DYs.ngFKKXsTRzYHVJJJZQHXzzW', 'etudiant', NULL, '2025-02-11 18:34:03', NULL),
+(9, 'e', 'e', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'e', 'e@e.fr', '$2y$10$Ml7YaBjGUdwQQNWJwt1Tx.DQYzVoTJ2Sz/VvDbUYrrJMMSqMeuCZa', 'etudiant', NULL, '2025-02-11 18:38:37', NULL);
 
 -- --------------------------------------------------------
 
@@ -164,7 +173,8 @@ INSERT INTO `feedback` (`id`, `user_name`, `role`, `feedback`, `created_at`, `da
 (17, 'Amo Gus', 'etudiant', 'Avis d\'étudiant 1', '2025-02-07 14:50:18', '2025-02-07 14:50:18'),
 (18, 'Amo Gus', 'etudiant', 'Avis d\'étudiant 2', '2025-02-07 14:50:22', '2025-02-07 14:50:22'),
 (19, 'Amo Gus', 'etudiant', 'Avis d\'étudiant 3', '2025-02-07 14:50:24', '2025-02-07 14:50:24'),
-(20, 'iutnervers', 'entreprise', 'J\'aime bien', '2025-02-10 10:29:21', '2025-02-10 10:29:21');
+(20, 'iutnervers', 'entreprise', 'J\'aime bien', '2025-02-10 10:29:21', '2025-02-10 10:29:21'),
+(21, 'Quizzine', 'entreprise', 'Je donne mon avis', '2025-02-11 10:12:54', '2025-02-11 10:12:54');
 
 -- --------------------------------------------------------
 
@@ -174,8 +184,8 @@ INSERT INTO `feedback` (`id`, `user_name`, `role`, `feedback`, `created_at`, `da
 
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL,
-  `expediteur_id` int(11) NOT NULL,
-  `destinataire_id` int(11) NOT NULL,
+  `expediteur_id` varchar(20) DEFAULT NULL,
+  `destinataire_id` varchar(20) DEFAULT NULL,
   `contenu` text NOT NULL,
   `date_envoi` datetime DEFAULT CURRENT_TIMESTAMP,
   `statut` enum('non_lu','lu') DEFAULT 'non_lu',
@@ -187,64 +197,49 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`id`, `expediteur_id`, `destinataire_id`, `contenu`, `date_envoi`, `statut`, `conversation_id`) VALUES
-(1, 2, 1, 'salut t trop fort vas y vien cousin', '2025-02-06 11:26:26', 'lu', NULL),
-(2, 1, 2, 'ouaisssss mercii', '2025-02-06 11:27:28', 'lu', NULL),
-(3, 1, 2, 'mercoiiiiii', '2025-02-06 11:28:29', 'lu', NULL),
-(4, 1, 2, 'mercoiiiiii', '2025-02-06 11:28:55', 'lu', NULL),
-(5, 1, 2, 'eznfizfne', '2025-02-06 11:29:03', 'lu', NULL),
-(6, 2, 1, 'nique toi je rigolais bhaaaaa', '2025-02-06 11:40:48', 'lu', NULL),
-(7, 1, 2, 'mais weshhhhh t un chienn toi', '2025-02-06 11:41:21', 'lu', NULL),
-(8, 5, 5, 'Peux-tu me dire si parce que pourquoi le fait que cela implique l\'autre chose qui sera là ?', '2025-02-06 14:51:26', 'lu', NULL),
-(9, 5, 5, 'oui madame', '2025-02-06 14:52:43', 'lu', NULL),
-(10, 2, 1, 'dzdzd', '2025-02-10 10:21:04', 'lu', NULL),
-(11, 2, 1, 'salamm', '2025-02-10 10:22:05', 'lu', NULL),
-(12, 2, 1, 'sava gros', '2025-02-10 10:22:27', 'lu', NULL),
-(13, 2, 1, 'dzdzd', '2025-02-10 10:22:32', 'lu', NULL),
-(14, 2, 1, 'ssdsd', '2025-02-10 10:23:55', 'lu', NULL),
-(15, 2, 1, 'dsdsd', '2025-02-10 10:24:49', 'lu', NULL),
-(16, 2, 1, 'sdsdsd', '2025-02-10 10:24:52', 'lu', NULL),
-(17, 2, 1, 'sdsd', '2025-02-10 10:25:09', 'lu', NULL),
-(18, 2, 1, 'fgrgtg', '2025-02-10 10:25:12', 'lu', NULL),
-(19, 2, 1, 'ùmm', '2025-02-10 10:33:35', 'lu', NULL),
-(20, 2, 1, 'dzdz', '2025-02-10 10:34:04', 'lu', NULL),
-(21, 2, 1, 'yf', '2025-02-10 10:34:40', 'lu', NULL),
-(22, 2, 1, 'rgdgr', '2025-02-10 10:34:43', 'lu', NULL),
-(23, 2, 1, 'sdsd', '2025-02-10 10:35:28', 'lu', NULL),
-(24, 2, 1, 'sdsd', '2025-02-10 10:42:51', 'lu', NULL),
-(25, 2, 1, 'fhth', '2025-02-10 10:58:16', 'lu', NULL),
-(26, 2, 1, 'thfh', '2025-02-10 10:58:24', 'lu', NULL),
-(27, 2, 1, 'sa dit quoi\r\n\r\n', '2025-02-10 11:09:30', 'lu', NULL),
-(28, 2, 1, 'dzdz', '2025-02-10 11:09:32', 'lu', NULL),
-(29, 2, 1, 'dzdzd', '2025-02-10 11:09:49', 'lu', NULL),
-(30, 2, 1, 'dneznflk\r\n', '2025-02-10 11:12:00', 'lu', NULL),
-(31, 2, 1, 'gtgd', '2025-02-10 11:22:49', 'lu', NULL),
-(32, 2, 1, 'ss', '2025-02-10 15:30:28', 'lu', NULL),
-(33, 2, 1, 'dthy', '2025-02-10 15:30:36', 'lu', NULL),
-(34, 2, 1, 'tcgtc', '2025-02-10 15:30:39', 'lu', NULL),
-(35, 2, 2, 'yvhyvy', '2025-02-10 15:30:47', 'lu', NULL),
-(36, 2, 5, 'opmopm', '2025-02-10 15:30:52', 'non_lu', NULL),
-(37, 2, 1, 'thyjuki', '2025-02-10 15:31:21', 'lu', NULL),
-(38, 1, 2, 'sdsds', '2025-02-10 16:01:06', 'non_lu', NULL),
-(39, 1, 2, 'ssd', '2025-02-10 16:02:46', 'non_lu', NULL),
-(40, 1, 2, 'csc', '2025-02-10 16:07:10', 'non_lu', NULL),
-(41, 1, 2, 'sdssd', '2025-02-10 16:18:01', 'non_lu', NULL),
-(42, 1, 2, 'reg', '2025-02-10 16:23:45', 'non_lu', NULL),
-(43, 1, 2, 'dfvdfv', '2025-02-10 16:23:47', 'non_lu', NULL),
-(44, 1, 2, 'sdvd', '2025-02-10 16:24:21', 'non_lu', NULL),
-(45, 1, 2, 'fefr', '2025-02-10 16:25:04', 'non_lu', NULL),
-(46, 1, 2, 'frfrf', '2025-02-10 16:25:12', 'non_lu', NULL),
-(47, 1, 2, 'braaa', '2025-02-10 16:25:21', 'non_lu', NULL),
-(48, 1, 2, 'yth', '2025-02-10 16:25:53', 'non_lu', NULL),
-(49, 1, 2, 'fhfhf', '2025-02-10 16:25:55', 'non_lu', NULL),
-(50, 2, 1, 'petite salope que t \r\n', '2025-02-10 16:34:01', 'non_lu', NULL),
-(51, 1, 2, 'humm ah bah c screen', '2025-02-10 16:34:54', 'non_lu', NULL),
-(52, 1, 2, 'oiolgok', '2025-02-10 16:41:06', 'non_lu', NULL),
-(53, 1, 2, 'salammm', '2025-02-10 16:45:25', 'non_lu', NULL),
-(54, 1, 2, 'salutt\r\n', '2025-02-10 17:11:16', 'non_lu', NULL),
-(55, 2, 1, 'z', '2025-02-10 17:11:48', 'non_lu', NULL),
-(56, 2, 1, 'zdzd', '2025-02-10 17:11:52', 'non_lu', NULL),
-(57, 2, 1, 'xqxsq', '2025-02-10 17:14:29', 'non_lu', NULL),
-(58, 1, 2, 'heinn\r\n', '2025-02-10 17:15:00', 'non_lu', NULL);
+(59, 'E2', 'E1', 'salut jeune étudiant, je vous accepte mais j\'aimerais vous posez quelques questions', '2025-02-11 09:50:36', 'non_lu', NULL),
+(60, 'E1', 'E2', 'Bonjour, oui posez toutes les questions qui vous chantes', '2025-02-11 10:04:19', 'non_lu', NULL),
+(61, 'E2', 'E1', 'Merci pour votre réactivité donc j\'aimerais savoir si vous possédez un moyen de transport ?', '2025-02-11 10:07:37', 'non_lu', NULL),
+(62, 'E2', 'E1', 'Merci pour votre réactivité donc j\'aimerais savoir si vous possédez un moyen de transport ?', '2025-02-11 10:07:43', 'non_lu', NULL),
+(63, 'E2', 'E1', 'jnckzc', '2025-02-11 10:07:55', 'non_lu', NULL),
+(64, 'E1', 'E2', 'oui', '2025-02-11 10:09:04', 'non_lu', NULL),
+(65, 'E1', 'E2', 'fd', '2025-02-11 10:09:14', 'non_lu', NULL),
+(66, 'E1', 'E2', 'rfddg', '2025-02-11 10:09:16', 'non_lu', NULL),
+(67, 'E1', 'E2', 'fd', '2025-02-11 10:09:32', 'non_lu', NULL),
+(68, 'E2', 'E1', 'bla', '2025-02-11 10:10:07', 'non_lu', NULL),
+(69, 'E2', 'E1', 'sdsd', '2025-02-11 10:12:14', 'non_lu', 1),
+(70, 'E2', 'E1', 'efsfe', '2025-02-11 10:13:17', 'non_lu', 1),
+(71, 'E2', 'E1', 'lk', '2025-02-11 10:17:36', 'non_lu', 1),
+(72, 'E2', 'E1', 'uol', '2025-02-11 10:18:20', 'non_lu', 1),
+(73, 'E2', 'E1', 'dfgh', '2025-02-11 10:24:33', 'non_lu', 1),
+(74, 'E2', 'E1', '!:;,nb', '2025-02-11 10:24:38', 'non_lu', 1),
+(75, 'E1', 'E2', 'frgthj', '2025-02-11 10:25:10', 'non_lu', 1),
+(76, 'E1', 'E2', 'rtgh', '2025-02-11 10:34:22', 'non_lu', 1),
+(77, 'E1', 'E2', 'dzdz', '2025-02-11 10:52:00', 'non_lu', 1),
+(78, 'E1', 'E2', 'dezde', '2025-02-11 10:59:57', 'non_lu', 1),
+(79, 'E2', 'E3', 'salut ta le même prénom que ton frère', '2025-02-11 11:06:21', 'non_lu', 2),
+(80, 'E2', 'E1', 'dzdz', '2025-02-11 11:16:13', 'non_lu', 1),
+(81, 'E2', 'E3', 'xsxs', '2025-02-11 15:24:46', 'non_lu', 2),
+(94, 'C5', 'E5', 'salut', '2025-02-11 16:13:11', 'non_lu', 3),
+(95, 'C5', 'E7', 'salut', '2025-02-11 16:13:53', 'non_lu', 4),
+(96, 'C5', 'E7', 'hiuiui', '2025-02-11 16:15:48', 'non_lu', 4),
+(97, 'C5', 'E7', 'mm', '2025-02-11 16:15:55', 'non_lu', 4),
+(98, 'C5', 'E7', 'salut mec', '2025-02-11 16:20:12', 'non_lu', 4),
+(99, 'C5', 'E5', 'salut mec', '2025-02-11 16:20:56', 'non_lu', 3),
+(100, 'E5', 'C5', 'egrureygyuerqhg', '2025-02-11 16:24:02', 'non_lu', 3),
+(101, 'C5', 'E5', 'oui', '2025-02-11 16:24:25', 'non_lu', 3),
+(102, 'C5', 'E6', 'ok mec', '2025-02-11 16:24:43', 'non_lu', 5),
+(103, 'E6', 'C5', 'oui', '2025-02-11 16:24:56', 'non_lu', 5),
+(104, 'E5', 'C5', 'gezgrehty', '2025-02-11 16:31:18', 'non_lu', 3),
+(105, 'E5', 'C5', 'salut', '2025-02-11 16:31:22', 'non_lu', 3),
+(106, 'E5', 'C5', 'htyj', '2025-02-11 16:33:51', 'non_lu', 3),
+(107, 'E5', 'C5', 'dzefz', '2025-02-11 16:33:54', 'non_lu', 3),
+(108, 'E5', 'C5', 'adde', '2025-02-11 16:38:28', 'non_lu', 3),
+(109, 'E5', 'C5', 'lsaurt', '2025-02-11 16:56:56', 'non_lu', 3),
+(110, 'C5', 'E7', 'aaaa', '2025-02-11 19:32:36', 'non_lu', 4),
+(111, 'C5', 'E7', 'ffff', '2025-02-11 19:32:38', 'non_lu', 4),
+(112, 'C5', 'E5', 'salut', '2025-02-12 09:22:29', 'non_lu', 3),
+(113, 'C5', 'E7', 'ok mec', '2025-02-12 09:33:27', 'non_lu', 4);
 
 -- --------------------------------------------------------
 
@@ -405,7 +400,7 @@ ALTER TABLE `stages`
 -- AUTO_INCREMENT pour la table `candidatures`
 --
 ALTER TABLE `candidatures`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT pour la table `competences`
 --
@@ -420,17 +415,17 @@ ALTER TABLE `entreprises`
 -- AUTO_INCREMENT pour la table `etudiants`
 --
 ALTER TABLE `etudiants`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT pour la table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT pour la table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 --
 -- AUTO_INCREMENT pour la table `notifications`
 --

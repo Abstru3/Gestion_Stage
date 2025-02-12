@@ -56,6 +56,7 @@ body {
     border-right: 1px solid var(--border-color);
     padding: 1.5rem;
     overflow-y: auto;
+    height: 700px;
 }
 
 .conversation-list select {
@@ -81,8 +82,9 @@ body {
     flex: 1;
     padding: 1.5rem;
     overflow: hidden;
-    position: relative; /* Ajout pour le positionnement absolu du reply-box */
-    height: calc(70vh - 100px); /* Hauteur fixe avec espace pour la marge */
+    position: relative;
+    height: auto;
+    max-height: 660px;
 }
 
 /* Messages Container */
@@ -179,17 +181,17 @@ body {
 
 .reply-box {
     display: flex;
-    align-items: center; /* Centre les éléments verticalement */
-    justify-content: space-between; /* Espace entre les éléments */
+    align-items: center;
+    justify-content: space-between;
     position: absolute;
     bottom: 0;
-    left: 0;
     right: 0;
     background: white;
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
     margin: 1rem;
+    width: 70%;
 }
 
 .reply-box textarea {
@@ -206,7 +208,7 @@ body {
     line-height: 1.6;
     transition: all var(--transition-duration) ease;
     overflow-y: hidden;
-    margin-right: 1rem; /* Ajouter une marge à droite */
+    margin-right: 1rem;
 }
 
 .reply-box .button {
@@ -467,4 +469,25 @@ body {
     text-decoration: none;
     background: #4ea8e4;
     transition: background-color 0.2s ease;
+}
+
+.notification-badge {
+    background-color: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    margin-left: 5px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }

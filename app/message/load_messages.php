@@ -92,6 +92,29 @@ try {
         }
         echo '</ul>';
     }
+
+    // Update message status to 'lu'
+    if ($role === 'etudiant') {
+        $update_query = "UPDATE messages 
+                         SET statut = 'lu' 
+                         WHERE expediteur_id = CONCAT('C', :entreprise_id) 
+                         AND destinataire_id = CONCAT('E', :user_id)
+                         AND statut = 'non_lu'";
+        $pdo->prepare($update_query)->execute([
+            ':entreprise_id' => $selected_entreprise_id,
+            ':user_id' => $user_id
+        ]);
+    } else {
+        $update_query = "UPDATE messages 
+                         SET statut = 'lu' 
+                         WHERE expediteur_id = CONCAT('E', :etudiant_id) 
+                         AND destinataire_id = CONCAT('C', :user_id)
+                         AND statut = 'non_lu'";
+        $pdo->prepare($update_query)->execute([
+            ':etudiant_id' => $selected_etudiant_id,
+            ':user_id' => $user_id
+        ]);
+    }
 } catch (Exception $e) {
     echo "<p class='error'>Error: " . $e->getMessage() . "</p>";
 }
@@ -105,6 +128,12 @@ function loadMessages() {
     
     if ((etudiantId && '<?php echo $role; ?>' === 'entreprise') || 
         (entrepriseId && '<?php echo $role; ?>' === 'etudiant')) {
+        // Supprimer la notification immédiatement
+        const activeConversation = $('.conversation-item.active');
+        if (activeConversation.length) {
+            activeConversation.find('.notification-badge').remove();
+        }
+
         $.ajax({
             url: 'load_messages.php',
             method: 'GET',

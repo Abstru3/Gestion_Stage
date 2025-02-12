@@ -82,12 +82,27 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_offres->execute();
     $offres_recommandees = $stmt_offres->fetchAll(PDO::FETCH_ASSOC);
 
+    $stmt_messages = $pdo->prepare("
+        SELECT DISTINCT e.id, e.nom as expediteur_nom, COUNT(m.id) as nb_messages
+        FROM messages m
+        JOIN entreprises e ON CONCAT('C', e.id) = m.expediteur_id
+        WHERE m.destinataire_id = CONCAT('E', :user_id)
+        AND m.statut = 'non_lu'
+        GROUP BY e.id, e.nom
+        ORDER BY MAX(m.date_envoi) DESC
+    ");
+    $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
+    $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
+
     $dashboard_data = [
         'total_candidatures' => $pdo->query("SELECT COUNT(*) FROM candidatures WHERE etudiant_id = {$_SESSION['user_id']}")->fetchColumn(),
         'candidatures_en_cours' => $pdo->query("SELECT COUNT(*) FROM candidatures WHERE etudiant_id = {$_SESSION['user_id']} AND statut = 'en_attente'")->fetchColumn(),
         'dernieres_candidatures' => $dernieres_candidatures,
-        'offres_recommandees' => $offres_recommandees
+        'offres_recommandees' => $offres_recommandees,
+        'messages_non_lus' => $messages_non_lus,
+        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages'))
     ];
+    
 } elseif ($_SESSION['role'] == 'entreprise') {
     // Candidatures récentes pour les offres de l'entreprise
     $stmt_candidatures = $pdo->prepare("
@@ -102,10 +117,24 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_candidatures->execute([$_SESSION['user_id']]);
     $dernieres_candidatures = $stmt_candidatures->fetchAll(PDO::FETCH_ASSOC);
 
+    $stmt_messages = $pdo->prepare("
+        SELECT DISTINCT e.id, CONCAT(e.nom, ' ', e.prenom) as expediteur_nom, COUNT(m.id) as nb_messages
+        FROM messages m
+        JOIN etudiants e ON CONCAT('E', e.id) = m.expediteur_id
+        WHERE m.destinataire_id = CONCAT('C', :user_id)
+        AND m.statut = 'non_lu'
+        GROUP BY e.id, e.nom, e.prenom
+        ORDER BY MAX(m.date_envoi) DESC
+    ");
+    $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
+    $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
+
     $dashboard_data = [
         'total_offres' => $pdo->query("SELECT COUNT(*) FROM offres_stages WHERE entreprise_id = {$_SESSION['user_id']}")->fetchColumn(),
         'candidatures_recues' => $pdo->query("SELECT COUNT(*) FROM candidatures c JOIN offres_stages o ON c.offre_id = o.id WHERE o.entreprise_id = {$_SESSION['user_id']}")->fetchColumn(),
-        'dernieres_candidatures' => $dernieres_candidatures
+        'dernieres_candidatures' => $dernieres_candidatures,
+        'messages_non_lus' => $messages_non_lus,
+        'total_messages_non_lus' => array_sum(array_column($messages_non_lus, 'nb_messages'))
     ];
 } elseif ($_SESSION['role'] == 'admin') {
     // Statistiques détaillées et dernières activités
@@ -280,6 +309,26 @@ if ($_SESSION['role'] == 'etudiant') {
                 ?>
             </p>
         </div>
+        <?php if (in_array($_SESSION['role'], ['etudiant', 'entreprise'])): ?>
+    <div class="dashboard-card">
+        <h3>Notifications</h3>
+        <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
+            <p>Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)</p>
+            <ul class="dashboard-list">
+                <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+                    <li>
+                        <a href="/Gestion_Stage/app/message/inbox.php?<?= $_SESSION['role'] === 'etudiant' ? 'entreprise_id=' : 'etudiant_id=' ?><?= $message['id'] ?>">
+                            <?= htmlspecialchars($message['expediteur_nom']) ?>
+                            <span class="notification-badge"><?= $message['nb_messages'] ?></span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>Vous n'avez aucun nouveau message</p>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
     </div>
 
         <p><a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a></p>
