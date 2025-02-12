@@ -36,6 +36,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    // Traitement de la photo de profil
+    if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/profil/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileInfo = pathinfo($_FILES['profile_photo']['name']);
+        $extension = strtolower($fileInfo['extension']);
+        
+        // Vérifier le type de fichier
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+            // Générer un nom de fichier unique
+            $newFileName = uniqid() . '.' . $extension;
+            $uploadFile = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadFile)) {
+                // Mettre à jour la base de données avec le nouveau nom de fichier
+                $stmt = $pdo->prepare("UPDATE $table SET icone = ? WHERE id = ?");
+                $stmt->execute([$newFileName, $_SESSION['user_id']]);
+                
+                // Rafraîchir les données de l'utilisateur
+                $user = get_user($pdo, $_SESSION['user_id'], $table);
+            } else {
+                $errors[] = "Erreur lors du téléchargement de la photo.";
+            }
+        } else {
+            $errors[] = "Format de fichier non autorisé. Utilisez JPG, PNG ou GIF.";
+        }
+    }
+
     // Si aucun mot de passe n'est fourni, ne pas modifier le mot de passe
     if (empty($errors)) {
         if (!empty($new_password)) {
@@ -62,11 +93,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeversStage - Mon profil</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
 </head>
 <body>
     <div class="container">
-        <h1>Mon profil</h1>
+        <div class="profile-header">
+            <?php if (!empty($user['icone'])): ?>
+                <img src="/Gestion_Stage/public/uploads/profil/<?php echo htmlspecialchars($user['icone']); ?>" alt="Photo de profil" class="profile-photo">
+            <?php else: ?>
+                <i class="<?php echo $_SESSION['role'] == 'etudiant' ? 'fas fa-user-graduate' : 'fas fa-building'; ?> profile-icon"></i>
+            <?php endif; ?>
+            <h1>Mon profil</h1>
+        </div>
 
         <!-- Affichage des erreurs -->
         <?php if (!empty($errors)): ?>
@@ -84,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         <?php endif; ?>
 
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             <label for="username">Nom d'utilisateur:</label>
             <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
 
@@ -93,6 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <label for="new_password">Nouveau mot de passe (laisser vide pour ne pas changer):</label>
             <input type="password" id="new_password" name="new_password">
+
+            <div class="photo-upload">
+                <label for="profile_photo">Photo de profil:</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                <p class="help-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</p>
+            </div>
 
             <?php if ($_SESSION['role'] == 'etudiant'): ?>
                 <label for="nom">Nom:</label>

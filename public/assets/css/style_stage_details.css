@@ -1,73 +1,358 @@
 :root {
-    --secondary-color: #3498db;
-    --accent-color: #e74c3c;
-    --secondary-color-hover: #4ea8e4;
-    --accent-color-hover: #f26858;
-    --text-color: #333;
-    --light-gray: #f5f6fa;
-    --border-radius: 8px;
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --success: #2ecc71;
+    --text: #2c3e50;
+    --text-light: #95a5a6;
+    --bg: #f8f9fa;
+    --border: #e9ecef;
+    --radius: 8px;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
 }
 
-.rights-reserved {
-    position: fixed;
-    bottom: 2%;
-    left: 50%;
-    transform: translateX(-50%);
+/* Base */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    margin: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Navigation */
+.breadcrumb {
+    display: flex;
     align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    color: var(--text-light);
 }
 
-.btn-apply {
-    transition: background-color 0.2s ease;
-}
-
-.btn-apply:hover {
-    transition: background-color 0.2s ease;
+.breadcrumb a {
+    color: var(--secondary);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.offer-details {
-    transition: background-color 0.2s ease;
-    background-color: rgb(255, 255, 255);
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    border-radius: 8px;
+.breadcrumb a:hover {
+    color: var(--primary);
+}
+
+/* Main content */
+.offer-container {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.offer-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.offer-header h1 {
+    margin: 0 0 1.5rem;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Company info */
+.company-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: var(--radius);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.company-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow);
+    background: white;
+}
+
+.company-logo-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
-    width: 30%;
-    min-width: 500px;
+    border: 3px solid white;
+    box-shadow: var(--shadow);
 }
 
-.offer-infos {
-    margin-bottom: 20px;
-    width: 100%;
-    text-align: left;
-    align-items: flex-start;
+.company-logo-placeholder i {
+    font-size: 2.5rem;
+    color: var(--primary);
 }
 
-.apply {
-    margin-top: 20px;
+.company-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: white;
+    text-align: center;
+}
+
+/* Grid Layout */
+.offer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.card h2 {
+    margin: 0;
+    padding: 1.25rem;
+    font-size: 1.1rem;
+    color: var(--primary);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
     align-items: center;
-    transition: background-color 0.2s ease;
+    gap: 0.75rem;
 }
 
-.offer-details:hover {
-    transition: background-color 0.2s ease;
-    background-color: rgb(243, 243, 243);
+.card h2 i {
+    color: var(--secondary);
 }
 
-.offer-details .fas {
-    color: var(--secondary-color);
-    padding: 5px;
+/* Card Content - Enhanced Description Display */
+.card-content {
+    padding: 1.5rem;
+    color: var(--text);
+    line-height: 1.8;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
 }
 
-.apply:hover {
-    background-color: #eeeeee;
-    transition: background-color 0.2s ease;
+.description-text {
+    white-space: pre-line;
+    max-width: 100%;
+    font-size: 0.95rem;
+}
+
+/* Add specific styles for long words and URLs */
+.description-text a {
+    word-break: break-all;
+}
+
+/* Info List */
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.info-list i {
+    color: var(--secondary);
+    font-size: 1.1rem;
+    width: 1.5rem;
+}
+
+/* Application Form */
+.application-form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.form-group input[type="file"]:hover {
+    border-color: var(--secondary);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: var(--secondary);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.btn-link {
+    color: var(--secondary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navigation-buttons {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1224px) {
+    .offer-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+
+    .offer-header {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 0;
+    }
+
+    .offer-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .company-logo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .card h2 {
+        padding: 1rem;
+    }
+
+    .card-content {
+        padding: 1rem;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .description-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .offer-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .company-badge {
+        padding: 0.75rem;
+    }
+
+    .company-logo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .offer-grid {
+        padding: 1rem;
+    }
+
+    .info-list li {
+        padding: 0.75rem 1rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .card-content {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .description-text {
+        font-size: 0.85rem;
+    }
 }
