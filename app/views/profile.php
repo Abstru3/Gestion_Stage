@@ -94,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>NeversStage - Mon profil</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
 </head>
