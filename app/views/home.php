@@ -229,7 +229,7 @@ if ($_SESSION['role'] == 'etudiant') {
         <h1>Bienvenue, <?= htmlspecialchars($welcome_message) ?></h1>
         <nav>
     <ul>
-        <li><a href="profile.php">👤 Mon profil</a></li>
+        <li><a href="/Gestion_Stage/app/views/profile.php">👤 Mon profil</a></li>
         <?php if ($_SESSION['role'] == 'etudiant'): ?>
             <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
             <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>
@@ -366,85 +366,89 @@ if ($_SESSION['role'] == 'etudiant') {
         <h3>Notifications</h3>
         <ul class="dashboard-list">
             <?php if ($_SESSION['role'] == 'etudiant'): ?>
-                <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
-                    <li>
-                        <i class="fas fa-envelope"></i>
-                        Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
-                        <ul>
-                            <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
-                                <li>
-                                    <a href="/Gestion_Stage/app/message/inbox.php?entreprise_id=<?= $message['id'] ?>">
-                                        <?= htmlspecialchars($message['expediteur_nom']) ?>
-                                        <span class="notification-badge"><?= $message['nb_messages'] ?></span>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </li>
-                <?php endif; ?>
+                <?php if ($dashboard_data['total_messages_non_lus'] > 0 || $dashboard_data['total_candidatures_updated'] > 0): ?>
+                    <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
+                            <ul>
+                                <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+                                    <li>
+                                        <a href="/Gestion_Stage/app/message/inbox.php?entreprise_id=<?= $message['id'] ?>">
+                                            <?= htmlspecialchars($message['expediteur_nom']) ?>
+                                            <span class="notification-badge"><?= $message['nb_messages'] ?></span>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
 
-                <?php if ($dashboard_data['total_candidatures_updated'] > 0): ?>
-                    <li>
-                        <i class="fas fa-bell"></i>
-                        Mises à jour de vos candidatures:
-                        <ul>
+                    <?php if ($dashboard_data['total_candidatures_updated'] > 0): ?>
+                        <li>
+                            <i class="fas fa-bell"></i>
+                            Mises à jour de vos candidatures:
+                            <ul>
                             <?php foreach ($dashboard_data['candidatures_updated'] as $candidature): ?>
                                 <li>
                                     <a href="/Gestion_Stage/app/views/panels/student_panel.php" 
-                                       onclick="event.preventDefault(); markAsReadAndRedirect(<?= $candidature['id'] ?>, this.href);">
+                                    onclick="event.preventDefault(); markAsReadAndRedirect(<?= $candidature['id'] ?>, this.href);">
                                         <?= htmlspecialchars($candidature['entreprise_nom']) ?> - 
                                         <?= htmlspecialchars($candidature['titre']) ?> : 
-                                        <span class="status-<?= $candidature['statut'] ?>">
+                                        <span class="text-<?= 
+                                            $candidature['statut'] === 'acceptee' ? 'success' : 
+                                            ($candidature['statut'] === 'en_attente' ? 'warning' : 'refuse') 
+                                        ?>">
                                             <?= formatStatus($candidature['statut']) ?>
                                         </span>
                                     </a>
                                 </li>
                             <?php endforeach; ?>
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <li>Aucune nouvelle notification</li>
                 <?php endif; ?>
 
             <?php else: /* Entreprise */ ?>
-                <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
-                    <li>
-                        <i class="fas fa-envelope"></i>
-                        Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
-                        <ul>
-                            <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
-                                <li>
-                                    <a href="/Gestion_Stage/app/message/inbox.php?etudiant_id=<?= $message['id'] ?>">
-                                        <?= htmlspecialchars($message['expediteur_nom']) ?>
-                                        <span class="notification-badge"><?= $message['nb_messages'] ?></span>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </li>
-                <?php endif; ?>
+                <?php if ($dashboard_data['total_messages_non_lus'] > 0 || $dashboard_data['total_pending_applications'] > 0): ?>
+                    <?php if ($dashboard_data['total_messages_non_lus'] > 0): ?>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            Vous avez <?= $dashboard_data['total_messages_non_lus'] ?> nouveau(x) message(s)
+                            <ul>
+                                <?php foreach ($dashboard_data['messages_non_lus'] as $message): ?>
+                                    <li>
+                                        <a href="/Gestion_Stage/app/message/inbox.php?etudiant_id=<?= $message['id'] ?>">
+                                            <?= htmlspecialchars($message['expediteur_nom']) ?>
+                                            <span class="notification-badge"><?= $message['nb_messages'] ?></span>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
 
-                <?php if ($dashboard_data['total_pending_applications'] > 0): ?>
-                    <li>
-                        <i class="fas fa-clock"></i>
-                        Candidatures en attente:
-                        <ul>
-                            <?php foreach ($dashboard_data['pending_applications'] as $application): ?>
-                                <li>
-                                    <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?= $application['offre_id'] ?>" style="color: #000;">
-                                        <?= htmlspecialchars($application['titre']) ?>
-                                        <span class="notification-badge pending"><?= $application['count_pending'] ?></span>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </li>
+                    <?php if ($dashboard_data['total_pending_applications'] > 0): ?>
+                        <li>
+                            <i class="fas fa-clock"></i>
+                            Candidatures en attente:
+                            <ul>
+                                <?php foreach ($dashboard_data['pending_applications'] as $application): ?>
+                                    <li>
+                                        <a href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?= $application['offre_id'] ?>" style="color: #000;">
+                                            <?= htmlspecialchars($application['titre']) ?>
+                                            <span class="notification-badge pending"><?= $application['count_pending'] ?></span>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <li>Aucune nouvelle notification</li>
                 <?php endif; ?>
-            <?php endif; ?>
-
-            <?php if (!$dashboard_data['total_messages_non_lus'] && 
-                    !($dashboard_data['total_candidatures_updated'] ?? 0) && 
-                    !($dashboard_data['total_new_applications'] ?? 0) && 
-                    !($dashboard_data['total_pending_applications'] ?? 0)): ?>
-                <li>Aucune nouvelle notification</li>
             <?php endif; ?>
         </ul>
     </div>

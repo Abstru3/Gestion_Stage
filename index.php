@@ -28,6 +28,9 @@ $recent_internships = array_slice($recent_internships, 0, 4);
             <div class="logo">
                 <img src="./public/assets/images/logo.png" alt="NeversStage" height="100">
             </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="nav-links">
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="./app/views/home.php" class="btn btn-workspace"><i class="fas fa-user"></i> Mon Espace</a>
@@ -100,73 +103,44 @@ $recent_internships = array_slice($recent_internships, 0, 4);
         </script>
 
         <section class="recent-offers">
-    <h2>Dernières offres de stages</h2>
-    <div class="offers-grid">
-        <?php if (!empty($recent_internships)): ?>
-            <?php foreach ($recent_internships as $internship): ?>
-                <div class="offer-card">
-                    <div class="offer-header">
-                        <div class="offer-header-content">
-                            <div>
-                                <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                                <span class="company-name">
-                                    <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
-                                </span>
+        <h2>Dernières offres de stages</h2>
+        <div class="offers-grid">
+            <?php if (!empty($recent_internships)): ?>
+                
+                <?php foreach ($recent_internships as $internship): ?>
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="offer-header-content">
+                                <div>
+                                    <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
+                                    <span class="company-name">
+                                        <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
+                                    </span>
+                                </div>
+                                <?php if (!empty($internship['logo'])): ?>
+                                    <!-- <img src="/Gestion_Stage/<?php echo htmlspecialchars($internship['logo']); ?>" alt="Logo de l'entreprise" class="company-logo"> -->
+                                <?php endif; ?>
                             </div>
-                            <span class="offer-type"><?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+                        </div>
+                        <div class="offer-body">
+                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 100)) . '...'; ?></p>
+                            <div class="offer-details">
+                                <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
+                                <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
+                                <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+                            </div>
+                        </div>
+                        <div class="offer-footer">
+                            <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
                         </div>
                     </div>
-
-                    <div class="offer-details">
-                        <span class="detail-group">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <?php echo htmlspecialchars($internship['ville'] . ', ' . $internship['region']); ?>
-                        </span>
-                        
-                        <span class="detail-group">
-                            <i class="fas fa-calendar-alt"></i>
-                            Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?>
-                        </span>
-                        
-                        <span class="detail-group">
-                            <i class="fas fa-clock"></i>
-                            Durée: <?php echo htmlspecialchars($internship['duree']); ?>
-                        </span>
-
-                        <?php if ($internship['remuneration']): ?>
-                        <span class="detail-group">
-                            <i class="fas fa-euro-sign"></i>
-                            <?php echo number_format($internship['remuneration'], 2, ',', ' '); ?> €/mois
-                        </span>
-                        <?php endif; ?>
-                        
-                        <?php if ($internship['teletravail']): ?>
-                        <span class="detail-group">
-                            <i class="fas fa-home"></i>
-                            Télétravail possible
-                        </span>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="offer-description">
-                        <p><?php echo htmlspecialchars(substr($internship['description'], 0, 150)) . '...'; ?></p>
-                    </div>
-
-                    <div class="offer-actions">
-                        <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-view">
-                            <i class="fas fa-eye"></i> Voir plus
-                        </a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="empty-state">Aucune offre de stage disponible pour le moment.</p>
-        <?php endif; ?>
-    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Aucune offre de stage disponible pour le moment.</p>
+            <?php endif; ?>
+        </div>
     <div class="see-more">
-        <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-primary">
-            <i class="fas fa-list"></i> Voir toutes les offres
-        </a>
+    <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-primary">Voir toutes les offres</a>
     </div>
 </section>
 
@@ -207,6 +181,41 @@ $recent_internships = array_slice($recent_internships, 0, 4);
         });
 
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.querySelector('.nav-links');
+
+    mobileMenuBtn.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        this.classList.toggle('active');
+        
+        // Change l'icône
+        const icon = this.querySelector('i');
+        if (icon.classList.contains('fa-bars')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+
+    // Ferme le menu si on clique en dehors
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.nav-links') && 
+            !event.target.closest('.mobile-menu-btn') && 
+            navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            mobileMenuBtn.classList.remove('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+});
+</script>
 
     <script src="./public/assets/js/script.js"></script>
 </body>

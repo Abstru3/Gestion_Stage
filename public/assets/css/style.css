@@ -314,15 +314,17 @@ th {
 .dashboard-list a {
     text-decoration: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding: 5px 0;
     color: #000;
+    transition: color 0.2s ease;
 }
 
 .dashboard-list a:hover {
-    color: #007bff;
+    color: rgb(39, 39, 39);
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .dashboard-list ul li {
@@ -358,14 +360,23 @@ th {
 /* Statut des candidatures */
 .text-warning {
     color: #ffc107;
+    background-color: #ffc1071d;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 .text-success {
     color: #28a745;
+    background-color: #07ff0f17;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 .text-refuse {
     color: red;
+    background-color: #ff07071f;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 /* Bouton retour */
@@ -519,87 +530,4 @@ button.btn-primary:hover {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
-}
-
-/* Profile Styles */
-.profile-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding: 2rem 0;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.profile-icon {
-    font-size: 3rem;
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-    display: block;
-    animation: fadeIn 0.5s ease-in;
-}
-
-.profile-header h1 {
-    margin: 0;
-    color: var(--text-color);
-}
-
-.profile-photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--primary);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 1rem;
-}
-
-.photo-upload {
-    margin: 1.5rem 0;
-}
-
-.photo-upload input[type="file"] {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    cursor: pointer;
-}
-
-.help-text {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-top: 0.5rem;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .profile-header {
-        padding: 1.5rem 0;
-    }
-
-    .profile-icon {
-        font-size: 2.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-header {
-        padding: 1rem 0;
-    }
-
-    .profile-icon {
-        font-size: 2rem;
-    }
 }

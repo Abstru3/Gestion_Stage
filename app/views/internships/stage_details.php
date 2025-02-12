@@ -153,7 +153,7 @@ if (!$internship) {
             </div>
 
             <div class="navigation-buttons">
-                <a href="/Gestion_Stage/index.php" class="btn btn-secondary">
+                <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Retour aux offres
                 </a>
             </div>

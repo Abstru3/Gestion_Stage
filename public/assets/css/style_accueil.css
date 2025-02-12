@@ -31,25 +31,30 @@ body {
     padding: 1rem 0;
 }
 
+/* Ajustement de la navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 5%;
     height: 70px;
-}
-
-.logo h1 {
-    font-size: 2rem;
-}
-
-.logo span {
-    color: var(--secondary-color);
+    position: relative;
 }
 
 .nav-links {
     display: flex;
     gap: 1rem;
+}
+
+/* Repositionnement du bouton mobile */
+.mobile-menu-btn {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
 }
 
 /* Hero Section */
@@ -143,6 +148,7 @@ form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+    padding: 2rem;
 }
 
 .offer-card {
@@ -284,14 +290,112 @@ form {
     .navbar {
         flex-direction: column;
         height: auto;
-        padding: 1rem;
+        padding: 1rem 5%;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    .logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .nav-links {
-        margin-top: 1rem;
+        position: fixed;
+        top: 0;
+        left: -70%; /* Changé de right à left */
+        height: 100vh;
+        width: 70%;
+        max-width: 300px;
+        background: var(--primary-color);
+        flex-direction: column;
+        padding: 80px 20px 20px;
+        transition: left 0.3s ease; /* Changé de right à left */
+        z-index: 99;
+    }
+
+    .nav-links.active {
+        left: 0; /* Changé de right à left */
+    }
+
+    .nav-links .btn {
+        width: 100%;
+        text-align: center;
+        margin: 5px 0;
+    }
+
+    .logo img {
+        height: 60px;
     }
 
     .hero-section h2 {
         font-size: 2rem;
     }
+
+    .offers-grid {
+        grid-template-columns: 1fr; /* Une seule colonne */
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+
+    .offer-details {
+        display: flex;
+        flex-direction: column; /* Empiler les informations */
+        gap: 0.8rem;
+    }
+
+    .offer-details span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .offer-details i {
+        width: 20px; /* Largeur fixe pour aligner les icônes */
+        text-align: center;
+    }
+
+    .offer-card {
+        padding: 1rem;
+    }
+
+    .offer-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .company-name {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .offers-grid {
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+
+    .offer-details span {
+        font-size: 0.85rem;
+    }
+}
+
+/* Animation pour le menu burger */
+.mobile-menu-btn.active .fas {
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
 }

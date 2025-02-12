@@ -18,11 +18,6 @@
 
 .offers-grid {
     display: grid;
-    gap: 2rem;
-}
-
-.offers-grid {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
 }
@@ -78,4 +73,71 @@
     background-color: var(--secondary-color-hover);
     color: white;
     transition: background-color 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .offers-grid {
+        grid-template-columns: 1fr; /* Une seule colonne */
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+
+    .offer-details {
+        display: flex;
+        flex-direction: column; /* Empiler les informations */
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    .offer-details span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .offer-details i {
+        width: 20px; /* Largeur fixe pour aligner les icônes */
+        text-align: center;
+    }
+
+    .offer-card {
+        padding: 1rem;
+    }
+
+    .offer-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .company-name {
+        font-size: 0.9rem;
+    }
+
+    .container-all-internships {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .offers-grid {
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+
+    .offer-details span {
+        font-size: 0.85rem;
+    }
+
+    .offer-header {
+        padding: 1rem;
+    }
+
+    .offer-body {
+        padding: 1rem;
+    }
+
+    .offer-footer {
+        padding: 0.8rem;
+    }
 }
