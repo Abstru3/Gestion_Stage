@@ -2,6 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
+ob_start(); // Add this line to prevent header issues
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
@@ -21,46 +22,117 @@ $currentStep = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 $error = '';
 $success = '';
 
+// Modifier la partie du traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Traitement du formulaire selon l'étape
+    // Initialiser le tableau form_data s'il n'existe pas
+    if (!isset($_SESSION['form_data'])) {
+        $_SESSION['form_data'] = [];
+    }
+
+    if (isset($_POST['next_step']) || isset($_POST['prev_step'])) {
+        // Sauvegarder les données du formulaire actuel
+        $_SESSION['form_data'] = array_merge($_SESSION['form_data'], $_POST);
+        
+        // Déterminer la prochaine étape
+        $nextStep = isset($_POST['next_step']) ? $_POST['next_step'] : $_POST['prev_step'];
+        header("Location: ?step=" . $nextStep);
+        exit();
+    }
+
     if (isset($_POST['final_submit'])) {
-        // Traitement final du formulaire
         try {
+            // Vérification des champs requis
+            $required_fields = [
+                'titre', 'description', 'email_contact', 'date_debut', 
+                'duree', 'domaine', 'remuneration', 'ville', 
+                'code_postal', 'region', 'departement'
+            ];
+
+            $missing_fields = [];
+            foreach ($required_fields as $field) {
+                if (empty($_SESSION['form_data'][$field])) {
+                    $missing_fields[] = $field;
+                }
+            }
+
+            if (!empty($missing_fields)) {
+                throw new Exception("Les champs suivants sont requis : " . implode(", ", $missing_fields));
+            }
+
+            // Dans la section où vous préparez les données pour l'insertion
+            if (isset($_SESSION['form_data']['remuneration'])) {
+                if ($_SESSION['form_data']['remuneration'] === 'autre' && isset($_SESSION['form_data']['remuneration_autre'])) {
+                    $remuneration = $_SESSION['form_data']['remuneration_autre'];
+                } else {
+                    $remuneration = $_SESSION['form_data']['remuneration'];
+                }
+            } else {
+                $remuneration = null;
+            }
+
+            // Préparer les données pour l'insertion
+            $data = [
+                'entreprise_id' => $_SESSION['user_id'],
+                'titre' => $_SESSION['form_data']['titre'],
+                'description' => $_SESSION['form_data']['description'],
+                'email_contact' => $_SESSION['form_data']['email_contact'],
+                'lien_candidature' => $_SESSION['form_data']['lien_candidature'] ?? null,
+                'date_debut' => $_SESSION['form_data']['date_debut'],
+                'duree' => $_SESSION['form_data']['duree'],
+                'domaine' => $_SESSION['form_data']['domaine'],
+                'remuneration' => $remuneration,
+                'teletravail' => isset($_SESSION['form_data']['teletravail']) ? 1 : 0,
+                'pays' => $_SESSION['form_data']['pays'] ?? 'France',
+                'ville' => $_SESSION['form_data']['ville'],
+                'code_postal' => $_SESSION['form_data']['code_postal'],
+                'region' => $_SESSION['form_data']['region'],
+                'departement' => $_SESSION['form_data']['departement'],
+                'lieu' => $_SESSION['form_data']['lieu'] ?? null,
+                'mode_stage' => $_SESSION['form_data']['mode_stage'] ?? 'présentiel'
+            ];
+
             $stmt = $pdo->prepare("INSERT INTO offres_stages (
                 entreprise_id, titre, description, email_contact, lien_candidature,
                 date_debut, duree, domaine, remuneration, teletravail,
                 pays, ville, code_postal, region, departement, lieu, mode_stage
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                :entreprise_id, :titre, :description, :email_contact, :lien_candidature,
+                :date_debut, :duree, :domaine, :remuneration, :teletravail,
+                :pays, :ville, :code_postal, :region, :departement, :lieu, :mode_stage
             )");
             
-            $stmt->execute([
-                $_SESSION['user_id'],
-                $_POST['titre'],
-                $_POST['description'],
-                $_POST['email_contact'],
-                $_POST['lien_candidature'],
-                $_POST['date_debut'],
-                $_POST['duree'],
-                $_POST['domaine'],
-                $_POST['remuneration'],
-                isset($_POST['teletravail']) ? 1 : 0,
-                $_POST['pays'],
-                $_POST['ville'],
-                $_POST['code_postal'],
-                $_POST['region'],
-                $_POST['departement'],
-                $_POST['lieu'],
-                $_POST['mode_stage']
-            ]);
+            $stmt->execute($data);
 
-            $success = "Offre de stage publiée avec succès!";
+            // Nettoyer la session et rediriger
+            unset($_SESSION['form_data']);
+            $_SESSION['success_message'] = "Offre de stage publiée avec succès!";
             header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
             exit();
-        } catch (PDOException $e) {
-            $error = "Erreur lors de la publication: " . $e->getMessage();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+            // Retourner à l'étape appropriée en cas d'erreur
+            if (strpos($error, 'titre') !== false || strpos($error, 'description') !== false) {
+                header("Location: ?step=2");
+                exit();
+            }
+            if (strpos($error, 'region') !== false || strpos($error, 'ville') !== false) {
+                header("Location: ?step=3");
+                exit();
+            }
+        }
+    } else {
+        // Navigation entre les étapes
+        $nextStep = $currentStep + 1;
+        if ($nextStep <= 3) {
+            header("Location: ?step=$nextStep");
+            exit();
         }
     }
+}
+
+// Ajouter cette fonction helper améliorée
+function getFormValue($field, $default = '') {
+    return isset($_SESSION['form_data'][$field]) ? $_SESSION['form_data'][$field] : $default;
 }
 ?>
 
@@ -88,10 +160,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <?php if ($success): ?>
-            <div class="success"><?= $success ?></div>
+            <div class="success"><?= $success ?></div>)): ?>
         <?php endif; ?>
 
         <form method="POST" action="" class="multi-step-form" id="internshipForm">
+            
             <?php if ($currentStep === 1): ?>
                 <div class="step-content">
                     <h2>Étape 1 : Informations sur l'entreprise</h2>
@@ -105,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="email_contact">Email de contact*</label>
                         <input type="email" id="email_contact" name="email_contact" 
+                               value="<?= htmlspecialchars(getFormValue('email_contact')) ?>"
                                placeholder="contact@entreprise.com" required>
                     </div>
 
@@ -127,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="form-navigation">
-                        <button type="button" onclick="nextStep(2)">Suivant</button>
+                        <button type="submit" name="next_step" value="2">Suivant</button>
                     </div>
                 </div>
 
@@ -138,21 +212,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="titre">Titre de l'offre*</label>
                         <input type="text" id="titre" name="titre" required maxlength="200"
+                               value="<?= htmlspecialchars(getFormValue('titre')) ?>"
                                placeholder="Ex: Assistant de recherche (6 mois)">
                     </div>
 
                     <div class="form-group">
                         <label for="description">Description du stage*</label>
                         <textarea id="description" name="description" required 
-                                minlength="200" placeholder="Décrivez les missions, objectifs..."
-                                oninvalid="this.setCustomValidity('La description doit contenir au moins 200 caractères')"
-                                oninput="this.setCustomValidity('')"></textarea>
+                                minlength="200" placeholder="Décrivez les missions, objectifs..."><?= htmlspecialchars(getFormValue('description')) ?></textarea>
                         <small>Minimum 200 caractères requis</small>
                     </div>
 
                     <div class="form-group">
                         <label for="date_debut">Date de début*</label>
                         <input type="date" id="date_debut" name="date_debut" required
+                               value="<?= htmlspecialchars(getFormValue('date_debut')) ?>"
                                min="<?= date('Y-m-d') ?>">
                     </div>
 
@@ -160,12 +234,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="duree">Durée du stage*</label>
                         <select id="duree" name="duree" required>
                             <option value="">Sélectionner une durée</option>
-                            <option value="2 mois">2 mois</option>
-                            <option value="3 mois">3 mois</option>
-                            <option value="4 mois">4 mois</option>
-                            <option value="5 mois">5 mois</option>
-                            <option value="6 mois">6 mois</option>
-                            <option value="12 mois">12 mois</option>
+                            <?php foreach (["2 mois", "3 mois", "4 mois", "5 mois", "6 mois", "12 mois"] as $duree): ?>
+                                <option value="<?= $duree ?>" <?= getFormValue('duree') === $duree ? 'selected' : '' ?>><?= $duree ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -174,8 +245,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select id="domaine" name="domaine" required>
                             <option value="">Sélectionner un domaine</option>
                             <optgroup label="Informatique">
-                                <option value="developpement_web">Développement Web</option>
-                                <option value="developpement_mobile">Développement Mobile</option>
+                                <option value="developpement_web" <?= getFormValue('domaine') === 'developpement_web' ? 'selected' : '' ?>>Développement Web</option>
+                                <option value="developpement_mobile" <?= getFormValue('domaine') === 'developpement_mobile' ? 'selected' : '' ?>>Développement Mobile</option>
                                 <option value="reseaux">Réseaux</option>
                                 <option value="cybersecurite">Cybersécurité</option>
                             </optgroup>
@@ -198,14 +269,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="remuneration">Rémunération mensuelle*</label>
                         <select id="remuneration" name="remuneration" required onchange="toggleAutreMontant()">
                             <option value="">Sélectionner une rémunération</option>
-                            <option value="417">Minimum légal (417€)</option>
-                            <option value="500">500€</option>
-                            <option value="600">600€</option>
-                            <option value="700">700€</option>
-                            <option value="800">800€</option>
-                            <option value="900">900€</option>
-                            <option value="1000">1000€</option>
-                            <option value="autre">Autre montant</option>
+                            <option value="417" <?= getFormValue('remuneration') === '417' ? 'selected' : '' ?>>Minimum légal (417€)</option>
+                            <option value="500" <?= getFormValue('remuneration') === '500' ? 'selected' : '' ?>>500€</option>
+                            <option value="600" <?= getFormValue('remuneration') === '600' ? 'selected' : '' ?>>600€</option>
+                            <option value="700" <?= getFormValue('remuneration') === '700' ? 'selected' : '' ?>>700€</option>
+                            <option value="800" <?= getFormValue('remuneration') === '800' ? 'selected' : '' ?>>800€</option>
+                            <option value="900" <?= getFormValue('remuneration') === '900' ? 'selected' : '' ?>>900€</option>
+                            <option value="1000" <?= getFormValue('remuneration') === '1000' ? 'selected' : '' ?>>1000€</option>
+                            <option value="autre" <?= getFormValue('remuneration') === 'autre' ? 'selected' : '' ?>>Autre montant</option>
                         </select>
                         <div id="autre_montant_container" style="display: none; margin-top: 10px;">
                             <input type="number" 
@@ -214,21 +285,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    min="417" 
                                    step="1" 
                                    placeholder="Saisir un montant en euros"
+                                   value="<?= getFormValue('remuneration_autre') ?>"
                                    oninput="updateRemuneration(this.value)">
                             <small>Minimum légal : 417€</small>
                         </div>
+                        <!-- Champ caché pour stocker la valeur finale de la rémunération -->
+                        <input type="hidden" id="remuneration_hidden" name="remuneration" 
+                               value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
                     </div>
 
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="teletravail" value="1">
+                            <input type="checkbox" name="teletravail" value="1" <?= getFormValue('teletravail') == '1' ? 'checked' : '' ?>>
                             Télétravail possible
                         </label>
                     </div>
 
+                    <div class="form-group">
+                        <label for="mode_stage">Mode de stage*</label>
+                        <select id="mode_stage" name="mode_stage" required>
+                            <option value="présentiel">Présentiel</option>
+                            <option value="distanciel">Distanciel</option>
+                        </select>
+                    </div>
+
+                    <input type="hidden" name="lieu" value="">
+                    <input type="hidden" name="lien_candidature" value="">
+                    <!-- Ajouter les champs cachés de l'étape 1 -->
+                    <input type="hidden" name="email_contact" value="<?= htmlspecialchars(getFormValue('email_contact')) ?>">
+
                     <div class="form-navigation">
-                        <button type="button" onclick="prevStep(1)">Précédent</button>
-                        <button type="button" onclick="nextStep(3)">Suivant</button>
+                        <button type="submit" name="prev_step" value="1">Précédent</button>
+                        <button type="submit" name="next_step" value="3">Suivant</button>
                     </div>
                 </div>
 
@@ -281,8 +369,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                pattern="[0-9]{5}" placeholder="Ex: 58000">
                     </div>
 
+                    <!-- Ajouter les champs cachés des étapes précédentes -->
+                    <input type="hidden" name="email_contact" value="<?= htmlspecialchars(getFormValue('email_contact')) ?>">
+                    <input type="hidden" name="titre" value="<?= htmlspecialchars(getFormValue('titre')) ?>">
+                    <input type="hidden" name="description" value="<?= htmlspecialchars(getFormValue('description')) ?>">
+                    <input type="hidden" name="date_debut" value="<?= htmlspecialchars(getFormValue('date_debut')) ?>">
+                    <input type="hidden" name="duree" value="<?= htmlspecialchars(getFormValue('duree')) ?>">
+                    <input type="hidden" name="domaine" value="<?= htmlspecialchars(getFormValue('domaine')) ?>">
+                    <input type="hidden" name="remuneration" value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
+                    <input type="hidden" name="teletravail" value="<?= htmlspecialchars(getFormValue('teletravail')) ?>">
+                    <input type="hidden" name="mode_stage" value="<?= htmlspecialchars(getFormValue('mode_stage')) ?>">
+
                     <div class="form-navigation">
-                        <button type="button" onclick="prevStep(2)">Précédent</button>
+                        <button type="submit" name="prev_step" value="2">Précédent</button>
                         <button type="submit" name="final_submit">Publier l'offre</button>
                     </div>
                 </div>
@@ -290,286 +389,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
-    <script>
-        function nextStep(step) {
-            window.location.href = `?step=${step}`;
-        }
-
-        function prevStep(step) {
-            window.location.href = `?step=${step}`;
-        }
-    </script>
-    <script>
-const regions = {
-    "Bourgogne-Franche-Comté": {
-        "58": "Nièvre",
-        "21": "Côte-d'Or",
-        "71": "Saône-et-Loire",
-        "89": "Yonne",
-        "25": "Doubs",
-        "39": "Jura",
-        "70": "Haute-Saône",
-        "90": "Territoire de Belfort"
-    },
-    "Auvergne-Rhône-Alpes": {
-        "03": "Allier",
-        "63": "Puy-de-Dôme",
-        "42": "Loire",
-        "69": "Rhône"
-    },
-    "Île-de-France": {
-        "75": "Paris",
-        "77": "Seine-et-Marne",
-        "78": "Yvelines",
-        "91": "Essonne",
-        "92": "Hauts-de-Seine",
-        "93": "Seine-Saint-Denis",
-        "94": "Val-de-Marne",
-        "95": "Val-d'Oise"
-    }
-};
-
-const villes = {
-    "58": [
-        "Nevers",
-        "Cosne-Cours-sur-Loire",
-        "Decize",
-        "Fourchambault",
-        "Varennes-Vauzelles",
-        "La Charité-sur-Loire",
-        "Imphy",
-        "Clamecy",
-        "Marzy",
-        "Saint-Léger-des-Vignes"
-    ],
-    "21": ["Dijon", "Beaune", "Chenôve", "Talant"],
-    "71": ["Mâcon", "Chalon-sur-Saône", "Autun", "Le Creusot"],
-    "89": ["Auxerre", "Sens", "Joigny", "Avallon"]
-};
-
-function updateDepartements() {
-    const regionSelect = document.getElementById('region');
-    const departementSelect = document.getElementById('departement');
-    const selectedRegion = regionSelect.value;
-    
-    departementSelect.innerHTML = '<option value="">Sélectionner un département</option>';
-    
-    if (selectedRegion && regions[selectedRegion]) {
-        Object.entries(regions[selectedRegion]).forEach(([code, nom]) => {
-            departementSelect.innerHTML += `<option value="${code}">${nom} (${code})</option>`;
-        });
-    }
-    
-    // Réinitialiser la sélection de ville
-    document.getElementById('ville').innerHTML = '<option value="">Sélectionner d'abord un département</option>';
-}
-
-function updateVilles() {
-    const departementSelect = document.getElementById('departement');
-    const villeSelect = document.getElementById('ville');
-    const selectedDepartement = departementSelect.value;
-    
-    villeSelect.innerHTML = '<option value="">Sélectionner une ville</option>';
-    
-    if (selectedDepartement && villes[selectedDepartement]) {
-        villes[selectedDepartement].forEach(ville => {
-            villeSelect.innerHTML += `<option value="${ville}">${ville}</option>`;
-        });
-    }
-
-    // Mise à jour automatique du code postal pour Nevers
-    const codePostalInput = document.getElementById('code_postal');
-    if (selectedDepartement === "58" && villeSelect.value === "Nevers") {
-        codePostalInput.value = "58000";
-    }
-}
-
-// Écouter les changements de ville pour mettre à jour le code postal
-document.getElementById('ville').addEventListener('change', function() {
-    const codePostalInput = document.getElementById('code_postal');
-    const departementSelect = document.getElementById('departement');
-    
-    if (departementSelect.value === "58") {
-        switch(this.value) {
-            case "Nevers":
-                codePostalInput.value = "58000";
-                break;
-            case "Cosne-Cours-sur-Loire":
-                codePostalInput.value = "58200";
-                break;
-            case "Decize":
-                codePostalInput.value = "58300";
-                break;
-            case "Fourchambault":
-                codePostalInput.value = "58600";
-                break;
-            case "Varennes-Vauzelles":
-                codePostalInput.value = "58640";
-                break;
-            // etc.
-        }
-    }
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const regions = {
-        "Bourgogne-Franche-Comté": {
-            "58": "Nièvre",
-            "21": "Côte-d'Or",
-            "71": "Saône-et-Loire",
-            "89": "Yonne",
-            "25": "Doubs",
-            "39": "Jura",
-            "70": "Haute-Saône",
-            "90": "Territoire de Belfort"
-        },
-        "Auvergne-Rhône-Alpes": {
-            "03": "Allier",
-            "63": "Puy-de-Dôme",
-            "42": "Loire",
-            "69": "Rhône"
-        },
-        "Île-de-France": {
-            "75": "Paris",
-            "77": "Seine-et-Marne",
-            "78": "Yvelines",
-            "91": "Essonne",
-            "92": "Hauts-de-Seine",
-            "93": "Seine-Saint-Denis",
-            "94": "Val-de-Marne",
-            "95": "Val-d'Oise"
-        }
-    };
-
-    const villes = {
-        "58": [
-            "Nevers",
-            "Cosne-Cours-sur-Loire",
-            "Decize",
-            "Fourchambault",
-            "Varennes-Vauzelles",
-            "La Charité-sur-Loire",
-            "Imphy",
-            "Clamecy",
-            "Marzy",
-            "Saint-Léger-des-Vignes"
-        ],
-        "21": ["Dijon", "Beaune", "Chenôve", "Talant"],
-        "71": ["Mâcon", "Chalon-sur-Saône", "Autun", "Le Creusot"],
-        "89": ["Auxerre", "Sens", "Joigny", "Avallon"]
-    };
-
-    const codesPostaux = {
-        "Nevers": "58000",
-        "Cosne-Cours-sur-Loire": "58200",
-        "Decize": "58300",
-        "Fourchambault": "58600",
-        "Varennes-Vauzelles": "58640",
-        "La Charité-sur-Loire": "58400",
-        "Imphy": "58160",
-        "Clamecy": "58500",
-        "Marzy": "58180"
-    };
-
-    window.updateDepartements = function() {
-        const regionSelect = document.getElementById('region');
-        const departementSelect = document.getElementById('departement');
-        const selectedRegion = regionSelect.value;
-        
-        departementSelect.innerHTML = '<option value="">Sélectionner un département</option>';
-        
-        if (selectedRegion && regions[selectedRegion]) {
-            Object.entries(regions[selectedRegion]).forEach(([code, nom]) => {
-                departementSelect.innerHTML += `<option value="${code}">${nom} (${code})</option>`;
-            });
-        }
-        
-        // Réinitialiser les champs dépendants
-        document.getElementById('ville').innerHTML = '<option value="">Sélectionner d\'abord un département</option>';
-        document.getElementById('code_postal').value = '';
-    };
-
-    window.updateVilles = function() {
-        const departementSelect = document.getElementById('departement');
-        const villeSelect = document.getElementById('ville');
-        const selectedDepartement = departementSelect.value;
-        
-        villeSelect.innerHTML = '<option value="">Sélectionner une ville</option>';
-        
-        if (selectedDepartement && villes[selectedDepartement]) {
-            villes[selectedDepartement].forEach(ville => {
-                villeSelect.innerHTML += `<option value="${ville}">${ville}</option>`;
-            });
-        }
-    };
-
-    window.updateCodePostal = function() {
-        const villeSelect = document.getElementById('ville');
-        const codePostalInput = document.getElementById('code_postal');
-        const selectedVille = villeSelect.value;
-        
-        if (codesPostaux[selectedVille]) {
-            codePostalInput.value = codesPostaux[selectedVille];
-        } else {
-            codePostalInput.value = '';
-        }
-    };
-});
-</script>
-<script>
-function toggleAutreMontant() {
-    const select = document.getElementById('remuneration');
-    const container = document.getElementById('autre_montant_container');
-    const input = document.getElementById('remuneration_autre');
-    
-    if (select.value === 'autre') {
-        container.style.display = 'block';
-        input.required = true;
-        input.focus();
-    } else {
-        container.style.display = 'none';
-        input.required = false;
-        input.value = '';
-        // Réinitialiser les styles et messages d'erreur
-        input.style.borderColor = '#ddd';
-        const warningDiv = document.getElementById('remuneration_warning');
-        if (warningDiv) warningDiv.textContent = '';
-        document.querySelector('button[name="final_submit"]').disabled = false;
-    }
-}
-
-function updateRemuneration(value) {
-    const input = document.getElementById('remuneration_autre');
-    const submitButton = document.querySelector('button[name="final_submit"]');
-    const warningDiv = document.getElementById('remuneration_warning');
-    
-    // Créer le div d'avertissement s'il n'existe pas
-    if (!warningDiv) {
-        const warning = document.createElement('div');
-        warning.id = 'remuneration_warning';
-        warning.style.color = '#ff0000';
-        warning.style.fontSize = '0.8em';
-        warning.style.marginTop = '5px';
-        input.parentNode.appendChild(warning);
-    }
-
-    if (value < 417) {
-        document.getElementById('remuneration_warning').textContent = 
-            'La rémunération ne peut pas être inférieure au minimum légal (417€)';
-        submitButton.disabled = true;
-        input.style.borderColor = '#ff0000';
-    } else {
-        document.getElementById('remuneration_warning').textContent = '';
-        submitButton.disabled = false;
-        input.style.borderColor = '#ddd';
-    }
-}
-
-// Exécuter au chargement pour gérer les retours en arrière du navigateur
-document.addEventListener('DOMContentLoaded', function() {
-    toggleAutreMontant();
-});
-</script>
+    <script src="/Gestion_Stage/public/assets/js/location.js"></script>
+    <script src="/Gestion_Stage/public/assets/js/remuneration.js"></script>
 </body>
 </html>
