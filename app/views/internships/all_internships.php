@@ -21,8 +21,8 @@ if (!in_array($order, $valid_orders)) {
     $order = 'ASC';
 }
 
-// Récupérer toutes les offres de stage
-$query = "SELECT o.*, e.nom as entreprise_nom 
+// Modifier la requête SQL pour inclure date_fin
+$query = "SELECT o.*, e.nom as entreprise_nom, o.date_debut, o.date_fin 
           FROM offres_stages o 
           JOIN entreprises e ON o.entreprise_id = e.id 
           WHERE o.titre LIKE :search OR o.description LIKE :search OR e.nom LIKE :search 
@@ -75,6 +75,10 @@ $internships = $stmt->fetchAll();
                 <?php foreach ($internships as $internship): ?>
                     <div class="offer-card">
                         <div class="offer-header">
+                            <div class="mode-badge">
+                                <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
+                                <?php echo htmlspecialchars($internship['mode_stage']); ?>
+                            </div>
                             <div class="offer-header-content">
                                 <div>
                                     <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
@@ -92,7 +96,14 @@ $internships = $stmt->fetchAll();
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                                 <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>
-                                <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+                                <span><i class="fas fa-clock"></i> Durée: <?php 
+                                    if ($internship['date_fin'] && $internship['date_debut']) {
+                                        echo calculateDuration($internship['date_debut'], $internship['date_fin']); 
+                                    } else {
+                                        echo 'Non spécifiée';
+                                    }
+                                ?></span>
+                                <span><i class="fas fa-euro-sign"></i> Rémunération: <?php echo $internship['remuneration'] ? number_format($internship['remuneration'], 2, ',', ' ') . ' €' : 'Non spécifiée'; ?></span>
                             </div>
                         </div>
                         <div class="offer-footer">

@@ -70,8 +70,24 @@ function get_internships($pdo) {
     }
 }
 
-
-
+// Fonction pour calculer la durée entre deux dates
+function calculateDuration($dateDebut, $dateFin) {
+    if (!$dateDebut || !$dateFin) {
+        return 'Non spécifiée';
+    }
+    
+    $debut = new DateTime($dateDebut);
+    $fin = new DateTime($dateFin);
+    $interval = $debut->diff($fin);
+    
+    $mois = $interval->m + ($interval->y * 12);
+    $jours = $interval->d;
+    
+    if ($mois > 0) {
+        return $mois . ' mois' . ($jours > 0 ? ' et ' . $jours . ' jours' : '');
+    }
+    return $jours . ' jours';
+}
 
 // Fonction pour récupérer les candidatures d'un étudiant
 function get_applications($pdo, $etudiant_id) {

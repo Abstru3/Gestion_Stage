@@ -71,14 +71,14 @@ if (!$internship) {
 
             <div class="offer-grid">
                 <div class="offer-main">
-                    <div class="card">
-                        <h2><i class="fas fa-info-circle"></i> Description du stage</h2>
-                        <div class="card-content">
-                            <div class="description-text">
-                                <?php echo nl2br(htmlspecialchars($internship['description'])); ?>
-                            </div>
+                <div class="card">
+                    <h2><i class="fas fa-info-circle"></i> Description du stage</h2>
+                    <div class="card-content">
+                        <div class="description-text">
+                            <?php echo nl2br(htmlspecialchars($internship['description'])); ?>
                         </div>
                     </div>
+                </div>
 
                     <div class="card">
                         <h2><i class="fas fa-building"></i> À propos de l'entreprise</h2>

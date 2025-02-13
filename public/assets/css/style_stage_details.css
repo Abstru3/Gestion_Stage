@@ -127,9 +127,18 @@ body {
 /* Cards */
 .card {
     background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; /* Pour éviter les débordements pendant l'animation */
+    height: fit-content;  /* Pour s'adapter au contenu */
+}
+
+/* Effet au survol des cards */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .card h2 {
@@ -160,10 +169,12 @@ body {
     hyphens: auto;
 }
 
+/* Éviter les retours à la ligne non désirés */
 .description-text {
-    white-space: pre-line;
-    max-width: 100%;
-    font-size: 0.95rem;
+    white-space: normal; /* Garde uniquement les retours à la ligne intentionnels */
+    word-wrap: break-word; /* Permet aux mots longs de se couper */
+    overflow-wrap: break-word;
+    line-height: 1.6;
 }
 
 /* Add specific styles for long words and URLs */
@@ -278,6 +289,12 @@ body {
     text-align: center;
 }
 
+/* Améliorer le style des info-cards dans la sidebar */
+.info-card {
+    position: sticky;
+    top: 20px;
+}
+
 /* Responsive */
 @media (max-width: 1224px) {
     .offer-grid {
@@ -317,6 +334,14 @@ body {
 
     .description-text {
         font-size: 0.9rem;
+    }
+
+    .card:hover {
+        transform: translateY(-3px); /* Effet plus subtil sur mobile */
+    }
+    
+    .info-card {
+        position: static;
     }
 }
 

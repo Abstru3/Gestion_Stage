@@ -110,6 +110,10 @@ $recent_internships = array_slice($recent_internships, 0, 4);
                 <?php foreach ($recent_internships as $internship): ?>
                     <div class="offer-card">
                         <div class="offer-header">
+                            <div class="mode-badge">
+                                <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
+                                <?php echo htmlspecialchars($internship['mode_stage']); ?>
+                            </div>
                             <div class="offer-header-content">
                                 <div>
                                     <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
@@ -117,9 +121,6 @@ $recent_internships = array_slice($recent_internships, 0, 4);
                                         <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
                                     </span>
                                 </div>
-                                <?php if (!empty($internship['logo'])): ?>
-                                    <!-- <img src="/Gestion_Stage/<?php echo htmlspecialchars($internship['logo']); ?>" alt="Logo de l'entreprise" class="company-logo"> -->
-                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="offer-body">
@@ -127,7 +128,10 @@ $recent_internships = array_slice($recent_internships, 0, 4);
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                                 <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
-                                <span><i class="fas fa-globe"></i> Mode: <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
+                                <span><i class="fas fa-clock"></i> Durée: <?php 
+                                    echo calculateDuration($internship['date_debut'], $internship['date_fin']); 
+                                ?></span>
+                                <span><i class="fas fa-euro-sign"></i> Rémunération: <?php echo $internship['remuneration'] ? number_format($internship['remuneration'], 2, ',', ' ') . ' €' : 'Non spécifiée'; ?></span>
                             </div>
                         </div>
                         <div class="offer-footer">

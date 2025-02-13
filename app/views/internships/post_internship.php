@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Vérification des champs requis
             $required_fields = [
                 'titre', 'description', 'email_contact', 'date_debut', 
-                'duree', 'domaine', 'remuneration', 'ville', 
+                'date_fin', 'domaine', 'remuneration', 'ville', 
                 'code_postal', 'region', 'departement'
             ];
 
@@ -78,10 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email_contact' => $_SESSION['form_data']['email_contact'],
                 'lien_candidature' => $_SESSION['form_data']['lien_candidature'] ?? null,
                 'date_debut' => $_SESSION['form_data']['date_debut'],
-                'duree' => $_SESSION['form_data']['duree'],
+                'date_fin' => $_SESSION['form_data']['date_fin'],
                 'domaine' => $_SESSION['form_data']['domaine'],
                 'remuneration' => $remuneration,
-                'teletravail' => isset($_SESSION['form_data']['teletravail']) ? 1 : 0,
                 'pays' => $_SESSION['form_data']['pays'] ?? 'France',
                 'ville' => $_SESSION['form_data']['ville'],
                 'code_postal' => $_SESSION['form_data']['code_postal'],
@@ -93,11 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt = $pdo->prepare("INSERT INTO offres_stages (
                 entreprise_id, titre, description, email_contact, lien_candidature,
-                date_debut, duree, domaine, remuneration, teletravail,
+                date_debut, date_fin, domaine, remuneration,
                 pays, ville, code_postal, region, departement, lieu, mode_stage
             ) VALUES (
                 :entreprise_id, :titre, :description, :email_contact, :lien_candidature,
-                :date_debut, :duree, :domaine, :remuneration, :teletravail,
+                :date_debut, :date_fin, :domaine, :remuneration,
                 :pays, :ville, :code_postal, :region, :departement, :lieu, :mode_stage
             )");
             
@@ -170,13 +169,13 @@ function getFormValue($field, $default = '') {
                     <h2>Étape 1 : Informations sur l'entreprise</h2>
                     
                     <div class="form-group">
-                        <label for="nom_entreprise">Nom de l'entreprise*</label>
+                        <label for="nom_entreprise">Nom de l'entreprise</label>
                         <input type="text" id="nom_entreprise" name="nom_entreprise" 
                                value="<?= htmlspecialchars($entreprise['nom']) ?>" required maxlength="255">
                     </div>
 
                     <div class="form-group">
-                        <label for="email_contact">Email de contact*</label>
+                        <label for="email_contact">Email de contact</label>
                         <input type="email" id="email_contact" name="email_contact" 
                                value="<?= htmlspecialchars(getFormValue('email_contact')) ?>"
                                placeholder="contact@entreprise.com" required>
@@ -210,38 +209,35 @@ function getFormValue($field, $default = '') {
                     <h2>Étape 2 : Détails du stage</h2>
                     
                     <div class="form-group">
-                        <label for="titre">Titre de l'offre*</label>
+                        <label for="titre">Titre de l'offre</label>
                         <input type="text" id="titre" name="titre" required maxlength="200"
                                value="<?= htmlspecialchars(getFormValue('titre')) ?>"
                                placeholder="Ex: Assistant de recherche (6 mois)">
                     </div>
 
                     <div class="form-group">
-                        <label for="description">Description du stage*</label>
+                        <label for="description">Description du stage</label>
                         <textarea id="description" name="description" required 
                                 minlength="200" placeholder="Décrivez les missions, objectifs..."><?= htmlspecialchars(getFormValue('description')) ?></textarea>
                         <small>Minimum 200 caractères requis</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="date_debut">Date de début*</label>
+                        <label for="date_debut">Date de début</label>
                         <input type="date" id="date_debut" name="date_debut" required
                                value="<?= htmlspecialchars(getFormValue('date_debut')) ?>"
                                min="<?= date('Y-m-d') ?>">
                     </div>
 
                     <div class="form-group">
-                        <label for="duree">Durée du stage*</label>
-                        <select id="duree" name="duree" required>
-                            <option value="">Sélectionner une durée</option>
-                            <?php foreach (["2 mois", "3 mois", "4 mois", "5 mois", "6 mois", "12 mois"] as $duree): ?>
-                                <option value="<?= $duree ?>" <?= getFormValue('duree') === $duree ? 'selected' : '' ?>><?= $duree ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label for="date_fin">Date de fin</label>
+                        <input type="date" id="date_fin" name="date_fin" required
+                               value="<?= htmlspecialchars(getFormValue('date_fin')) ?>"
+                               min="<?= date('Y-m-d') ?>">
                     </div>
 
                     <div class="form-group">
-                        <label for="domaine">Domaine*</label>
+                        <label for="domaine">Domaine</label>
                         <select id="domaine" name="domaine" required>
                             <option value="">Sélectionner un domaine</option>
                             <optgroup label="Informatique">
@@ -266,7 +262,7 @@ function getFormValue($field, $default = '') {
                     </div>
 
                     <div class="form-group">
-                        <label for="remuneration">Rémunération mensuelle*</label>
+                        <label for="remuneration">Rémunération mensuelle</label>
                         <select id="remuneration" name="remuneration" required onchange="toggleAutreMontant()">
                             <option value="">Sélectionner une rémunération</option>
                             <option value="417" <?= getFormValue('remuneration') === '417' ? 'selected' : '' ?>>Minimum légal (417€)</option>
@@ -295,14 +291,7 @@ function getFormValue($field, $default = '') {
                     </div>
 
                     <div class="form-group">
-                        <label>
-                            <input type="checkbox" name="teletravail" value="1" <?= getFormValue('teletravail') == '1' ? 'checked' : '' ?>>
-                            Télétravail possible
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="mode_stage">Mode de stage*</label>
+                        <label for="mode_stage">Mode de stage</label>
                         <select id="mode_stage" name="mode_stage" required>
                             <option value="présentiel">Présentiel</option>
                             <option value="distanciel">Distanciel</option>
@@ -325,12 +314,12 @@ function getFormValue($field, $default = '') {
                     <h2>Étape 3 : Localisation</h2>
                     
                     <div class="form-group">
-                        <label for="pays">Pays*</label>
+                        <label for="pays">Pays</label>
                         <input type="text" id="pays" name="pays" value="France" required readonly>
                     </div>
 
                     <div class="form-group">
-                        <label for="region">Région*</label>
+                        <label for="region">Région</label>
                         <select id="region" name="region" required onchange="updateDepartements()">
                             <option value="">Sélectionner une région</option>
                             <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
@@ -350,21 +339,21 @@ function getFormValue($field, $default = '') {
                     </div>
 
                     <div class="form-group">
-                        <label for="departement">Département*</label>
+                        <label for="departement">Département</label>
                         <select id="departement" name="departement" required onchange="updateVilles()">
                             <option value="">Sélectionner d'abord une région</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="ville">Ville*</label>
+                        <label for="ville">Ville</label>
                         <select id="ville" name="ville" required onchange="updateCodePostal()">
                             <option value="">Sélectionner d'abord un département</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="code_postal">Code postal*</label>
+                        <label for="code_postal">Code postal</label>
                         <input type="text" id="code_postal" name="code_postal" required 
                                pattern="[0-9]{5}" placeholder="Ex: 58000">
                     </div>
@@ -374,10 +363,9 @@ function getFormValue($field, $default = '') {
                     <input type="hidden" name="titre" value="<?= htmlspecialchars(getFormValue('titre')) ?>">
                     <input type="hidden" name="description" value="<?= htmlspecialchars(getFormValue('description')) ?>">
                     <input type="hidden" name="date_debut" value="<?= htmlspecialchars(getFormValue('date_debut')) ?>">
-                    <input type="hidden" name="duree" value="<?= htmlspecialchars(getFormValue('duree')) ?>">
+                    <input type="hidden" name="date_fin" value="<?= htmlspecialchars(getFormValue('date_fin')) ?>">
                     <input type="hidden" name="domaine" value="<?= htmlspecialchars(getFormValue('domaine')) ?>">
                     <input type="hidden" name="remuneration" value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
-                    <input type="hidden" name="teletravail" value="<?= htmlspecialchars(getFormValue('teletravail')) ?>">
                     <input type="hidden" name="mode_stage" value="<?= htmlspecialchars(getFormValue('mode_stage')) ?>">
 
                     <div class="form-navigation">
@@ -388,6 +376,8 @@ function getFormValue($field, $default = '') {
             <?php endif; ?>
         </form>
     </div>
+
+    <p class="index-button"><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>
 
     <script src="/Gestion_Stage/public/assets/js/location.js"></script>
     <script src="/Gestion_Stage/public/assets/js/remuneration.js"></script>
