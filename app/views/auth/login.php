@@ -8,27 +8,20 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.p
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $identifier = $_POST['identifier'];
     $password = $_POST['password'];
+    
+    $result = login($pdo, $identifier, $password);
 
-    $user = login($pdo, $identifier, $password);
-
-    if ($user) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['username'] = $user['username']; // Ajoutez cette ligne
-
-        // Ajoutez ces lignes pour le débogage
-        error_log("User logged in: " . print_r($_SESSION, true));
-
-        if ($_SESSION['role'] == 'admin') {
-            header("Location: /Gestion_Stage/app/views/panels/admin_panel.php");
-        } else {
-            header("Location: /Gestion_Stage/app/views/home.php");
-        }
+    if (is_array($result) && isset($result['error'])) {
+        $error = $result['error'];
+    } elseif ($result) {
+        $_SESSION['user_id'] = $result['id'];
+        $_SESSION['role'] = $result['role'];
+        $_SESSION['username'] = $result['username'];
+        
+        header('Location: /Gestion_Stage/app/views/home.php');
         exit();
     } else {
         $error = "Identifiant ou mot de passe incorrect.";
-        // Ajoutez cette ligne pour le débogage
-        error_log("Login failed for user: " . $identifier);
     }
 }
 ?>

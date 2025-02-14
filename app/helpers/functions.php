@@ -12,6 +12,11 @@ function login($pdo, $identifier, $password) {
         $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE (email = :identifier OR username = :identifier)");
         $stmt->execute(['identifier' => $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Vérifier si le compte entreprise est validé
+        if ($user && $user['role'] === 'entreprise' && !$user['valide']) {
+            return ['error' => 'Votre compte est en attente de validation par un administrateur.'];
+        }
     }
 
     if ($user && password_verify($password, $user['password'])) {

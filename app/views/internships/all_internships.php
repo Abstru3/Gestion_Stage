@@ -92,7 +92,7 @@ $internships = $stmt->fetchAll();
                             </div>
                         </div>
                         <div class="offer-body">
-                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 100)) . '...'; ?></p>
+                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 75)) . '...'; ?></p>
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                                 <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo htmlspecialchars($internship['lieu']); ?></span>

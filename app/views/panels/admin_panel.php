@@ -17,13 +17,18 @@ $total_applications = $pdo->query("SELECT COUNT(*) FROM candidatures")->fetchCol
 $total_students = $pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
 $total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
 
-// Récupérer la liste des utilisateurs
+// Modifier la requête de récupération des utilisateurs
 $users = $pdo->query("
-    SELECT id, email, 'etudiant' as role FROM etudiants
+    SELECT id, email, telephone, adresse, 'etudiant' as role FROM etudiants
     UNION ALL
-    SELECT id, email, 'entreprise' as role FROM entreprises
+    SELECT id, email, telephone, adresse, 'entreprise' as role FROM entreprises
     ORDER BY id DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+// Section pour gérer les entreprises en attente de validation
+$stmt = $pdo->prepare("SELECT * FROM entreprises WHERE valide = FALSE");
+$stmt->execute();
+$entreprises_en_attente = $stmt->fetchAll();
 ?>
 
 
@@ -46,8 +51,9 @@ $users = $pdo->query("
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <a href="#" class="navbar-brand text-center text-light">Admin Panel</a>
-        <a href="#statistiques" class="active">Statistiques</a>
+        <a href="#statistiques">Statistiques</a>
         <a href="#utilisateurs">Utilisateurs</a>
+        <a href="#entreprises_attente">Entreprises en attente</a>
         <a href="/Gestion_Stage/app/views/home.php">Espace personnel</a>
         <a href="/Gestion_Stage/index.php">Menu principal</a>
         <a href="/Gestion_Stage/app/views/auth/logout.php">Se déconnecter</a>
@@ -117,6 +123,8 @@ $users = $pdo->query("
                             <tr>
                                 <th>ID</th>
                                 <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Adresse</th>
                                 <th>Rôle</th>
                             </tr>
                         </thead>
@@ -125,6 +133,8 @@ $users = $pdo->query("
                                 <tr>
                                     <td><?= htmlspecialchars($user['id']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td><?= htmlspecialchars($user['telephone'] ?? 'Non renseigné') ?></td>
+                                    <td><?= htmlspecialchars($user['adresse'] ?? 'Non renseigné') ?></td>
                                     <td><?= htmlspecialchars($user['role']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
@@ -153,11 +163,45 @@ $users = $pdo->query("
                 });
             </script>
 
-            <p class="text-center mt-4">
-                <a href="/Gestion_Stage/app/views/home.php" class="btn btn-primary">Espace personnel</a>
-            </p>
+            <!-- Entreprises en attente de validation -->
+            <div class="card p-4 shadow mt-4" id="entreprises_attente">
+                <h2 class="mb-3">Entreprises en attente de validation</h2>
+                <?php if (!empty($entreprises_en_attente)): ?>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>SIRET</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($entreprises_en_attente as $entreprise): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($entreprise['nom']) ?></td>
+                                    <td><?= htmlspecialchars($entreprise['siret']) ?></td>
+                                    <td><?= htmlspecialchars($entreprise['email']) ?></td>
+                                    <td>
+                                        <form method="POST" action="/Gestion_Stage/app/controllers/validate_company.php">
+                                            <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
+                                            <button type="submit" class="btn btn-primary">Valider</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>Aucune entreprise en attente de validation</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
+
+    <p class="text-center mt-4">
+        <a href="/Gestion_Stage/app/views/home.php" class="btn btn-primary">Espace personnel</a>
+    </p>
 
     <script>
         // Toggle Sidebar on small screens
@@ -173,7 +217,7 @@ $users = $pdo->query("
                 labels: ['Étudiants', 'Entreprises'],
                 datasets: [{
                     data: [<?php echo $total_students; ?>, <?php echo $total_companies; ?>],
-                    backgroundColor: ['#36A2EB', '#FF6384']
+                    backgroundColor: ['#F64C4C', '#366AED']
                 }]
             }
         });
