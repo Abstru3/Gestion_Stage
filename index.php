@@ -23,6 +23,12 @@ $recent_internships = array_slice($recent_internships, 0, 4);
     <link rel="icon" type="image/png" href="./public/assets/images/logo_reduis.png">
 </head>
 <body>
+    <?php if (isset($_SESSION['info_message'])): ?>
+        <div class="info-message">
+            <?= htmlspecialchars($_SESSION['info_message']) ?>
+            <?php unset($_SESSION['info_message']); ?>
+        </div>
+    <?php endif; ?>
     <header class="main-header">
         <nav class="navbar">
             <div class="logo">
@@ -124,7 +130,7 @@ $recent_internships = array_slice($recent_internships, 0, 4);
                             </div>
                         </div>
                         <div class="offer-body">
-                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 100)) . '...'; ?></p>
+                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 90)) . '...'; ?></p>
                             <div class="offer-details">
                                 <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                                 <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>

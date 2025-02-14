@@ -112,6 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                      VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([$username, $email, $hashed_password, $nom, $prenom]);
 
+                $pdo->commit();
+                $_SESSION['success'] = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+                header("Location: login.php");
+                exit();
+
             } elseif ($role === 'entreprise') {
                 $nom_entreprise = trim(htmlspecialchars($_POST['nom_entreprise'] ?? ''));
                 $description = trim(htmlspecialchars($_POST['description'] ?? ''));
@@ -148,12 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $adresse_facturation, $nom_contact, $telephone, $site_web,
                     $tva_intracommunautaire, $siret
                 ]);
-            }
 
-            $pdo->commit();
-            $_SESSION['success'] = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-            header("Location: login.php");
-            exit();
+                $pdo->commit();
+                $_SESSION['info_message'] = "Votre compte entreprise a été créé avec succès ! Il est actuellement en attente de validation par un administrateur. Vous recevrez une notification par email une fois votre compte validé.";
+                header("Location: /Gestion_Stage/index.php");
+                exit();
+            }
 
         } catch (Exception $e) {
             $pdo->rollBack();
