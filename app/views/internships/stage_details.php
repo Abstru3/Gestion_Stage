@@ -83,14 +83,20 @@ if (!$internship) {
                     <div class="card">
                         <h2><i class="fas fa-building"></i> À propos de l'entreprise</h2>
                         <div class="card-content">
-                            <p><?php echo nl2br(htmlspecialchars($internship['description_entreprise'] ?? '')); ?></p>
-                            <?php if (!empty($internship['site_web'])): ?>
-                                <a href="<?php echo htmlspecialchars($internship['site_web']); ?>" 
-                                   target="_blank" 
+                            <?php echo nl2br(htmlspecialchars($internship['description_entreprise'] ?? '')); ?>
+                            <div class="company-links">
+                                <?php if (!empty($internship['site_web'])): ?>
+                                    <a href="<?php echo htmlspecialchars($internship['site_web']); ?>" 
+                                       target="_blank" 
+                                       class="btn btn-link">
+                                        <i class="fas fa-globe"></i> Visiter le site web
+                                    </a>
+                                <?php endif; ?>
+                                <a href="/Gestion_Stage/app/views/company_profile.php?id=<?php echo $internship['entreprise_id']; ?>" 
                                    class="btn btn-link">
-                                    <i class="fas fa-globe"></i> Visiter le site web
+                                    <i class="fas fa-building"></i> Voir le profil de l'entreprise
                                 </a>
-                            <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>

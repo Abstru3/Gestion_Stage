@@ -13,13 +13,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'etudiant') {
 function formatStatus($status) {
     switch ($status) {
         case 'en_attente':
-            return 'En attente';
-        case 'accepte':
-            return 'Acceptée';
-        case 'refuse':
-            return 'Refusée';
+            return '<span class="status status-pending"><i class="fas fa-clock"></i> En attente</span>';
+        case 'acceptee':
+            return '<span class="status status-accepted"><i class="fas fa-check-circle"></i> Acceptée</span>';
+        case 'refusee':
+            return '<span class="status status-rejected"><i class="fas fa-times-circle"></i> Refusée</span>';
         default:
-            return ucfirst($status);
+            return '<span class="status status-pending"><i class="fas fa-clock"></i> En attente</span>';
     }
 }
 
@@ -60,7 +60,9 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeversStage - Panneau Étudiant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
+    <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_student_panel.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
@@ -88,68 +90,42 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
     </nav>
 
     <main class="container">
-        <h2>Rechercher des offres de stages</h2>
-        <form action="" method="get">
-            <input type="text" name="search" placeholder="Rechercher..." value="<?php echo htmlspecialchars($search); ?>">
-            <select name="sort">
-                <option value="date_debut" <?php echo $sort == 'date_debut' ? 'selected' : ''; ?>>Date de début</option>
-                <option value="titre" <?php echo $sort == 'titre' ? 'selected' : ''; ?>>Titre</option>
-                <option value="entreprise_nom" <?php echo $sort == 'entreprise_nom' ? 'selected' : ''; ?>>Entreprise</option>
-            </select>
-            <select name="order">
-                <option value="ASC" <?php echo $order == 'ASC' ? 'selected' : ''; ?>>Croissant</option>
-                <option value="DESC" <?php echo $order == 'DESC' ? 'selected' : ''; ?>>Décroissant</option>
-            </select>
-            <button type="submit" class="btn-primary">Rechercher</button>
-        </form>
-
-        <h2>Offres de stages disponibles</h2>
-        <?php if (empty($internships)): ?>
-            <p>Aucune offre de stage ne correspond à votre recherche.</p>
-        <?php else: ?>
-            <?php foreach ($internships as $internship): ?>
-                <div class="card">
-                    <div class="card-header">
-                        <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Entreprise:</strong> <?php echo htmlspecialchars($internship['entreprise_nom']); ?></p>
-                        <p><?php echo htmlspecialchars($internship['description']); ?></p>
-                        <p>Date de début: <?php echo $internship['date_debut']; ?></p>
-                        <p>Date de fin: <?php echo $internship['date_fin']; ?></p>
-                    </div>
-                    <div class="card-footer">
-                        <form action="/Gestion_Stage/app/views/internships/apply.php" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
-                            <label for="cv">CV (PDF) :</label>
-                            <input type="file" name="cv" accept=".pdf" required>
-                            <label for="lettre_motivation">Lettre de motivation (PDF) :</label>
-                            <input type="file" name="lettre_motivation" accept=".pdf" required>
-                            <button type="submit" class="btn-primary">Postuler</button>
-                        </form>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-
-        <h2>Mes candidatures</h2>
-        <?php if (empty($applications)): ?>
-            <p>Vous n'avez pas encore postulé à des offres de stage.</p>
-        <?php else: ?>
-            <?php foreach ($applications as $application): ?>
-                <div class="card">
-                    <div class="card-header">
-                        <h3><?php echo htmlspecialchars($application['titre']); ?></h3>
-                    </div>
-                    <div class="card-body">
-                        <p>Statut: <?php echo formatStatus($application['statut']); ?></p>
-                        <p>Date de candidature: <?php echo $application['date_candidature']; ?></p>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-search"></i> Accédez à toutes les offres</h2>
+            </div>
+            <div class="card-body text-center">
+                <p>Découvrez l'ensemble des offres de stage disponibles et filtrez selon vos critères.</p>
+                <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn-large">
+                    <i class="fas fa-list"></i> Voir toutes les offres
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt"></i> Mes candidatures</h2>
+            </div>
+            <div class="card-body text-center">
+                <?php if (empty($applications)): ?>
+                    <p>Vous n'avez pas encore postulé à des offres de stage.</p>
+                <?php else: ?>
+                    <?php foreach ($applications as $application): ?>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><?php echo htmlspecialchars($application['titre']); ?></h3>
+                            </div>
+                            <div class="card-body">
+                                <p><?php echo formatStatus($application['statut']); ?></p>
+                                <p><i class="fas fa-calendar"></i> Date de candidature: <?php echo date('d/m/Y', strtotime($application['date_candidature'])); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
     </main>
 
-    <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a></p>
+    <p><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>
 </body>
 </html>

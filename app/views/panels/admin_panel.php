@@ -39,7 +39,7 @@ $entreprises_en_attente = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeversStage - Panneau d'administration</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -183,9 +183,15 @@ $entreprises_en_attente = $stmt->fetchAll();
                                     <td><?= htmlspecialchars($entreprise['siret']) ?></td>
                                     <td><?= htmlspecialchars($entreprise['email']) ?></td>
                                     <td>
-                                        <form method="POST" action="/Gestion_Stage/app/controllers/validate_company.php">
+                                        <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $entreprise['id'] ?>" 
+                                           class="btn btn-info btn-sm me-2">
+                                            <i class="fas fa-eye"></i> Voir le profil
+                                        </a>
+                                        <form method="POST" action="/Gestion_Stage/app/controllers/validate_company.php" class="d-inline">
                                             <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
-                                            <button type="submit" class="btn btn-primary">Valider</button>
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-check"></i> Valider
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
