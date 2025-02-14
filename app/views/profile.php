@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $new_password = $_POST['new_password'];
+    $description_entreprise = $_POST['description_entreprise'];  // Récupération de la description
 
     // Vérification des exigences du mot de passe
     if (!empty($new_password)) {
@@ -67,14 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Si aucun mot de passe n'est fourni, ne pas modifier le mot de passe
+    // Mise à jour de la description de l'entreprise
     if (empty($errors)) {
         if (!empty($new_password)) {
-            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $hashed_password, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ?, description = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $hashed_password, $description_entreprise, $_SESSION['user_id']]);
         } else {
-            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, description = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $description_entreprise, $_SESSION['user_id']]);
         }
 
         // Rafraîchir les données de l'utilisateur
@@ -84,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $successMessage = "Votre profil a été mis à jour avec succès !";
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -150,7 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
                 <label for="nom_entreprise">Nom de l'entreprise:</label>
                 <input type="text" id="nom_entreprise" name="nom_entreprise" value="<?php echo htmlspecialchars($user['nom']); ?>" required>
-
+                
+                <label for="description_entreprise">Description de l'entreprise:</label>
+                <textarea id="description_entreprise" name="description_entreprise" rows="4" required><?php echo htmlspecialchars($user['description']); ?></textarea>
+                
                 <label for="siret">SIRET:</label>
                 <input type="text" id="siret" name="siret" value="<?php echo htmlspecialchars($user['siret']); ?>" required>
             <?php endif; ?>
