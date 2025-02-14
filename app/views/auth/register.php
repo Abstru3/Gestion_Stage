@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="form-section">
                     <h2>Informations de connexion</h2>
                     <div class="form-group">
-                        <label for="email">Email professionnel :</label>
+                        <label for="email">Email professionnel :*</label>
                         <input type="email" id="email" name="email" required 
                                value="${previousValues.email}"
                                placeholder="votre.email@exemple.com"
@@ -245,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     
                     <div class="form-group">
-                        <label for="username">Nom d'utilisateur :</label>
+                        <label for="username">Nom d'utilisateur :*</label>
                         <input type="text" id="username" name="username" required 
                                value="${previousValues.username}"
                                placeholder="Choisissez un nom d'utilisateur"
@@ -253,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mot de passe :</label>
+                        <label for="password">Mot de passe :*</label>
                         <div class="password-input-container">
                             <input type="password" id="password" name="password" required 
                                    placeholder="8 caractères minimum">
@@ -265,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
 
                     <div class="form-group">
-                        <label for="confirm_password">Confirmation du mot de passe :</label>
+                        <label for="confirm_password">Confirmation du mot de passe :*</label>
                         <div class="password-input-container">
                             <input type="password" id="confirm_password" name="confirm_password" 
                                    required placeholder="Confirmez votre mot de passe">
@@ -284,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-section">
                         <h2>Informations personnelles</h2>
                         <div class="form-group">
-                            <label for="nom">Nom :</label>
+                            <label for="nom">Nom :*</label>
                             <input type="text" id="nom" name="nom" required 
                                    value="${previousValues.nom}"
                                    placeholder="Votre nom de famille"
@@ -292,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
 
                         <div class="form-group">
-                            <label for="prenom">Prénom :</label>
+                            <label for="prenom">Prénom :*</label>
                             <input type="text" id="prenom" name="prenom" required 
                                    value="${previousValues.prenom}"
                                    placeholder="Votre prénom"
@@ -305,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="form-section">
                         <h2>Informations de l'entreprise</h2>
                         <div class="form-group">
-                            <label for="nom_entreprise">Raison sociale :</label>
+                            <label for="nom_entreprise">Raison sociale :*</label>
                             <input type="text" id="nom_entreprise" name="nom_entreprise" required 
                                    value="${previousValues.nom_entreprise}"
                                    placeholder="Nom de votre entreprise"
@@ -313,14 +313,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
 
                         <div class="form-group">
-                            <label for="description">Présentation de l'entreprise :</label>
+                            <label for="description">Présentation de l'entreprise :*</label>
                             <textarea id="description" name="description" required 
                                     placeholder="Décrivez brièvement votre entreprise"
                                     maxlength="1000">${previousValues.description}</textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="adresse_facturation">Adresse de facturation :</label>
+                            <label for="adresse_facturation">Adresse de facturation :*</label>
                             <input type="text" id="adresse_facturation" name="adresse_facturation" 
                                    required value="${previousValues.adresse_facturation}" 
                                    placeholder="Adresse complète"
@@ -328,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
 
                                                 <div class="form-group">
-                            <label for="siret">SIRET :</label>
+                            <label for="siret">SIRET :*</label>
                             <input type="text" id="siret" name="siret" required 
                                    value="${previousValues.siret}" 
                                    placeholder="Numéro SIRET (14 chiffres)"
