@@ -123,5 +123,9 @@ function get_user_by_email($pdo, $email) {
         return false;
     }
 }
+function getFormValue($key) {
+    return isset($_POST[$key]) ? $_POST[$key] : null;
+}
+
 
 ?>

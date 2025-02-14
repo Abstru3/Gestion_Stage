@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $domaine = isset($_POST['domaine']) ? $_POST['domaine'] : null;
         $pays = isset($_POST['pays']) ? $_POST['pays'] : 'France';
         $lieu = isset($_POST['lieu']) ? $_POST['lieu'] : null;
+
         
         $stmt = $pdo->prepare("UPDATE offres_stages SET 
             titre = ?, 
@@ -38,10 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             email_contact = ?, 
             lien_candidature = ?,
             date_debut = ?, 
-            duree = ?, 
+            date_fin = ?,
             domaine = ?, 
-            remuneration = ?, 
-            teletravail = ?,
+            remuneration = ?,
             pays = ?, 
             ville = ?, 
             code_postal = ?, 
@@ -57,10 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['email_contact'],
             $lien_candidature,
             $_POST['date_debut'],
-            $_POST['duree'],
+            $_POST['date_fin'],
             $domaine,
             $_POST['remuneration'],
-            isset($_POST['teletravail']) ? 1 : 0,
             $pays,
             $_POST['ville'],
             $_POST['code_postal'],
@@ -130,18 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label for="duree">Durée du stage*</label>
-                    <select id="duree" name="duree" required>
-                        <option value="">Sélectionner une durée</option>
-                        <?php
-                        $durees = ["2 mois", "3 mois", "4 mois", "5 mois", "6 mois", "12 mois"];
-                        foreach ($durees as $duree) {
-                            $selected = ($offre['duree'] === $duree) ? 'selected' : '';
-                            echo "<option value=\"$duree\" $selected>$duree</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
+                        <label for="date_fin">Date de fin</label>
+                        <input type="date" id="date_fin" name="date_fin"
+                               value="<?= htmlspecialchars(getFormValue('date_fin')) ?>"
+                               min="<?= date('Y-m-d') ?>">
+                    </div>
+
 
                 <div class="form-group">
                     <label for="remuneration">Rémunération mensuelle*</label>
@@ -177,13 +170,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="teletravail" value="1" 
-                               <?= $offre['teletravail'] ? 'checked' : '' ?>>
-                        Télétravail possible
-                    </label>
-                </div>
 
                 <div class="form-group">
                     <label for="mode_stage">Mode de stage*</label>

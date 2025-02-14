@@ -22,14 +22,6 @@ try {
     $error_message = "Une erreur est survenue lors du chargement de vos offres de stage.";
 }
 
-// Fonction pour calculer la date de fin basée sur la date de début et la durée
-function calculerDateFin($dateDebut, $duree) {
-    $debut = new DateTime($dateDebut);
-    $dureeNombre = intval($duree);
-    $debut->modify("+$dureeNombre months");
-    return $debut->format('Y-m-d');
-}
-
 // Remplacer la fonction formatDateFr avec cette version
 function formatDateFr($date) {
     $mois = array(
@@ -119,21 +111,14 @@ function formatDateFr($date) {
                             </div>
                             
                             <div class="detail-group">
-                                <span class="icon">⏳</span>
-                                <span>Durée: <?= htmlspecialchars($offre['duree']) ?></span>
+                                <span class="icon">📅</span>
+                                <span>Fin: <?= formatDateFr($offre['date_fin']) ?></span> <!-- Affichage de la date de fin -->
                             </div>
 
                             <?php if ($offre['remuneration']): ?>
                             <div class="detail-group">
                                 <span class="icon">💰</span>
                                 <span>Rémunération: <?= number_format($offre['remuneration'], 2, ',', ' ') ?> €/mois</span>
-                            </div>
-                            <?php endif; ?>
-                            
-                            <?php if ($offre['teletravail']): ?>
-                            <div class="detail-group">
-                                <span class="icon">🏠</span>
-                                <span>Télétravail possible</span>
                             </div>
                             <?php endif; ?>
                         </div>
