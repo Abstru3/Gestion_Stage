@@ -128,9 +128,8 @@ function get_user_by_email($pdo, $email) {
         return false;
     }
 }
-function getFormValue($key) {
-    return isset($_POST[$key]) ? $_POST[$key] : null;
+// Fonction pour récupérer la valeur d'un champ de formulaire, ou une valeur par défaut si elle est vide
+function getFormValue($field) {
+    return isset($_SESSION['form_data'][$field]) ? $_SESSION['form_data'][$field] : '';
 }
-
-
 ?>

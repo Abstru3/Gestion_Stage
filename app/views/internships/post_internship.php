@@ -31,6 +31,31 @@ if (!isset($_SESSION['form_data'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['form_data'] = array_merge($_SESSION['form_data'], $_POST);
 
+    // Gestion de l'upload du logo si présent
+    if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/logos/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileInfo = pathinfo($_FILES['logo']['name']);
+        $extension = strtolower($fileInfo['extension']);
+        
+        // Vérifier le type de fichier
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+            $newFileName = uniqid() . '.' . $extension;
+            $uploadFile = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadFile)) {
+                $_SESSION['form_data']['logo'] = 'uploads/logos/' . $newFileName;
+            } else {
+                $error = "Erreur lors du téléchargement du logo.";
+            }
+        } else {
+            $error = "Format de fichier non autorisé. Utilisez JPG, PNG ou GIF.";
+        }
+    }
+
     if (isset($_POST['next_step'])) {
         header("Location: ?step=" . (int) $_POST['next_step']);
         exit();
@@ -65,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email_contact' => $_SESSION['form_data']['email_contact'],
                 'lien_candidature' => $_SESSION['form_data']['lien_candidature'] ?? null,
                 'date_debut' => $_SESSION['form_data']['date_debut'],
-                'date_fin' => $_SESSION['form_data']['date_fin'],  // Ajouter date_fin ici
+                'date_fin' => $_SESSION['form_data']['date_fin'] ?? null,
                 'domaine' => $_SESSION['form_data']['domaine'],
                 'remuneration' => $remuneration,
                 'pays' => $_SESSION['form_data']['pays'] ?? 'France',
@@ -73,26 +98,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'code_postal' => $_SESSION['form_data']['code_postal'],
                 'region' => $_SESSION['form_data']['region'],
                 'departement' => $_SESSION['form_data']['departement'],
-                'mode_stage' => $_SESSION['form_data']['mode_stage'] ?? 'présentiel'
+                'mode_stage' => $_SESSION['form_data']['mode_stage'] ?? 'présentiel',
+                'logo' => $_SESSION['form_data']['logo'] ?? null,
+                'lieu' => $_SESSION['form_data']['lieu'] ?? null
             ];
+
+            // Construire la requête SQL dynamiquement avec les champs disponibles
+            $fields = array_keys($data);
+            $placeholders = array_map(function($field) { return ":$field"; }, $fields);
             
-            
+            $sql = "INSERT INTO offres_stages (" . implode(", ", $fields) . ") 
+                    VALUES (" . implode(", ", $placeholders) . ")";
 
-            // Vérifie si 'lieu' est défini et ajuste la requête en conséquence
-            if (isset($_SESSION['form_data']['lieu'])) {
-                $data['lieu'] = $_SESSION['form_data']['lieu'];
-                $sql = "INSERT INTO offres_stages (entreprise_id, titre, description, email_contact, lien_candidature, date_debut, date_fin, domaine, remuneration, pays, ville, code_postal, region, departement, lieu, mode_stage) 
-        VALUES (:entreprise_id, :titre, :description, :email_contact, :lien_candidature, :date_debut, :date_fin, :domaine, :remuneration, :pays, :ville, :code_postal, :region, :departement, :lieu, :mode_stage)";
-
-            } else {
-                $sql = "INSERT INTO offres_stages (entreprise_id, titre, description, email_contact, lien_candidature, date_debut, date_fin, domaine, remuneration, pays, ville, code_postal, region, departement, lieu, mode_stage) 
-        VALUES (:entreprise_id, :titre, :description, :email_contact, :lien_candidature, :date_debut, :date_fin, :domaine, :remuneration, :pays, :ville, :code_postal, :region, :departement, :lieu, :mode_stage)";
-
-            }
-
-            // Prépare la requête SQL
+            // Prépare et exécute la requête SQL
             $stmt = $pdo->prepare($sql);
-            $stmt->execute($data);  // Exécute avec le tableau de données
+            $stmt->execute($data);
 
             // Nettoyage et redirection
             unset($_SESSION['form_data']);
@@ -105,10 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fonction helper sécurisée
-function getFormValue($field, $default = '') {
-    return htmlspecialchars($_SESSION['form_data'][$field] ?? $default);
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -139,7 +156,7 @@ function getFormValue($field, $default = '') {
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
 
-        <form method="POST" action="" class="multi-step-form" id="internshipForm">
+        <form method="POST" action="" class="multi-step-form" id="internshipForm" enctype="multipart/form-data">
             
             <?php if ($currentStep === 1): ?>
                 <div class="step-content">
@@ -166,7 +183,11 @@ function getFormValue($field, $default = '') {
 
                     <div class="form-group">
                         <label for="logo">Logo de l'entreprise</label>
+                        <div class="logo-preview">
+                            
+                        </div>
                         <input type="file" id="logo" name="logo" accept="image/*">
+                        <p class="help-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</p>
                     </div>
 
                     <div class="form-group">

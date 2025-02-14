@@ -24,15 +24,54 @@ if (!$offre) {
     exit();
 }
 
+// Récupérer l'icône de l'entreprise
+$stmt = $pdo->prepare("SELECT icone FROM entreprises WHERE id = ?");
+$stmt->execute([$entreprise_id]);
+$entreprise = $stmt->fetch();
+$iconeEntreprise = $entreprise['icone'] ?? null;
+
+// Définir le logo à afficher (priorité : logo de l'offre -> icône de l'entreprise -> image par défaut)
+$logo = !empty($offre['logo']) ? $offre['logo'] : (!empty($iconeEntreprise) ? $iconeEntreprise : 'uploads/logos/default.png');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Définir des valeurs par défaut pour les champs optionnels
-        $lien_candidature = isset($_POST['lien_candidature']) ? $_POST['lien_candidature'] : null;
-        $domaine = isset($_POST['domaine']) ? $_POST['domaine'] : null;
-        $pays = isset($_POST['pays']) ? $_POST['pays'] : 'France';
-        $lieu = isset($_POST['lieu']) ? $_POST['lieu'] : null;
+        $lien_candidature = $_POST['lien_candidature'] ?? null;
+        $domaine = $_POST['domaine'] ?? null;
+        $pays = $_POST['pays'] ?? 'France';
+        $lieu = $_POST['lieu'] ?? null;
 
-        
+        // Gestion de l'upload du logo
+        $logoPath = $offre['logo']; // Conserve l'ancien logo si aucun nouveau n'est téléchargé
+
+        // Gestion de l'upload du logo
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/logos/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileInfo = pathinfo($_FILES['logo']['name']);
+            $extension = strtolower($fileInfo['extension']);
+            
+            // Vérifier le type de fichier
+            if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+                // Générer un nom de fichier unique
+                $newFileName = uniqid() . '.' . $extension;
+                $uploadFile = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadFile)) {
+                    // Mettre à jour la base de données avec le nouveau nom de fichier
+                    $logoPath = 'uploads/logos/' . $newFileName;
+                } else {
+                    throw new Exception("Erreur lors du téléchargement du logo.");
+                }
+            } else {
+                throw new Exception("Format de fichier non autorisé. Utilisez JPG, PNG ou GIF.");
+            }
+        }
+
+        // Mise à jour de l'offre de stage avec le logo
         $stmt = $pdo->prepare("UPDATE offres_stages SET 
             titre = ?, 
             description = ?, 
@@ -48,10 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             region = ?, 
             departement = ?, 
             lieu = ?, 
-            mode_stage = ?
+            mode_stage = ?, 
+            logo = ?
             WHERE id = ? AND entreprise_id = ?");
-        
-        $stmt->execute([
+
+        $stmt->execute([ 
             $_POST['titre'],
             $_POST['description'],
             $_POST['email_contact'],
@@ -67,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['departement'],
             $lieu,
             $_POST['mode_stage'],
+            $logoPath, // Chemin du logo mis à jour
             $offre_id,
             $entreprise_id
         ]);
@@ -75,10 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['success_message'] = "L'offre a été mise à jour avec succès!";
         header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
         exit();
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $error = "Erreur lors de la mise à jour: " . $e->getMessage();
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -98,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="error"><?= $error ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="" class="multi-step-form" id="internshipForm">
+        <form method="POST" action="" class="multi-step-form" id="internshipForm" enctype="multipart/form-data">
             <div class="step-content">
                 <div class="form-group">
                     <label for="titre">Titre de l'offre*</label>
@@ -133,6 +175,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="date" id="date_fin" name="date_fin"
                                value="<?= htmlspecialchars(getFormValue('date_fin')) ?>"
                                min="<?= date('Y-m-d') ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="logo">Logo de l'entreprise</label>
+                        <div class="logo-preview">
+                            <?php if (!empty($offre['logo'])): ?>
+                                <img src="/Gestion_Stage/public/uploads/logos/<?php echo htmlspecialchars($offre['logo']); ?>" alt="Logo actuel" class="current-logo">
+                            <?php endif; ?>
+                        </div>
+                        <input type="file" id="logo" name="logo" accept="image/*">
+                        <p class="help-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</p>
                     </div>
 
 
