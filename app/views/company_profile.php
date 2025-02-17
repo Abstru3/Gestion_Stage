@@ -155,7 +155,7 @@ if (!$entreprise) {
                 </a>
             <?php else: ?>
                 <a href="<?php echo $returnPage; ?>" class="index-button">
-                    <i class="fas fa-arrow-left"></i> Retour aux détails du stage
+                    <i class="fas fa-arrow-left"></i> Retour
                 </a>
             <?php endif; ?>
         </div>

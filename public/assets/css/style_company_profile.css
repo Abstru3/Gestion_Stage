@@ -45,6 +45,9 @@
 
 .company-logo-container {
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 3rem;
 }
 
@@ -55,6 +58,7 @@
     border-radius: 50%;
     border: 3px solid var(--secondary-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
 }
 
 .company-logo:hover {
@@ -204,7 +208,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid var(--secondary-color);
+    border: 3px solid var(--primary-color);
     transition: transform 0.3s ease;
 }
 

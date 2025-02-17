@@ -330,22 +330,53 @@ $(document).ready(function() {
     $(document).on('click', '.conversation-item a', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
-        window.history.pushState({}, '', href);
+        const urlParams = new URLSearchParams(new URL(href, window.location.href).search);
+        const entrepriseId = urlParams.get('entreprise_id');
         
-        // Supprimer la notification de la conversation cliquée
+        window.history.pushState({}, '', href);
         $(this).find('.notification-badge').remove();
         
         loadMessages();
         updateActiveConversation();
-    });
+        
+        // Si c'est un étudiant qui clique sur une conversation d'entreprise
+        if ('<?php echo $role; ?>' === 'etudiant' && entrepriseId) {
+            // Assurez-vous que le cadre existe dans le DOM
+            if ($('.company-info-frame').length === 0) {
+                $('body').append('<div class="company-info-frame" style="display: none;"></div>');
+            }
 
-    // Initialisation au chargement de la page
-    if (new URLSearchParams(window.location.search).get('entreprise_id') || 
-        new URLSearchParams(window.location.search).get('etudiant_id')) {
-        loadMessages();
-        initializeMessageForm();
-        setInterval(loadMessages, 50000);
-    }
+            $.ajax({
+                url: 'get_company_info.php',
+                method: 'GET',
+                data: { entreprise_id: entrepriseId },
+                success: function(response) {
+                    console.log('Réponse reçue:', response); // Debug
+                    const companyInfoFrame = $('.company-info-frame');
+                    companyInfoFrame.html(response);
+                    // Forcer les styles directement
+                    companyInfoFrame.attr('style', `
+                        display: block !important;
+                        position: fixed;
+                        top: 100px;
+                        right: 2rem;
+                        width: 250px;
+                        background: white;
+                        z-index: 1000;
+                        opacity: 1;
+                        padding: 1.5rem;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        border-radius: 10px;
+                    `);
+                },
+                error: function(error) {
+                    console.error('Erreur:', error);
+                }
+            });
+        } else {
+            $('.company-info-frame').hide();
+        }
+    });
 
     // Fonction pour mettre à jour la classe active
     function updateActiveConversation() {
@@ -432,7 +463,6 @@ $(document).ready(function() {
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <!-- Remplacer la section d'affichage des entreprises par : -->
         <?php if ($role === 'etudiant'): ?>
             <h3>Mes conversations</h3>
             <ul class="conversations">
@@ -446,22 +476,22 @@ $(document).ready(function() {
                         <li class="conversation-item <?php echo $selected_entreprise_id == $entreprise['id'] ? 'active' : ''; ?>">
                             <a href="?entreprise_id=<?php echo $entreprise['id']; ?>">
                                 <div class="avatar">
-                                    <?php if ($entreprise['logo']): ?>
-                                        <img src="/Gestion_Stage/public/uploads/logos/<?php echo htmlspecialchars($entreprise['logo']); ?>" 
-                                             alt="Logo <?php echo htmlspecialchars($entreprise['nom']); ?>">
+                                    <?php if ($entreprise['icone']): ?>
+                                        <img src="/Gestion_Stage/public/uploads/profil/<?php echo htmlspecialchars($entreprise['icone']); ?>" 
+                                             alt="Icône <?php echo htmlspecialchars($entreprise['nom']); ?>">
                                     <?php else: ?>
                                         <i class="fas fa-building"></i>
                                     <?php endif; ?>
                                 </div>
                                 <div class="info">
                                     <span class="name">
-<?php echo htmlspecialchars($entreprise['nom']); ?>
+                                        <?php echo htmlspecialchars($entreprise['nom']); ?>
                                         <?php if ($entreprise['messages_non_lus'] > 0): ?>
                                             <span class="notification-badge">
                                                 <?php echo $entreprise['messages_non_lus'] > 9 ? '9+' : $entreprise['messages_non_lus']; ?>
                                             </span>
                                         <?php endif; ?>
-</span>
+                                    </span>
                                     <?php if ($entreprise['titre_offre']): ?>
                                         <span class="offer-title"><?php echo htmlspecialchars($entreprise['titre_offre']); ?></span>
                                     <?php endif; ?>
@@ -546,6 +576,21 @@ $(document).ready(function() {
         </button>
     </form>
 </div>
+
+<?php if ($role === 'etudiant' && $selected_entreprise_id): ?>
+    <div class="company-info-frame">
+        <?php if ($entreprise['icone']): ?>
+            <img src="/Gestion_Stage/public/uploads/profil/<?php echo htmlspecialchars($entreprise['icone']); ?>" 
+                 alt="Logo <?php echo htmlspecialchars($entreprise['nom']); ?>">
+        <?php else: ?>
+            <i class="fas fa-building"></i>
+        <?php endif; ?>
+        <h3><?php echo htmlspecialchars($entreprise['nom']); ?></h3>
+        <a href="/Gestion_Stage/app/views/company_profile.php?id=<?php echo $selected_entreprise_id; ?>" class="btn-profile">
+            <i class="fas fa-building"></i> Accéder au profil
+        </a>
+    </div>
+<?php endif; ?>
 
     </div>
     <p class="index-button"><a class="index-button" href="/Gestion_Stage/app/views/home.php"><i class="fas fa-arrow-left"></i> Retour à l'espace personnel</a></p>

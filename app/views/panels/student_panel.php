@@ -106,7 +106,7 @@ $applications = get_applications($pdo, $_SESSION['user_id']);
             <div class="card-header">
                 <h2><i class="fas fa-file-alt"></i> Mes candidatures</h2>
             </div>
-            <div class="card-body text-center">
+            <div class="card-body text-center applications">
                 <?php if (empty($applications)): ?>
                     <p>Vous n'avez pas encore postulé à des offres de stage.</p>
                 <?php else: ?>

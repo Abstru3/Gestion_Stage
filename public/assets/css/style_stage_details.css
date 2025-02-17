@@ -227,11 +227,14 @@ body {
 
 .form-group input[type="file"] {
     width: 100%;
-    padding: 0.75rem;
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 0.9rem;
     border: 2px dashed var(--border);
     border-radius: var(--radius);
     cursor: pointer;
     transition: var(--transition);
+    box-sizing: border-box;
 }
 
 .form-group input[type="file"]:hover {
