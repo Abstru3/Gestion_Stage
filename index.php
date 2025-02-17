@@ -266,6 +266,11 @@ $verified_companies = $pdo->query("
         });
     });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initFloatingAnimation();
+        });
+        </script>
 
     <script src="./public/assets/js/script.js"></script>
     <script src="./public/assets/js/logo-animation.js"></script>
@@ -289,10 +294,5 @@ $verified_companies = $pdo->query("
         setInterval(refreshVerifiedCompanies, 10000);
     });
     </script>
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initFloatingAnimation();
-        });
-        </script> -->
 </body>
 </html>
