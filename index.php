@@ -175,11 +175,20 @@ $recent_internships = array_slice($recent_internships, 0, 4);
                 <p><i class="fas fa-envelope"></i> contact@neversstage.fr</p>
                 <p><i class="fas fa-phone"></i> +33 1 23 45 67 89</p>
             </div>
+            <div class="footer-section">
+                <h3>Mentions légales</h3>
+                <ul>
+                    <li><a href="./public/policies/privacy.php">Politique de confidentialité</a></li>
+                    <li><a href="./public/policies/terms.php">Conditions d'utilisation</a></li>
+                    <li><a href="./public/policies/cookies.php">Politique des cookies</a></li>
+                </ul>
+            </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; <?php echo date('Y'); ?> NeversStage - Tous droits réservés</p>
         </div>
     </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const offers = document.querySelectorAll('.offer-card');
