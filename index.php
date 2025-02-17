@@ -11,7 +11,6 @@ $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchCol
 
 $recent_internships = get_internships($pdo);
 $recent_internships = array_slice($recent_internships, 0, 4);
-
 // Récupérer 4 entreprises vérifiées au hasard
 $verified_companies = $pdo->query("
     SELECT id, nom, icone, description 
@@ -118,75 +117,74 @@ $verified_companies = $pdo->query("
         </script>
 
         <section class="recent-offers">
-        <h2>Dernières offres de stages</h2>
-        <div class="offers-grid">
-            <?php if (!empty($recent_internships)): ?>
-                
-                <?php foreach ($recent_internships as $internship): ?>
-                    <div class="offer-card">
-                        <div class="offer-header">
-                            <div class="mode-badge">
-                                <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
-                                <?php echo htmlspecialchars($internship['mode_stage']); ?>
-                            </div>
-                            <div class="offer-header-content">
-                                <div>
-                                    <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
-                                    <span class="company-name">
-                                        <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
-                                    </span>
+            <h2>Dernières offres de stages</h2>
+            <div class="offers-grid">
+                <?php if (!empty($recent_internships)): ?>
+
+                    <?php foreach ($recent_internships as $internship): ?>
+                        <div class="offer-card">
+                            <div class="offer-header">
+                                <div class="mode-badge">
+                                    <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
+                                    <?php echo htmlspecialchars($internship['mode_stage']); ?>
+                                </div>
+                                <div class="offer-header-content">
+                                    <div>
+                                        <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
+                                        <span class="company-name">
+                                            <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="offer-body">
-                            <p><?php echo htmlspecialchars(substr($internship['description'], 0, 90)) . '...'; ?></p>
-                            <div class="offer-details">
-                                <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
-                                <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
-                                <span><i class="fas fa-clock"></i> Durée: <?php 
-                                    echo calculateDuration($internship['date_debut'], $internship['date_fin']); 
-                                ?></span>
-                                <span><i class="fas fa-euro-sign"></i> Rémunération: <?php echo $internship['remuneration'] ? number_format($internship['remuneration'], 2, ',', ' ') . ' €' : 'Non spécifiée'; ?></span>
+                            <div class="offer-body">
+                                <p><?php echo htmlspecialchars(substr($internship['description'], 0, 90)) . '...'; ?></p>
+                                <div class="offer-details">
+                                    <span><i class="fas fa-calendar-alt"></i> Début: <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Lieu: <?php echo !empty($internship['lieu']) ? htmlspecialchars($internship['lieu']) : 'Lieu non fourni'; ?></span>
+                                    <span><i class="fas fa-clock"></i> Durée: <?php 
+                                        echo calculateDuration($internship['date_debut'], $internship['date_fin']); 
+                                    ?></span>
+                                    <span><i class="fas fa-euro-sign"></i> Rémunération: <?php echo $internship['remuneration'] ? number_format($internship['remuneration'], 2, ',', ' ') . ' €' : 'Non spécifiée'; ?></span>
+                                </div>
+                            </div>
+                            <div class="offer-footer">
+                                <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
                             </div>
                         </div>
-                        <div class="offer-footer">
-                            <a href="/Gestion_Stage/app/views/internships/stage_details.php?id=<?php echo $internship['id']; ?>" class="btn btn-details">Voir plus</a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p>Aucune offre de stage disponible pour le moment.</p>
-            <?php endif; ?>
-        </div>
-    <div class="see-more">
-    <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-primary">Voir toutes les offres</a>
-    </div>
-</section>
-
-<section class="verified-companies">
-    <h2><i class="fas fa-check-circle"></i> Entreprises vérifiées</h2>
-    <div class="companies-grid">
-        <?php foreach ($verified_companies as $company): ?>
-            <div class="company-card">
-                <div class="company-logo">
-                    <?php if (!empty($company['icone'])): ?>
-                        <img src="/Gestion_Stage/public/uploads/profil/<?= htmlspecialchars($company['icone']) ?>" 
-                             alt="Logo <?= htmlspecialchars($company['nom']) ?>">
-                    <?php else: ?>
-                        <i class="fas fa-building"></i>
-                    <?php endif; ?>
-                </div>
-                <h3><?= htmlspecialchars($company['nom']) ?></h3>
-                <p><?= htmlspecialchars(substr($company['description'], 0, 100)) . '...' ?></p>
-                <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $company['id'] ?>" 
-                   class="btn btn-company">
-                    Voir le profil
-                </a>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>Aucune offre de stage disponible pour le moment.</p>
+                <?php endif; ?>
             </div>
-        <?php endforeach; ?>
-    </div>
-</section>
+        <div class="see-more">
+        <a href="/Gestion_Stage/app/views/internships/all_internships.php" class="btn btn-primary">Voir toutes les offres</a>
+        </div>
+    </section>
 
+    <section class="verified-companies">
+        <h2><i class="fas fa-check-circle"></i> Entreprises vérifiées</h2>
+        <div class="companies-grid">
+            <?php foreach ($verified_companies as $company): ?>
+                <div class="company-card">
+                    <div class="company-logo">
+                        <?php if (!empty($company['icone'])): ?>
+                            <img src="/Gestion_Stage/public/uploads/profil/<?= htmlspecialchars($company['icone']) ?>" 
+                                alt="Logo <?= htmlspecialchars($company['nom']) ?>">
+                        <?php else: ?>
+                            <i class="fas fa-building"></i>
+                        <?php endif; ?>
+                    </div>
+                    <h3><?= htmlspecialchars($company['nom']) ?></h3>
+                    <p><?= htmlspecialchars(substr($company['description'], 0, 100)) . '...' ?></p>
+                    <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $company['id'] ?>" 
+                    class="btn btn-company">
+                        Voir le profil
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
     </main>
 
     <footer class="main-footer">
@@ -235,40 +233,43 @@ $verified_companies = $pdo->query("
     </script>
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.querySelector('.nav-links');
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.querySelector('.nav-links');
 
-    mobileMenuBtn.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        this.classList.toggle('active');
-        
-        // Change l'icône
-        const icon = this.querySelector('i');
-        if (icon.classList.contains('fa-bars')) {
-            icon.classList.remove('fa-bars');
-            icon.classList.add('fa-times');
-        } else {
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        }
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            this.classList.toggle('active');
+
+            // Change l'icône
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Ferme le menu si on clique en dehors
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.nav-links') && 
+                !event.target.closest('.mobile-menu-btn') && 
+                navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
     });
+    </script>
 
-    // Ferme le menu si on clique en dehors
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.nav-links') && 
-            !event.target.closest('.mobile-menu-btn') && 
-            navLinks.classList.contains('active')) {
-            navLinks.classList.remove('active');
-            mobileMenuBtn.classList.remove('active');
-            const icon = mobileMenuBtn.querySelector('i');
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-        }
-    });
-});
-</script>
-
+    <script src="./public/assets/js/script.js"></script>
+    <script src="./public/assets/js/logo-animation.js"></script>
+    <!-- <script src="./public/assets/js/float-animation.js"></script> -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         function refreshVerifiedCompanies() {
@@ -284,10 +285,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => console.error('Erreur:', error));
         }
-
         // Rafraîchir toutes les 10 secondes
         setInterval(refreshVerifiedCompanies, 10000);
     });
     </script>
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initFloatingAnimation();
+        });
+        </script> -->
 </body>
 </html>
