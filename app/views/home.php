@@ -228,7 +228,8 @@ if ($_SESSION['role'] == 'etudiant') {
     <div class="container">
         <h1>Bienvenue, <?= htmlspecialchars($welcome_message) ?></h1>
         <nav>
-    <ul>
+    <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
+    <ul class="menu">
         <li><a href="/Gestion_Stage/app/views/profile.php">👤 Mon profil</a></li>
         <?php if ($_SESSION['role'] == 'etudiant'): ?>
             <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
@@ -243,6 +244,26 @@ if ($_SESSION['role'] == 'etudiant') {
         <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
     </ul>
 </nav>
+
+
+<script>
+// Lorsque l'utilisateur clique sur le bouton de menu, on l'ouvre/ferme
+document.querySelector('.menu-toggle').addEventListener('click', function() {
+    const menu = document.querySelector('.menu');
+    menu.classList.toggle('open');
+});
+
+// Réinitialiser l'état du menu si la taille de la fenêtre est supérieure à 768px
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        const menu = document.querySelector('.menu');
+        menu.classList.remove('open'); // Supprime la classe 'open' pour revenir à l'affichage normal
+    }
+});
+
+
+</script>
+        
 
 <?php if (isset($_SESSION['success'])): ?>
     <div class="notification success">
