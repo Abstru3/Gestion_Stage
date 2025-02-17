@@ -148,16 +148,23 @@ if (!$entreprise) {
             </div>
         </div>
 
-        <div class="return-button">
-            <?php if ($isAdmin): ?>
-                <a href="/Gestion_Stage/app/views/panels/admin_panel.php" class="index-button">
-                    <i class="fas fa-arrow-left"></i> Retour au panel admin
-                </a>
-            <?php else: ?>
-                <a href="<?php echo $returnPage; ?>" class="index-button">
-                    <i class="fas fa-arrow-left"></i> Retour
-                </a>
-            <?php endif; ?>
+        <div class="action-buttons">
+            <a href="/Gestion_Stage/app/views/internships/all_internships.php?search=<?= urlencode($entreprise['nom']) ?>&sort=date_debut&order=ASC" 
+               class="view-offers-button">
+                <i class="fas fa-list"></i> Voir toutes leurs offres
+            </a>
+
+            <div class="return-button">
+                <?php if ($isAdmin): ?>
+                    <a href="/Gestion_Stage/app/views/panels/admin_panel.php" class="index-button">
+                        <i class="fas fa-arrow-left"></i> Retour au panel admin
+                    </a>
+                <?php else: ?>
+                    <a href="<?php echo $returnPage; ?>" class="index-button">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </body>

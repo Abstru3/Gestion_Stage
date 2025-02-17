@@ -11,6 +11,15 @@ $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchCol
 
 $recent_internships = get_internships($pdo);
 $recent_internships = array_slice($recent_internships, 0, 4);
+
+// Récupérer 4 entreprises vérifiées au hasard
+$verified_companies = $pdo->query("
+    SELECT id, nom, icone, description 
+    FROM entreprises 
+    WHERE valide = 1 
+    ORDER BY RAND() 
+    LIMIT 4
+")->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -154,6 +163,30 @@ $recent_internships = array_slice($recent_internships, 0, 4);
     </div>
 </section>
 
+<section class="verified-companies">
+    <h2><i class="fas fa-check-circle"></i> Entreprises vérifiées</h2>
+    <div class="companies-grid">
+        <?php foreach ($verified_companies as $company): ?>
+            <div class="company-card">
+                <div class="company-logo">
+                    <?php if (!empty($company['icone'])): ?>
+                        <img src="/Gestion_Stage/public/uploads/profil/<?= htmlspecialchars($company['icone']) ?>" 
+                             alt="Logo <?= htmlspecialchars($company['nom']) ?>">
+                    <?php else: ?>
+                        <i class="fas fa-building"></i>
+                    <?php endif; ?>
+                </div>
+                <h3><?= htmlspecialchars($company['nom']) ?></h3>
+                <p><?= htmlspecialchars(substr($company['description'], 0, 100)) . '...' ?></p>
+                <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $company['id'] ?>" 
+                   class="btn btn-company">
+                    Voir le profil
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
     </main>
 
     <footer class="main-footer">
@@ -236,6 +269,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-    <script src="./public/assets/js/script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function refreshVerifiedCompanies() {
+            fetch('/Gestion_Stage/app/helpers/get_random_company.php')
+                .then(response => response.text())
+                .then(html => {
+                    const companiesGrid = document.querySelector('.companies-grid');
+                    companiesGrid.style.opacity = '0';
+                    setTimeout(() => {
+                        companiesGrid.innerHTML = html;
+                        companiesGrid.style.opacity = '1';
+                    }, 300);
+                })
+                .catch(error => console.error('Erreur:', error));
+        }
+
+        // Rafraîchir toutes les 10 secondes
+        setInterval(refreshVerifiedCompanies, 10000);
+    });
+    </script>
 </body>
 </html>
