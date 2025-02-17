@@ -163,6 +163,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Mettre à jour le profil</button>
         </form>
 
+        <?php if ($_SESSION['role'] == 'entreprise'): ?>
+            <p>
+                <a href="/Gestion_Stage/app/views/company_profile.php?id=<?php echo $_SESSION['user_id']; ?>" class="view-profile-button">
+                    <i class="fas fa-eye"></i> Visualiser mon profil
+                </a>
+            </p>
+        <?php endif; ?>
+
         <p><a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour à l'espace personnel</a></p>
     </div>
 </body>
