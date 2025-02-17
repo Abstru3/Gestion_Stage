@@ -2,7 +2,7 @@ function initLogoAnimation() {
     const logoImage = document.querySelector('.logo img');
     let opacity = 1;
     let increasing = false;
-    const ANIMATION_SPEED = 0.005;
+    const ANIMATION_SPEED = 0.003;
     
     function animate() {
         if (increasing) {
