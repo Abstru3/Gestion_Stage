@@ -1,81 +1,138 @@
-.policy-container {
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+/* Variables globales */
+:root {
+    --policy-primary: #2d3e50; /* Dark blue-gray */
+    --policy-secondary: #3498db; /* Light blue */
+    --policy-text: #333; /* Dark gray */
+    --policy-bg: #f5f6fa; /* Very light gray */
+    --policy-border: #ddd; /* Light gray border */
+    --policy-shadow: rgba(0,0,0,0.1); /* Subtle shadow */
+    --policy-radius: 8px; /* Slightly rounded corners */
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* General body styling */
+body {
+    font-family: var(--font-main);
+    line-height: 1.7;
+    color: var(--policy-text);
+    background: #f9f9f9;
+}
+
+/* Container principal */
+.policy-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 3rem;
+    background: #fff;
+    border-radius: var(--policy-radius);
+    box-shadow: 0 5px 20px var(--policy-shadow);
+    color: var(--policy-text);
+}
+
+/* En-tête de la politique */
 .policy-header {
     text-align: center;
     margin-bottom: 3rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border);
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--policy-border);
 }
 
+.policy-header h1 {
+    font-size: 2.5rem;
+    color: var(--policy-primary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.policy-header p {
+    color: #777;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+/* Sections de la politique */
 .policy-section {
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--policy-bg);
+    border-radius: var(--policy-radius);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.policy-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .policy-section h2 {
-    color: var(--primary);
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    color: var(--policy-primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    font-weight: 500;
+    border-bottom: 2px solid var(--policy-secondary);
+    padding-bottom: 0.75rem;
 }
 
 .policy-section p {
-    line-height: 1.8;
-    color: var(--text);
-    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: var(--policy-text);
 }
 
+/* Liste des politiques */
 .policy-list {
-    list-style: disc;
+    list-style: none;
     padding-left: 2rem;
-    margin: 1rem 0;
 }
 
 .policy-list li {
-    margin-bottom: 0.5rem;
-    line-height: 1.6;
-}
-.footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    padding: 2rem;
+    margin-bottom: 0.8rem;
 }
 
-.footer-section ul {
-    list-style: none;
-    padding: 0;
+.policy-list li::before {
+    content: '\2022'; /* Use a bullet point */
+    color: var(--policy-secondary);
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
 }
 
-.footer-section ul li {
-    margin-bottom: 0.5rem;
-}
-
-.footer-section ul li a {
-    color: var(--text-light);
+/* Liens */
+a {
+    color: var(--policy-secondary);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
-.footer-section ul li a:hover {
-    color: var(--primary);
+a:hover {
+    color: var(--policy-primary);
     text-decoration: underline;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .footer-content {
-        grid-template-columns: repeat(2, 1fr);
+    .policy-container {
+        margin: 2rem;
+        padding: 2rem;
+    }
+
+    .policy-header h1 {
+        font-size: 2rem;
+    }
+
+    .policy-section h2 {
+        font-size: 1.5rem;
     }
 }
 
-@media (max-width: 480px) {
-    .footer-content {
-        grid-template-columns: 1fr;
+/* Style d'impression */
+@media print {
+    .policy-container {
+        box-shadow: none;
+        border: none;
+    }
+
+    .policy-section {
+        background: none;
+        border: none;
     }
 }
