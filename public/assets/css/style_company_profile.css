@@ -307,3 +307,15 @@
         width: auto;
     }
 }
+
+.success-stat {
+    color: #28a745;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.success-stat i {
+    font-size: 1.1rem;
+}
