@@ -1,44 +1,32 @@
 function initLogoAnimation() {
     const logoImage = document.querySelector('.logo img');
-    let opacity = 1;
-    let increasing = false;
-    const ANIMATION_SPEED = 0.003;
+    let position = -20;
+    const ANIMATION_SPEED = 0.4;
+    const LIGHT_WIDTH = 25;
     
     function animate() {
-        if (increasing) {
-            opacity += ANIMATION_SPEED;
-            if (opacity >= 1) {
-                opacity = 1;
-                increasing = false;
-            }
-        } else {
-            opacity -= ANIMATION_SPEED;
-            if (opacity <= 0.1) {
-                opacity = 0.1;
-                increasing = true;
-            }
+        position += ANIMATION_SPEED;
+        
+        if (position > 120) {
+            position = -20;
         }
         
-        // Gradient qui fait varier l'opacité de gauche à droite
         logoImage.style.mask = `linear-gradient(
             to right,
-            rgba(0, 0, 0, 1) 10%,
-            rgba(0, 0, 0, ${opacity})
+            rgba(0, 0, 0, 0.7) ${position - LIGHT_WIDTH}%,
+            rgba(0, 0, 0, 1) ${position}%,
+            rgba(0, 0, 0, 0.7) ${position + LIGHT_WIDTH}%
         )`;
         
-        // Support pour tous les navigateurs
         logoImage.style.webkitMask = logoImage.style.mask;
         
-        // Effet de lueur subtil
-        logoImage.style.filter = `brightness(1.1)`;
+        logoImage.style.filter = `brightness(1.1) contrast(1.2) saturate(1.2)`;
         
         requestAnimationFrame(animate);
     }
 
-    // Optimisation des performances
-    logoImage.style.willChange = 'mask';
+    logoImage.style.willChange = 'mask, filter';
     
-    // Démarrage de l'animation
     animate();
 }
 
