@@ -274,7 +274,7 @@ $verified_companies = $pdo->query("
 
     <script src="./public/assets/js/script.js"></script>
     <script src="./public/assets/js/logo-animation.js"></script>
-    <!-- <script src="./public/assets/js/float-animation.js"></script> -->
+    <script src="./public/assets/js/float-animation.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         function refreshVerifiedCompanies() {
