@@ -175,8 +175,8 @@ $verified_companies = $pdo->query("
                             <i class="fas fa-building"></i>
                         <?php endif; ?>
                     </div>
-                    <h3><?= htmlspecialchars($company['nom']) ?></h3>
-                    <p><?= htmlspecialchars(substr($company['description'], 0, 100)) . '...' ?></p>
+                    <h3 class="company-title"><?= htmlspecialchars($company['nom']) ?></h3>
+                    <p class="company-description"><?= htmlspecialchars(substr($company['description'], 0, 150)) ?>...</p>
                     <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $company['id'] ?>" 
                     class="btn btn-company">
                         Voir le profil

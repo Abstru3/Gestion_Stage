@@ -542,6 +542,21 @@ form {
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    justify-content: space-between;
+}
+.company-title {
+    margin: 1rem 0;
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 3.2rem;
 }
 
 .company-card::before {
@@ -609,6 +624,18 @@ form {
     margin-bottom: 1.5rem;
     line-height: 1.6;
 }
+.company-description {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
 
 .btn-company {
     display: inline-block;
@@ -620,6 +647,9 @@ form {
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    margin-top: auto;
+    width: fit-content;
+    align-self: center;
 }
 
 .btn-company:hover {
