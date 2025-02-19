@@ -86,6 +86,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+$isCertified = false;
+if ($_SESSION['role'] == 'entreprise') {
+    $stmt = $pdo->prepare("SELECT certification, theme_color FROM entreprises WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $result = $stmt->fetch();
+    $isCertified = $result['certification'] == 1;
+    $currentThemeColor = $result['theme_color'];
+}
+
+// Traitement de la mise à jour de la couleur
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['theme_color'])) {
+    $newColor = $_POST['theme_color'];
+    // Validation du format hexadécimal
+    if (preg_match('/^#[a-fA-F0-9]{6}$/', $newColor)) {
+        $stmt = $pdo->prepare("UPDATE entreprises SET theme_color = ? WHERE id = ?");
+        $stmt->execute([$newColor, $_SESSION['user_id']]);
+        $currentThemeColor = $newColor;
+        $successMessage = "La couleur du thème a été mise à jour avec succès !";
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -95,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeversStage - Mon profil</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
-    <!-- Add Font Awesome -->
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" type="image/png" href="../../public/assets/images/logo_reduis.png">
@@ -161,6 +181,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php endif; ?>
 
             <button type="submit">Mettre à jour le profil</button>
+
+            <?php if ($_SESSION['role'] == 'entreprise' && $isCertified): ?>
+                <div class="theme-color-section">
+                <br><label for="profile_photo">Couleur du profil</label>
+                    <form action="" method="post" class="color-picker-form">
+                        <div class="color-picker-container">
+                            <label for="theme_color">Sélectionnez une couleur :</label>
+                            <input type="color" 
+                                id="theme_color" 
+                                name="theme_color" 
+                                value="<?php echo htmlspecialchars($currentThemeColor ?? '#3498db'); ?>"
+                                class="color-picker-input">
+                        </div>
+                        <button type="submit" class="color-submit-btn">Appliquer la couleur</button>
+                    </form>
+                    <?php if (isset($currentThemeColor)): ?>
+                        <p class="current-color">Couleur actuelle : <span><?php echo htmlspecialchars($currentThemeColor); ?></span></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </form>
 
         <?php if ($_SESSION['role'] == 'entreprise'): ?>
