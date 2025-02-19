@@ -8,6 +8,7 @@ require_once './app/helpers/functions.php';
 $total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
 $total_students = $pdo->query("SELECT COUNT(*) FROM etudiants WHERE role='etudiant'")->fetchColumn();
 $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchColumn();
+$verified_companies_count = $pdo->query("SELECT COUNT(*) FROM entreprises WHERE valide = 1")->fetchColumn();
 
 $recent_internships = get_internships($pdo);
 $recent_internships = array_slice($recent_internships, 0, 4);
@@ -74,23 +75,28 @@ $verified_companies = $pdo->query("
     </header>
 
     <main>
-        <section class="stats-section">
-            <div class="stat-card">
-                <i class="fas fa-briefcase"></i>
-                <h3 id="total-internships"><?php echo $total_internships; ?></h3>
-                <p>Offres de stages</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-building"></i>
-                <h3 id="total-companies"><?php echo $total_companies; ?></h3>
-                <p>Entreprises</p>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-user-graduate"></i>
-                <h3 id="total-students"><?php echo $total_students; ?></h3>
-                <p>Étudiants</p>
-            </div>
-        </section>
+    <section class="stats-section">
+    <div class="stat-card">
+        <i class="fas fa-briefcase"></i>
+        <h3 id="total-internships"><?php echo $total_internships; ?></h3>
+        <p>Offres de stages</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-building"></i>
+        <h3 id="total-companies"><?php echo $total_companies; ?></h3>
+        <p>Entreprises</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-user-graduate"></i>
+        <h3 id="total-students"><?php echo $total_students; ?></h3>
+        <p>Étudiants</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-check-circle"></i>
+        <h3 id="verified-companies"><?php echo $verified_companies_count; ?></h3>
+        <p>Entreprises vérifiées</p>
+    </div>
+</section>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             function animateCounter(id, start, end, duration) {
@@ -113,6 +119,7 @@ $verified_companies = $pdo->query("
             animateCounter('total-internships', 0, <?php echo $total_internships; ?>, 500);
             animateCounter('total-companies', 0, <?php echo $total_companies; ?>, 500);
             animateCounter('total-students', 0, <?php echo $total_students; ?>, 500);
+            animateCounter('verified-companies', 0, <?php echo $verified_companies_count; ?>, 500);
         });
         </script>
 
