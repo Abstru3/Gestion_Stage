@@ -10,14 +10,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Récupérer les statistiques et les données pour l'administration
 $total_users = $pdo->query("SELECT (SELECT COUNT(*) FROM etudiants) + (SELECT COUNT(*) FROM entreprises)")->fetchColumn();
 $total_internships = $pdo->query("SELECT COUNT(*) FROM offres_stages")->fetchColumn();
 $total_applications = $pdo->query("SELECT COUNT(*) FROM candidatures")->fetchColumn();
 $total_students = $pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
 $total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
 
-// Modifier la requête de récupération des utilisateurs
 $users = $pdo->query("
     SELECT id, email, telephone, adresse, 'etudiant' as role FROM etudiants
     UNION ALL
@@ -25,10 +23,9 @@ $users = $pdo->query("
     ORDER BY id DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// Section pour gérer les entreprises en attente de validation
-$stmt = $pdo->prepare("SELECT * FROM entreprises WHERE valide = FALSE");
+$stmt = $pdo->prepare("SELECT * FROM entreprises ORDER BY nom ASC");
 $stmt->execute();
-$entreprises_en_attente = $stmt->fetchAll();
+$entreprises = $stmt->fetchAll();
 ?>
 
 
@@ -53,7 +50,7 @@ $entreprises_en_attente = $stmt->fetchAll();
         <a href="#" class="navbar-brand text-center text-light">Admin Panel</a>
         <a href="#statistiques">Statistiques</a>
         <a href="#utilisateurs">Utilisateurs</a>
-        <a href="#entreprises_attente">Entreprises en attente</a>
+        <a href="#entreprises">Liste des entreprises</a>
         <a href="/Gestion_Stage/app/views/home.php">Espace personnel</a>
         <a href="/Gestion_Stage/index.php">Menu principal</a>
         <a href="/Gestion_Stage/app/views/auth/logout.php">Se déconnecter</a>
@@ -145,7 +142,6 @@ $entreprises_en_attente = $stmt->fetchAll();
 
             <script>
                 $(document).ready(function() {
-                    // Initialiser DataTables sur le tableau
                     $('#usersTable').DataTable({
                         "paging": true,
                         "searching": true,
@@ -163,45 +159,95 @@ $entreprises_en_attente = $stmt->fetchAll();
                 });
             </script>
 
-            <!-- Entreprises en attente de validation -->
-            <div class="card p-4 shadow mt-4" id="entreprises_attente">
-                <h2 class="mb-3">Entreprises en attente de validation</h2>
-                <?php if (!empty($entreprises_en_attente)): ?>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>SIRET</th>
-                                <th>Email</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($entreprises_en_attente as $entreprise): ?>
+            <!-- Liste des entreprises -->
+            <div class="card p-4 shadow mt-4" id="entreprises">
+                <h2 class="mb-3">Liste des entreprises</h2>
+                <?php if (!empty($entreprises)): ?>
+                    <div class="table-container">
+                        <table id="entreprisesTable" class="table table-striped">
+                            <thead>
                                 <tr>
-                                    <td><?= htmlspecialchars($entreprise['nom']) ?></td>
-                                    <td><?= htmlspecialchars($entreprise['siret']) ?></td>
-                                    <td><?= htmlspecialchars($entreprise['email']) ?></td>
-                                    <td>
-                                        <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $entreprise['id'] ?>" 
-                                           class="btn btn-info btn-sm me-2">
-                                            <i class="fas fa-eye"></i> Voir le profil
-                                        </a>
-                                        <form method="POST" action="/Gestion_Stage/app/controllers/validate_company.php" class="d-inline">
-                                            <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-check"></i> Valider
-                                            </button>
-                                        </form>
-                                    </td>
+                                    <th>Nom</th>
+                                    <th>SIRET</th>
+                                    <th>Email</th>
+                                    <th>Statut</th>
+                                    <th>Action</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($entreprises as $entreprise): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($entreprise['nom']) ?></td>
+                                        <td><?= htmlspecialchars($entreprise['siret']) ?></td>
+                                        <td><?= htmlspecialchars($entreprise['email']) ?></td>
+                                        <td>
+                                            <?php if ($entreprise['certification']): ?>
+                                                <span class="badge bg-secondary"><i class="fas fa-certificate"></i> Certifiée</span>
+                                            <?php elseif ($entreprise['valide']): ?>
+                                                <span class="badge bg-success"><i class="fas fa-check"></i> Validée</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-warning"><i class="fas fa-clock"></i> En attente</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="/Gestion_Stage/app/views/company_profile.php?id=<?= $entreprise['id'] ?>" 
+                                                   class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i> Voir
+                                                </a>
+                                                
+                                                <?php if (!$entreprise['valide']): ?>
+                                                    <form method="POST" action="/Gestion_Stage/app/actions/validate_company.php" class="d-inline">
+                                                        <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            <i class="fas fa-check"></i> Valider
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+                                                
+                                                <?php if ($entreprise['valide'] && !$entreprise['certification']): ?>
+                                                    <form method="POST" action="/Gestion_Stage/app/actions/certify_company.php" class="d-inline">
+                                                        <input type="hidden" name="entreprise_id" value="<?= $entreprise['id'] ?>">
+                                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                                            <i class="fas fa-certificate"></i> Certifier
+                                                        </button>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php else: ?>
-                    <p>Aucune entreprise en attente de validation</p>
+                    <p>Aucune entreprise créée</p>
                 <?php endif; ?>
             </div>
+
+            <!-- Ajouter le script d'initialisation de DataTables pour le tableau des entreprises -->
+            <script>
+                $(document).ready(function() {
+                    $('#entreprisesTable').DataTable({
+                        "paging": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "lengthMenu": [5, 10, 20],
+                        "language": {
+                            "search": "Rechercher :",
+                            "paginate": {
+                                "previous": "Précédent",
+                                "next": "Suivant"
+                            },
+                            "lengthMenu": "Afficher _MENU_ entrées",
+                            "info": "Affichage de _START_ à _END_ sur _TOTAL_ entreprises",
+                            "infoEmpty": "Aucune entreprise disponible",
+                            "zeroRecords": "Aucune entreprise correspondante trouvée"
+                        }
+                    });
+                });
+            </script>
         </div>
     </div>
 
@@ -210,12 +256,10 @@ $entreprises_en_attente = $stmt->fetchAll();
     </p>
 
     <script>
-        // Toggle Sidebar on small screens
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
         }
 
-        // Chart.js for the User Chart
         const ctx = document.getElementById('userChart').getContext('2d');
         new Chart(ctx, {
             type: 'pie',
@@ -228,60 +272,6 @@ $entreprises_en_attente = $stmt->fetchAll();
             }
         });
     </script>
-
-    <!-- <div class="container mt-4">
-    <h1 class="text-center mb-4">Gestion des Rôles des Utilisateurs</h1>
-
-    <div class="card p-4 shadow mt-4">
-        <h2 class="mb-3">Modifier les Rôles</h2>
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Email</th>
-                    <th>Rôle</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($users)) : ?>
-                    <?php foreach ($users as $user) : ?>
-                        <tr>
-                            <td><?= htmlspecialchars($user['id']) ?></td>
-                            <td><?= htmlspecialchars($user['email']) ?></td>
-                            <td>
-                                <form method="POST" action="update_role.php">
-                                    <div class="input-group">
-                                        <select name="role_id" class="form-control">
-                                            <?php if (!empty($roles)) : ?>
-                                                <?php foreach ($roles as $role) : ?>
-                                                    <option value="<?= $role['id'] ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : '' ?>>
-                                                        <?= htmlspecialchars($role['name']) ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            <?php else : ?>
-                                                <option>Aucun rôle disponible</option>
-                                            <?php endif; ?>
-                                        </select>
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary btn-sm mt-1">Modifier</button>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                </form>
-                            </td>
-                            <td>
-                                <a href="delete_user.php?id=<?= $user['id'] ?>" class="btn btn-danger btn-sm">Supprimer</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else : ?>
-                    <tr><td colspan="4" class="text-center">Aucun utilisateur trouvé.</td></tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-</div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

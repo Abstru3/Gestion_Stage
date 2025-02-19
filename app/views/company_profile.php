@@ -43,14 +43,14 @@ if (!$entreprise) {
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_company_profile.css">
     <link rel="icon" type="image/png" href="/Gestion_Stage/public/assets/images/logo_reduis.png">
 </head>
-<body>
-    <div class="company-profile-container">
+<body style="--theme-color: <?= htmlspecialchars($entreprise['theme_color']) ?>;">
+    <div class="company-profile-container" <?= $entreprise['certification'] ? 'data-certified="true"' : '' ?>>
         
         <h1 class="profile-title">
             Profil de <?= htmlspecialchars($entreprise['nom']) ?>
-            <span class="validation-status <?= $entreprise['valide'] ? 'status-validated' : 'status-pending' ?>">
-                <i class="fas <?= $entreprise['valide'] ? 'fa-check-circle' : 'fa-clock' ?>"></i>
-                <?= $entreprise['valide'] ? 'Entreprise validée' : 'En attente de validation' ?>
+            <span class="validation-status <?= $entreprise['certification'] ? 'status-certified' : ($entreprise['valide'] ? 'status-validated' : 'status-pending') ?>">
+                <i class="fas <?= $entreprise['certification'] ? 'fa-check-circle' : ($entreprise['valide'] ? 'fa-check-circle' : 'fa-clock') ?>"></i>
+                <?= $entreprise['certification'] ? 'Entreprise certifiée' : ($entreprise['valide'] ? 'Entreprise validée' : 'En attente de validation') ?>
             </span>
         </h1>
 
