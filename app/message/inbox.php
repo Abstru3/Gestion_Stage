@@ -250,6 +250,11 @@ if ($role === 'etudiant' && $selected_entreprise_id) {
     <h1>Boîte de réception</h1>
     <script>
 $(document).ready(function() {
+    // Au chargement de la page, charger directement la conversation si une ID est présente dans l'URL
+    if (window.location.search) {
+        loadMessages(true); // true indique que c'est le chargement initial
+    }
+
     function scrollToBottom() {
         const messageContainer = document.querySelector('.messages');
         if (messageContainer) {
@@ -257,13 +262,13 @@ $(document).ready(function() {
         }
     }
 
-    function loadMessages() {
+    function loadMessages(isInitialLoad = false) {
         const entrepriseId = new URLSearchParams(window.location.search).get('entreprise_id');
         const etudiantId = new URLSearchParams(window.location.search).get('etudiant_id');
         
         if ((etudiantId && '<?php echo $role; ?>' === 'entreprise') || 
             (entrepriseId && '<?php echo $role; ?>' === 'etudiant')) {
-            $('.reply-section').show();
+            
             $.ajax({
                 url: 'load_messages.php',
                 method: 'GET',
@@ -273,8 +278,20 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     $('#messageContent').html(response);
+                    $('.reply-section').show();
                     scrollToBottom();
                     initializeMessageForm();
+                    
+                    // Si c'est le chargement initial, marquer comme active
+                    if (isInitialLoad) {
+                        updateActiveConversation();
+                        // Supprimer la notification si elle existe
+                        if (entrepriseId) {
+                            $(`.conversation-item a[href*="entreprise_id=${entrepriseId}"]`).find('.notification-badge').remove();
+                        } else if (etudiantId) {
+                            $(`.conversation-item a[href*="etudiant_id=${etudiantId}"]`).find('.notification-badge').remove();
+                        }
+                    }
                 }
             });
         } else {
@@ -283,9 +300,26 @@ $(document).ready(function() {
     }
 
     function initializeMessageForm() {
-        $('#messageForm').off('submit');
-        
-        $('#messageForm').on('submit', function(e) {
+        const form = $('#messageForm');
+        if (!form.length) return;
+
+        // Gérer l'événement keydown sur le textarea
+        form.find('textarea[name="contenu"]').on('keydown', function(e) {
+            // Si c'est la touche Entrée
+            if (e.key === 'Enter') {
+                // Si Shift n'est pas pressé, envoyer le message
+                if (!e.shiftKey) {
+                    e.preventDefault(); // Empêcher le saut de ligne
+                    const contenu = $(this).val().trim();
+                    if (contenu) { // Vérifier que le message n'est pas vide
+                        form.submit();
+                    }
+                }
+            }
+        });
+
+        // Le reste du code existant pour le form.on('submit')...
+        form.off('submit').on('submit', function(e) {
             e.preventDefault();
             const form = $(this);
             const contenu = form.find('textarea[name="contenu"]').val();
@@ -336,7 +370,7 @@ $(document).ready(function() {
         window.history.pushState({}, '', href);
         $(this).find('.notification-badge').remove();
         
-        loadMessages();
+        loadMessages(true);
         updateActiveConversation();
         
         // Si c'est un étudiant qui clique sur une conversation d'entreprise
@@ -406,6 +440,30 @@ $(document).ready(function() {
 
     // Mettre à jour au chargement de la page
     updateActiveConversation();
+    
+    // Activer le défilement horizontal tactile
+    const conversationList = document.querySelector('.conversation-list');
+    let isScrolling = false;
+    let startX;
+    let scrollLeft;
+
+    conversationList.addEventListener('touchstart', (e) => {
+        isScrolling = true;
+        startX = e.touches[0].pageX - conversationList.offsetLeft;
+        scrollLeft = conversationList.scrollLeft;
+    });
+
+    conversationList.addEventListener('touchmove', (e) => {
+        if (!isScrolling) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - conversationList.offsetLeft;
+        const walk = (x - startX) * 2;
+        conversationList.scrollLeft = scrollLeft - walk;
+    });
+
+    conversationList.addEventListener('touchend', () => {
+        isScrolling = false;
+    });
 });
 </script>
 
@@ -420,8 +478,13 @@ $(document).ready(function() {
             <?php foreach ($etudiants as $etudiant): ?>
                 <li class="conversation-item <?php echo $selected_etudiant_id == $etudiant['id'] ? 'active' : ''; ?>">
                     <a href="?etudiant_id=<?php echo $etudiant['id']; ?>">
-                        <div class="avatar">
+                        <div class="avatar" data-name="<?php echo htmlspecialchars($etudiant['nom_complet']); ?>">
                             <i class="fas fa-user-graduate"></i>
+                            <?php if ($etudiant['messages_non_lus'] > 0): ?>
+                                <span class="notification-badge">
+                                    <?php echo $etudiant['messages_non_lus'] > 9 ? '9+' : $etudiant['messages_non_lus']; ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
                         <div class="info">
                             <span class="name">
@@ -475,12 +538,17 @@ $(document).ready(function() {
                     <?php foreach ($entreprises as $entreprise): ?>
                         <li class="conversation-item <?php echo $selected_entreprise_id == $entreprise['id'] ? 'active' : ''; ?>">
                             <a href="?entreprise_id=<?php echo $entreprise['id']; ?>">
-                                <div class="avatar">
+                                <div class="avatar" data-name="<?php echo htmlspecialchars($entreprise['nom']); ?>">
                                     <?php if ($entreprise['icone']): ?>
                                         <img src="/Gestion_Stage/public/uploads/profil/<?php echo htmlspecialchars($entreprise['icone']); ?>" 
                                              alt="Icône <?php echo htmlspecialchars($entreprise['nom']); ?>">
                                     <?php else: ?>
                                         <i class="fas fa-building"></i>
+                                    <?php endif; ?>
+                                    <?php if ($entreprise['messages_non_lus'] > 0): ?>
+                                        <span class="notification-badge">
+                                            <?php echo $entreprise['messages_non_lus'] > 9 ? '9+' : $entreprise['messages_non_lus']; ?>
+                                        </span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="info">
@@ -532,33 +600,55 @@ $(document).ready(function() {
 </div>
         
         <div class="message-content" id="messageContent">
-    <?php if ($role === 'etudiant' && !$selected_entreprise_id): ?>
+    <?php if (($role === 'etudiant' && !$selected_entreprise_id) || ($role === 'entreprise' && !$selected_etudiant_id)): ?>
         <p class="empty-message"><i class="fas fa-comments"></i> Sélectionnez une conversation pour afficher les messages</p>
-    <?php elseif ($role === 'entreprise' && !$selected_etudiant_id): ?>
-        <p class="empty-message"><i class="fas fa-comments"></i> Sélectionnez un étudiant pour afficher les messages</p>
     <?php elseif (empty($messages)): ?>
         <p class="empty-message"><i class="fas fa-envelope-open"></i> Aucun message dans cette conversation</p>
     <?php else: ?>
-        <ul class="messages">
-            <?php foreach ($messages as $message): ?>
+        <div class="messages-container">
+            <ul class="messages">
+                <?php 
+                $current_date = null;
+                foreach ($messages as $message): 
+                    $message_date = date('Y-m-d', strtotime($message['date_envoi']));
+                    if ($current_date !== $message_date):
+                        $current_date = $message_date;
+                ?>
+                    <li class="date-separator">
+                        <span>
+                            <?php 
+                            $today = date('Y-m-d');
+                            $yesterday = date('Y-m-d', strtotime('-1 day'));
+                            
+                            if ($message_date === $today) {
+                                echo 'Aujourd\'hui';
+                            } elseif ($message_date === $yesterday) {
+                                echo 'Hier';
+                            } else {
+                                echo date('d/m/Y', strtotime($message_date));
+                            }
+                            ?>
+                        </span>
+                    </li>
+                <?php endif; ?>
                 <li class="message <?php echo $message['statut'] === 'non_lu' ? 'unread' : ''; ?> 
-                                 <?php echo $message['expediteur_id'] == $user_id ? 'sent' : 'received'; ?>">
+                             <?php echo strpos($message['expediteur_id'], $user_prefix) === 0 ? 'sent' : 'received'; ?>">
                     <div class="message-header">
                         <span class="sender">
                             <i class="fas fa-user"></i>
                             <?php echo htmlspecialchars($message['expediteur_nom']); ?>
                         </span>
-                        <span class="date">
-                            <i class="far fa-clock"></i>
-                            <?php echo date('d/m/Y H:i', strtotime($message['date_envoi'])); ?>
+                        <span class="time">
+                            <?php echo date('H:i', strtotime($message['date_envoi'])); ?>
                         </span>
                     </div>
                     <div class="message-body">
                         <?php echo nl2br(htmlspecialchars($message['contenu'])); ?>
                     </div>
                 </li>
-            <?php endforeach; ?>
-        </ul>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     <?php endif; ?>
 </div>
 
