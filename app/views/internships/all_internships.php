@@ -128,10 +128,25 @@ try {
                             <div class="filter-group">
                                 <select name="domaine" id="domaine">
                                     <option value="">Domaine</option>
-                                    <option value="developpement" <?php echo $domaine === 'developpement' ? 'selected' : ''; ?>>Développement</option>
-                                    <option value="reseau" <?php echo $domaine === 'reseau' ? 'selected' : ''; ?>>Réseau</option>
-                                    <option value="cybersecurite" <?php echo $domaine === 'cybersecurite' ? 'selected' : ''; ?>>Cybersécurité</option>
-                                    <option value="data" <?php echo $domaine === 'data' ? 'selected' : ''; ?>>Data/IA</option>
+                                    <optgroup label="Informatique">
+                                        <option value="developpement_web" <?php echo $domaine === 'developpement_web' ? 'selected' : ''; ?>>Développement Web</option>
+                                        <option value="developpement_mobile" <?php echo $domaine === 'developpement_mobile' ? 'selected' : ''; ?>>Développement Mobile</option>
+                                        <option value="reseaux" <?php echo $domaine === 'reseaux' ? 'selected' : ''; ?>>Réseaux</option>
+                                        <option value="cybersecurite" <?php echo $domaine === 'cybersecurite' ? 'selected' : ''; ?>>Cybersécurité</option>
+                                        <option value="data" <?php echo $domaine === 'data' ? 'selected' : ''; ?>>Data/IA</option>
+                                    </optgroup>
+                                    <optgroup label="Commerce">
+                                        <option value="marketing_digital" <?php echo $domaine === 'marketing_digital' ? 'selected' : ''; ?>>Marketing Digital</option>
+                                        <option value="commerce_international" <?php echo $domaine === 'commerce_international' ? 'selected' : ''; ?>>Commerce International</option>
+                                        <option value="vente" <?php echo $domaine === 'vente' ? 'selected' : ''; ?>>Vente</option>
+                                    </optgroup>
+                                    <optgroup label="Autres">
+                                        <option value="finance" <?php echo $domaine === 'finance' ? 'selected' : ''; ?>>Finance</option>
+                                        <option value="ressources_humaines" <?php echo $domaine === 'ressources_humaines' ? 'selected' : ''; ?>>Ressources Humaines</option>
+                                        <option value="communication" <?php echo $domaine === 'communication' ? 'selected' : ''; ?>>Communication</option>
+                                        <option value="logistique" <?php echo $domaine === 'logistique' ? 'selected' : ''; ?>>Logistique</option>
+                                        <option value="autre" <?php echo $domaine === 'autre' ? 'selected' : ''; ?>>Autre</option>
+                                    </optgroup>
                                 </select>
                             </div>
 
