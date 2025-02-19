@@ -1,43 +1,65 @@
 function initFloatingAnimation() {
-    const statCards = Array.from(document.querySelectorAll('.stat-card'));
+    // Utiliser un Set pour une recherche plus rapide
+    const statCards = new Set(document.querySelectorAll('.stat-card'));
     const MAX_VISIBLE_CARDS = 3;
-    const ANIMATION_DURATION = 100; // Augmenté pour plus de stabilité
+    const ANIMATION_DURATION = 300; // Réduit pour plus de fluidité
     
+    // Utiliser requestAnimationFrame pour de meilleures performances
+    let animationFrameId = null;
     let isAnimating = false;
-    let currentAnimation = null;
 
-    // Configuration des animations
+    // Optimisation des constantes d'animation
     const animationConfig = {
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-        scaleOut: 'scale(0.8) translateY(20px)',
-        scaleNormal: 'scale(1) translateY(0)'
+        transform: {
+            out: 'translate3d(0, 20px, 0) scale(0.8)',
+            normal: 'translate3d(0, 0, 0) scale(1)'
+        }
     };
 
+    // Pré-compiler le template pour l'indicateur
+    const indicatorTemplate = document.createElement('template');
+    indicatorTemplate.innerHTML = `
+        <div class="swap-indicator">
+            <div class="swap-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+        </div>
+    `;
+
     function initializeCards() {
-        if (statCards.length > MAX_VISIBLE_CARDS) {
-            statCards.slice(MAX_VISIBLE_CARDS).forEach(card => {
+        if (statCards.size > MAX_VISIBLE_CARDS) {
+            Array.from(statCards).slice(MAX_VISIBLE_CARDS).forEach(card => {
                 card.style.display = 'none';
                 card.classList.add('hidden-card');
             });
         }
-        statCards.slice(0, MAX_VISIBLE_CARDS).forEach(addSwapIndicator);
+        Array.from(statCards).slice(0, MAX_VISIBLE_CARDS).forEach(addSwapIndicator);
     }
 
     function addSwapIndicator(card) {
         if (card.querySelector('.swap-indicator')) return;
-        
-        const indicator = document.createElement('div');
-        indicator.className = 'swap-indicator';
-        indicator.innerHTML = `
-            <div class="swap-icon">
-                <i class="fas fa-sync-alt"></i>
-            </div>
-        `;
-        card.appendChild(indicator);
+        card.appendChild(indicatorTemplate.content.cloneNode(true));
         card.style.cursor = 'pointer';
     }
 
-    function swapCards(visibleCard) {
+    function animateCard(card, properties) {
+        return new Promise(resolve => {
+            const onTransitionEnd = () => {
+                card.removeEventListener('transitionend', onTransitionEnd);
+                resolve();
+            };
+            
+            card.addEventListener('transitionend', onTransitionEnd);
+            
+            // Regrouper les modifications DOM dans un requestAnimationFrame
+            requestAnimationFrame(() => {
+                Object.assign(card.style, properties);
+            });
+        });
+    }
+
+    async function swapCards(visibleCard) {
         if (!visibleCard || isAnimating) return;
         
         const hiddenCard = document.querySelector('.stat-card.hidden-card');
@@ -46,69 +68,65 @@ function initFloatingAnimation() {
         isAnimating = true;
 
         // Annuler l'animation précédente si elle existe
-        if (currentAnimation) {
-            currentAnimation.abort();
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
         }
 
-        // Animation de sortie
-        visibleCard.style.transition = `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`;
-        visibleCard.style.transform = animationConfig.scaleOut;
-        visibleCard.style.opacity = '0';
+        try {
+            // Animation de sortie
+            await animateCard(visibleCard, {
+                transition: `transform ${ANIMATION_DURATION}ms ${animationConfig.easing}`,
+                transform: animationConfig.transform.out,
+                opacity: '0'
+            });
 
-        // Utiliser setTimeout au lieu de transitionend pour plus de fiabilité
-        setTimeout(() => {
-            // Échanger les cartes
-            visibleCard.style.display = 'none';
-            visibleCard.classList.add('hidden-card');
-            visibleCard.style.transform = '';
-            visibleCard.style.opacity = '';
-            
-            // Préparer la nouvelle carte
-            hiddenCard.style.display = 'flex';
-            hiddenCard.classList.remove('hidden-card');
-            hiddenCard.style.transform = animationConfig.scaleOut;
-            hiddenCard.style.opacity = '0';
-            
-            // Forcer un reflow
-            hiddenCard.offsetHeight;
+            // Échange des cartes avec une seule manipulation du DOM
+            requestAnimationFrame(() => {
+                visibleCard.style.display = 'none';
+                visibleCard.classList.add('hidden-card');
+                
+                hiddenCard.style.display = 'flex';
+                hiddenCard.classList.remove('hidden-card');
+                hiddenCard.style.transform = animationConfig.transform.out;
+                hiddenCard.style.opacity = '0';
+                
+                // Force reflow une seule fois
+                hiddenCard.offsetHeight;
+                
+                // Animation d'entrée
+                animateCard(hiddenCard, {
+                    transition: `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`,
+                    transform: animationConfig.transform.normal,
+                    opacity: '1'
+                });
+            });
 
-            // Animation d'entrée
-            hiddenCard.style.transition = `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`;
-            hiddenCard.style.transform = animationConfig.scaleNormal;
-            hiddenCard.style.opacity = '1';
-
-            // Ajouter l'indicateur à la nouvelle carte
+            // Ajouter l'indicateur de manière optimisée
             addSwapIndicator(hiddenCard);
 
-            // Réinitialiser l'état après l'animation
+        } finally {
+            // Utiliser setTimeout pour la réinitialisation
             setTimeout(() => {
                 isAnimating = false;
-                currentAnimation = null;
             }, ANIMATION_DURATION);
-        }, ANIMATION_DURATION);
+        }
     }
 
-    // Gestionnaire d'événements simple sans file d'attente
-    statCards.forEach(card => {
-        let lastClickTime = 0;
-        const CLICK_DELAY = ANIMATION_DURATION * 1.2; // Délai minimum entre les clics
-
-        card.addEventListener('click', (e) => {
-            if (card.classList.contains('hidden-card')) return;
-            
-            const now = Date.now();
-            if (now - lastClickTime < CLICK_DELAY) return; // Ignorer les clics trop rapides
-            
-            lastClickTime = now;
+    // Utiliser la délégation d'événements pour réduire les listeners
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.stat-card:not(.hidden-card)');
+        if (card && !isAnimating) {
             swapCards(card);
-        });
-    });
+        }
+    }, { passive: true });
 
-    // Initialisation
-    initializeCards();
+    // Initialisation optimisée
+    requestAnimationFrame(() => {
+        initializeCards();
+    });
 }
 
-// Styles améliorés
+// Styles optimisés
 const style = document.createElement('style');
 style.textContent = `
     .stat-card {
@@ -122,6 +140,21 @@ style.textContent = `
         padding: 2rem;
         border-radius: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        will-change: transform, opacity;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    .stat-card * {
+        will-change: transform;
+        transform: translateZ(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .stat-card {
+            transition: none !important;
+            transform: none !important;
+        }
     }
 
     .swap-indicator {
