@@ -1,106 +1,114 @@
 function initFloatingAnimation() {
     const statCards = Array.from(document.querySelectorAll('.stat-card'));
     const MAX_VISIBLE_CARDS = 3;
+    const ANIMATION_DURATION = 100; // Augmenté pour plus de stabilité
     
-    // Configuration
-    const ANIMATION_DURATION = 500;
-    
-    // Cacher la 4ème carte initialement
-    if (statCards.length > MAX_VISIBLE_CARDS) {
-        statCards.slice(MAX_VISIBLE_CARDS).forEach(card => {
-            card.style.display = 'none';
-            card.classList.add('hidden-card');
-        });
+    let isAnimating = false;
+    let currentAnimation = null;
+
+    // Configuration des animations
+    const animationConfig = {
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        scaleOut: 'scale(0.8) translateY(20px)',
+        scaleNormal: 'scale(1) translateY(0)'
+    };
+
+    function initializeCards() {
+        if (statCards.length > MAX_VISIBLE_CARDS) {
+            statCards.slice(MAX_VISIBLE_CARDS).forEach(card => {
+                card.style.display = 'none';
+                card.classList.add('hidden-card');
+            });
+        }
+        statCards.slice(0, MAX_VISIBLE_CARDS).forEach(addSwapIndicator);
     }
 
     function addSwapIndicator(card) {
-        card.style.cursor = 'pointer';
-        card.setAttribute('title', 'Cliquez pour voir une autre statistique');
+        if (card.querySelector('.swap-indicator')) return;
         
-        // Vérifier si l'indicateur existe déjà
-        if (!card.querySelector('.swap-indicator')) {
-            const indicator = document.createElement('div');
-            indicator.className = 'swap-indicator';
-            indicator.innerHTML = '<i class="fas fa-sync-alt"></i>';
-            card.appendChild(indicator);
-        }
+        const indicator = document.createElement('div');
+        indicator.className = 'swap-indicator';
+        indicator.innerHTML = `
+            <div class="swap-icon">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+        `;
+        card.appendChild(indicator);
+        card.style.cursor = 'pointer';
     }
 
-    // Ajouter le style de curseur et indicateur de click
-    statCards.slice(0, MAX_VISIBLE_CARDS).forEach(addSwapIndicator);
-
     function swapCards(visibleCard) {
-        if (!visibleCard) return;
+        if (!visibleCard || isAnimating) return;
         
-        // Trouver la carte cachée
         const hiddenCard = document.querySelector('.stat-card.hidden-card');
         if (!hiddenCard) return;
 
-        // Sauvegarder les styles initiaux
-        const visibleCardStyles = {
-            display: window.getComputedStyle(visibleCard).display,
-            transform: window.getComputedStyle(visibleCard).transform,
-            opacity: window.getComputedStyle(visibleCard).opacity
-        };
+        isAnimating = true;
 
-        // Animation de sortie pour la carte visible
-        visibleCard.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-        visibleCard.style.transform = 'scale(0.8) translateY(20px)';
+        // Annuler l'animation précédente si elle existe
+        if (currentAnimation) {
+            currentAnimation.abort();
+        }
+
+        // Animation de sortie
+        visibleCard.style.transition = `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`;
+        visibleCard.style.transform = animationConfig.scaleOut;
         visibleCard.style.opacity = '0';
 
+        // Utiliser setTimeout au lieu de transitionend pour plus de fiabilité
         setTimeout(() => {
-            // Échanger les positions dans le DOM
-            const parent = visibleCard.parentNode;
-            const visibleIndex = Array.from(parent.children).indexOf(visibleCard);
-            const hiddenIndex = Array.from(parent.children).indexOf(hiddenCard);
-            
-            // Cacher la carte visible
+            // Échanger les cartes
             visibleCard.style.display = 'none';
             visibleCard.classList.add('hidden-card');
+            visibleCard.style.transform = '';
+            visibleCard.style.opacity = '';
             
-            // Montrer la carte cachée avec les styles originaux
-            hiddenCard.style.display = visibleCardStyles.display;
+            // Préparer la nouvelle carte
+            hiddenCard.style.display = 'flex';
             hiddenCard.classList.remove('hidden-card');
-            hiddenCard.style.transform = 'scale(0.8) translateY(20px)';
+            hiddenCard.style.transform = animationConfig.scaleOut;
             hiddenCard.style.opacity = '0';
             
-            // Ajouter l'indicateur de changement à la nouvelle carte
-            addSwapIndicator(hiddenCard);
-            
-            // Animation d'entrée pour la carte cachée
-            requestAnimationFrame(() => {
-                hiddenCard.style.transition = `all ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-                hiddenCard.style.transform = 'scale(1) translateY(0)';
-                hiddenCard.style.opacity = '1';
-            });
+            // Forcer un reflow
+            hiddenCard.offsetHeight;
 
-            // Maintenir l'ordre des cartes dans le DOM
-            if (visibleIndex < hiddenIndex) {
-                parent.insertBefore(hiddenCard, visibleCard);
-            } else {
-                parent.insertBefore(hiddenCard, visibleCard.nextSibling);
-            }
+            // Animation d'entrée
+            hiddenCard.style.transition = `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`;
+            hiddenCard.style.transform = animationConfig.scaleNormal;
+            hiddenCard.style.opacity = '1';
+
+            // Ajouter l'indicateur à la nouvelle carte
+            addSwapIndicator(hiddenCard);
+
+            // Réinitialiser l'état après l'animation
+            setTimeout(() => {
+                isAnimating = false;
+                currentAnimation = null;
+            }, ANIMATION_DURATION);
         }, ANIMATION_DURATION);
     }
 
-    // Initialisation des événements
+    // Gestionnaire d'événements simple sans file d'attente
     statCards.forEach(card => {
-        let isAnimating = false;
-        
-        card.addEventListener('click', () => {
-            if (isAnimating || card.classList.contains('hidden-card')) return;
+        let lastClickTime = 0;
+        const CLICK_DELAY = ANIMATION_DURATION * 1.2; // Délai minimum entre les clics
+
+        card.addEventListener('click', (e) => {
+            if (card.classList.contains('hidden-card')) return;
             
-            isAnimating = true;
+            const now = Date.now();
+            if (now - lastClickTime < CLICK_DELAY) return; // Ignorer les clics trop rapides
+            
+            lastClickTime = now;
             swapCards(card);
-            
-            setTimeout(() => {
-                isAnimating = false;
-            }, ANIMATION_DURATION * 2);
         });
     });
+
+    // Initialisation
+    initializeCards();
 }
 
-// Ajouter le CSS nécessaire
+// Styles améliorés
 const style = document.createElement('style');
 style.textContent = `
     .stat-card {
@@ -154,7 +162,5 @@ style.textContent = `
         margin: 0;
     }
 `;
-document.head.appendChild(style);
 
-// Initialiser l'animation au chargement
-document.addEventListener('DOMContentLoaded', initFloatingAnimation);
+document.head.appendChild(style);
