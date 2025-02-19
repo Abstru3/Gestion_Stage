@@ -486,7 +486,7 @@ form {
 /* Section Entreprises vérifiées */
 .verified-companies {
     padding: 4rem 5%;
-    background: linear-gradient(135deg, var(--light-gray) 0%, #fff 100%);
+    background: linear-gradient(135deg, var(--light-gray) 0%,#f8f9fc 100%);
 }
 
 .verified-companies h2 {
