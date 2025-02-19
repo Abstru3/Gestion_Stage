@@ -185,6 +185,64 @@ $verified_companies = $pdo->query("
             <?php endforeach; ?>
         </div>
     </section>
+    <section class="domains-section">
+    <h2><i class="fas fa-graduation-cap"></i> Domaines de stages</h2>
+    <div class="domains-grid">
+        <div class="domain-card">
+            <i class="fas fa-laptop-code"></i>
+            <h3>Développement Web</h3>
+            <p>Front-end, Back-end, Full-stack</p>
+            <a href="/Gestion_Stage/app/views/internships/all_internships.php?domaine=developpement_web" class="btn btn-domain">Voir les offres</a>
+        </div>
+        <div class="domain-card">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Développement Mobile</h3>
+            <p>iOS, Android, Cross-platform</p>
+            <a href="/Gestion_Stage/app/views/internships/all_internships.php?domaine=developpement_mobile" class="btn btn-domain">Voir les offres</a>
+        </div>
+        <div class="domain-card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Cybersécurité</h3>
+            <p>Sécurité, Audit, Pentesting</p>
+            <a href="/Gestion_Stage/app/views/internships/all_internships.php?domaine=cybersecurite" class="btn btn-domain">Voir les offres</a>
+        </div>
+        <div class="domain-card">
+            <i class="fas fa-network-wired"></i>
+            <h3>Réseaux</h3>
+            <p>Administration, Cloud, DevOps</p>
+            <a href="/Gestion_Stage/app/views/internships/all_internships.php?domaine=reseaux" class="btn btn-domain">Voir les offres</a>
+        </div>
+    </div>
+</section>
+<section class="how-it-works">
+    <h2><i class="fas fa-question-circle"></i> Comment ça marche ?</h2>
+    <div class="steps-container">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <i class="fas fa-user-plus"></i>
+            <h3>Inscription</h3>
+            <p>Créez votre compte étudiant ou entreprise gratuitement</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <i class="fas fa-search"></i>
+            <h3>Recherche</h3>
+            <p>Trouvez le stage parfait ou publiez vos offres</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <i class="fas fa-paper-plane"></i>
+            <h3>Candidature</h3>
+            <p>Postulez en ligne ou recevez des candidatures</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <i class="fas fa-handshake"></i>
+            <h3>Connexion</h3>
+            <p>Trouvez le candidat idéal ou l'entreprise parfaite</p>
+        </div>
+    </div>
+</section>
     </main>
 
     <footer class="main-footer">

@@ -726,3 +726,119 @@ form {
         margin-bottom: 1rem;
     }
 }
+/* Section Domaines */
+.domains-section {
+    padding: 4rem 2rem;
+    background: #f8f9fa;
+}
+
+.domains-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.domain-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.domain-card:hover {
+    transform: translateY(-5px);
+}
+
+.domain-card i {
+    font-size: 2.5rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.domain-card h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.domain-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.btn-domain {
+    background: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.btn-domain:hover {
+    background: #0056b3;
+}
+
+/* Section Comment ça marche */
+.how-it-works {
+    padding: 4rem 2rem;
+    background: white;
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.step-card {
+    position: relative;
+    padding: 2rem;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.step-number {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #007bff;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.step-card i {
+    font-size: 2.5rem;
+    color: #007bff;
+    margin: 1rem 0;
+}
+
+.step-card h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.step-card p {
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .domains-grid,
+    .steps-container {
+        grid-template-columns: 1fr;
+    }
+}
