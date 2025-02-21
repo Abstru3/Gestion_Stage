@@ -44,6 +44,7 @@ body {
 .nav-links {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 /* Repositionnement du bouton mobile */
@@ -179,7 +180,7 @@ form {
 .offer-header {
     position: relative;
     padding: 1.5rem;
-    padding-top: 40px; /* Espace pour le badge */
+    padding-top: 40px;
     background: var(--primary-color);
     color: white;
 }
@@ -335,19 +336,19 @@ form {
     .nav-links {
         position: fixed;
         top: 0;
-        left: -70%; /* Changé de right à left */
+        left: -70%;
         height: 100vh;
         width: 70%;
         max-width: 300px;
         background: var(--primary-color);
         flex-direction: column;
         padding: 80px 20px 20px;
-        transition: left 0.3s ease; /* Changé de right à left */
+        transition: left 0.3s ease;
         z-index: 99;
     }
 
     .nav-links.active {
-        left: 0; /* Changé de right à left */
+        left: 0;
     }
 
     .nav-links .btn {
@@ -365,13 +366,13 @@ form {
     }
 
     .offers-grid {
-        grid-template-columns: 1fr; /* Une seule colonne */
+        grid-template-columns: 1fr;
         gap: 1.5rem;
         padding: 1rem;
     }
 
     .offer-card:hover {
-        transform: translateY(-3px); /* Effet plus subtil sur mobile */
+        transform: translateY(-3px);
         box-shadow: 0 6px 15px rgba(0,0,0,0.12);
     }
 
@@ -383,7 +384,7 @@ form {
     .offer-details {
         grid-template-columns: 1fr;
         display: flex;
-        flex-direction: column; /* Empiler les informations */
+        flex-direction: column;
         gap: 0.8rem;
     }
 
@@ -395,7 +396,7 @@ form {
     }
 
     .offer-details i {
-        width: 20px; /* Largeur fixe pour aligner les icônes */
+        width: 20px;
         text-align: center;
     }
 
@@ -408,6 +409,75 @@ form {
     }
 
     .company-name {
+        font-size: 0.9rem;
+    }
+
+    
+    .domains-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .domain-card {
+        padding: 2rem;
+    }
+
+    .domain-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .domain-card p {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-domain {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .steps-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .step-card {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .step-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .step-card p {
+        font-size: 0.95rem;
+    }
+    
+    .verified-companies h2 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .company-card {
+        height: 350px;
+    }
+
+    .company-logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .company-card h3 {
+        font-size: 1.2rem;
+    }
+
+    .company-card p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .btn-company {
+        padding: 0.7rem 1.5rem;
         font-size: 0.9rem;
     }
 }
@@ -432,7 +502,7 @@ form {
 .mode-badge {
     position: absolute;
     top: 10px;
-    right: 10px; /* Changé de left à right */
+    right: 10px;
     background: rgba(255, 255, 255, 0.95);
     padding: 5px 10px;
     border-radius: 15px;
@@ -441,11 +511,11 @@ form {
     align-items: center;
     gap: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    color: var(--text-color); /* Ajout de la couleur noire */
+    color: var(--text-color);
 }
 
 .mode-badge i {
-    color: var(--primary-color); /* Couleur de l'icône */
+    color: var(--primary-color);
 }
 
 /* Ajustement pour les petits écrans */
@@ -483,6 +553,7 @@ form {
         opacity: 1;
     }
 }
+
 /* Section Entreprises vérifiées */
 .verified-companies {
     padding: 4rem 5%;
@@ -657,6 +728,7 @@ form {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
 }
+
 /* Ajout des media queries pour la responsivité */
 @media (max-width: 1200px) {
     .companies-grid {
@@ -671,36 +743,6 @@ form {
 
     .company-card {
         height: 380px;
-    }
-}
-
-@media (max-width: 768px) {
-    .verified-companies h2 {
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .company-card {
-        height: 350px;
-    }
-
-    .company-logo {
-        width: 100px;
-        height: 100px;
-    }
-
-    .company-card h3 {
-        font-size: 1.2rem;
-    }
-
-    .company-card p {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .btn-company {
-        padding: 0.7rem 1.5rem;
-        font-size: 0.9rem;
     }
 }
 
@@ -726,6 +768,7 @@ form {
         margin-bottom: 1rem;
     }
 }
+
 /* Section Domaines */
 .domains-section {
     padding: 5rem 2rem;
@@ -741,50 +784,50 @@ form {
 
 .domains-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusted minmax */
-    gap: 2.5rem; /* Adjusted gap */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
     max-width: 1200px;
     margin: 2rem auto;
 }
 
 .domain-card {
     background: #fff;
-    padding: 2.5rem; /* Adjusted padding */
-    border-radius: 15px; /* Adjusted border-radius */
+    padding: 2.5rem;
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* Enhanced shadow */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .domain-card:hover {
-    transform: translateY(-8px); /* Adjusted translateY */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 .domain-card i {
-    font-size: 3rem; /* Adjusted font-size */
+    font-size: 3rem;
     color: var(--secondary-color);
-    margin-bottom: 1.5rem; /* Adjusted margin-bottom */
+    margin-bottom: 1.5rem;
 }
 
 .domain-card h3 {
     color: var(--primary-color);
     margin-bottom: 1rem;
-    font-size: 1.4rem; /* Adjusted font-size */
+    font-size: 1.4rem;
 }
 
 .domain-card p {
     color: #777;
-    margin-bottom: 2rem; /* Adjusted margin-bottom */
-    font-size: 1rem; /* Adjusted font-size */
-    line-height: 1.7; /* Improved line height */
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.7;
 }
 
 .btn-domain {
     background: var(--secondary-color);
     color: white;
-    padding: 0.75rem 1.5rem; /* Adjusted padding */
-    border-radius: 8px; /* Adjusted border-radius */
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
     text-decoration: none;
     transition: background 0.3s ease, transform 0.3s ease;
     display: inline-block;
@@ -792,38 +835,13 @@ form {
 
 .btn-domain:hover {
     background: var(--secondary-color-hover);
-    transform: translateY(-2px); /* Added translateY */
+    transform: translateY(-2px);
 }
 
-/* Media query for smaller screens */
-@media (max-width: 768px) {
-    .domains-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjusted minmax */
-        gap: 2rem;
-    }
-
-    .domain-card {
-        padding: 2rem; /* Adjusted padding */
-    }
-
-    .domain-card h3 {
-        font-size: 1.2rem;
-    }
-
-    .domain-card p {
-        font-size: 0.95rem;
-        margin-bottom: 1.5rem; /* Adjusted margin-bottom */
-    }
-
-    .btn-domain {
-        padding: 0.6rem 1.2rem; /* Adjusted padding */
-        font-size: 0.9rem;
-    }
-}
 /* Section Comment ça marche */
 .how-it-works {
     padding: 5rem 2rem;
-    background: var(--light-gray); /* Light background for contrast */
+    background: var(--light-gray);
 }
 
 .how-it-works h2 {
@@ -835,79 +853,177 @@ form {
 
 .steps-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Slightly larger cards */
-    gap: 3rem; /* Increased gap for better spacing */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
     max-width: 1200px;
     margin: 2rem auto;
 }
 
 .step-card {
     position: relative;
-    padding: 3rem 2rem; /* Increased padding */
+    padding: 3rem 2rem;
     text-align: center;
-    background: #fff; /* White background for cards */
-    border-radius: 15px; /* More rounded corners */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* Enhanced shadow */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .step-card:hover {
-    transform: translateY(-8px); /* Slightly lift on hover */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 .step-number {
     position: absolute;
-    top: -20px; /* Slightly higher position */
+    top: -20px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--primary-color);
     color: white;
-    width: 40px; /* Larger number */
-    height: 40px; /* Larger number */
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.2rem; /* Larger font size */
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2); /* Add shadow to the number */
+    font-size: 1.2rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
 }
 
 .step-card i {
-    font-size: 3rem; /* Larger icons */
+    font-size: 3rem;
     color: var(--secondary-color);
-    margin: 1.5rem 0; /* Increased margin */
+    margin: 1.5rem 0;
 }
 
 .step-card h3 {
-    color: var(--primary-color); /* Use primary color */
+    color: var(--primary-color);
     margin-bottom: 1rem;
-    font-size: 1.3rem; /* Slightly larger font */
+    font-size: 1.3rem;
 }
 
 .step-card p {
-    color: #777; /* Slightly darker text */
-    font-size: 1rem; /* Slightly larger font */
-    line-height: 1.7; /* Improved line height */
+    color: #777;
+    font-size: 1rem;
+    line-height: 1.7;
 }
 
-/* Media query for smaller screens */
+/* Media query pour plus petits écrans */
 @media (max-width: 768px) {
+
+}
+
+.how-it-works-trigger {
+    position: relative;
+    cursor: pointer;
+    margin: 0 1rem;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.how-it-works-trigger i {
+    font-size: 1.5rem;
+    color: white;
+    transition: color 0.3s ease;
+    padding: 0.5rem;
+    margin-right: -1.5rem;
+}
+
+.fa-question-circle:hover {
+    color: white;
+}
+
+.how-it-works-trigger:hover .steps-popup i {
+    color: var(--secondary-color-hover);
+}
+
+.steps-popup {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 2rem;
+    width: max-content;
+    z-index: 1000;
+    min-width: 800px;
+}
+
+.how-it-works-trigger:hover .steps-popup {
+    display: block;
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.step-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+}
+
+.step-number {
+    background: var(--primary-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-weight: bold;
+}
+
+.step-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.step-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.step-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+@media (max-width: 992px) {
+    .steps-popup {
+        min-width: 90vw;
+        right: -45vw;
+    }
+    
     .steps-container {
-        grid-template-columns: 1fr; /* Stack on smaller screens */
-        gap: 2rem;
+        grid-template-columns: repeat(2, 1fr);
     }
+}
 
-    .step-card {
-        padding: 2.5rem 1.5rem; /* Adjust padding for smaller screens */
-    }
-
-    .step-card h3 {
-        font-size: 1.2rem;
-    }
-
-    .step-card p {
-        font-size: 0.95rem;
+@media (max-width: 576px) {
+    .steps-container {
+        grid-template-columns: 1fr;
     }
 }

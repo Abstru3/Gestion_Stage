@@ -12,7 +12,7 @@ $verified_companies_count = $pdo->query("SELECT COUNT(*) FROM entreprises WHERE 
 
 $recent_internships = get_internships($pdo);
 $recent_internships = array_slice($recent_internships, 0, 4);
-// Récupérer 4 entreprises vérifiées au hasard
+
 $verified_companies = $pdo->query("
     SELECT id, nom, icone, description 
     FROM entreprises 
@@ -47,6 +47,37 @@ $verified_companies = $pdo->query("
                 <i class="fas fa-bars"></i>
             </button>
             <div class="nav-links">
+            <div class="how-it-works-trigger">
+                    <i class="fas fa-question-circle"></i>
+                    <div class="steps-popup">
+                        <div class="steps-container">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <i class="fas fa-user-plus"></i>
+                                <h3>Inscription</h3>
+                                <p>Créez votre compte étudiant ou entreprise gratuitement</p>
+                            </div>
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <i class="fas fa-search"></i>
+                                <h3>Recherche</h3>
+                                <p>Trouvez le stage parfait ou publiez vos offres</p>
+                            </div>
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <i class="fas fa-paper-plane"></i>
+                                <h3>Candidature</h3>
+                                <p>Postulez en ligne ou recevez des candidatures</p>
+                            </div>
+                            <div class="step-card">
+                                <div class="step-number">4</div>
+                                <i class="fas fa-handshake"></i>
+                                <h3>Connexion</h3>
+                                <p>Trouvez le candidat idéal ou l'entreprise parfaite</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="./app/views/home.php" class="btn btn-workspace"><i class="fas fa-user"></i> Mon Espace</a>
                     <a href="./app/views/auth/logout.php" class="btn btn-disconnect"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
@@ -221,35 +252,6 @@ $verified_companies = $pdo->query("
         </div>
     </div>
 </section>
-<section class="how-it-works">
-    <h2><i class="fas fa-question-circle"></i> Comment ça marche ?</h2>
-    <div class="steps-container">
-        <div class="step-card">
-            <div class="step-number">1</div>
-            <i class="fas fa-user-plus"></i>
-            <h3>Inscription</h3>
-            <p>Créez votre compte étudiant ou entreprise gratuitement</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">2</div>
-            <i class="fas fa-search"></i>
-            <h3>Recherche</h3>
-            <p>Trouvez le stage parfait ou publiez vos offres</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">3</div>
-            <i class="fas fa-paper-plane"></i>
-            <h3>Candidature</h3>
-            <p>Postulez en ligne ou recevez des candidatures</p>
-        </div>
-        <div class="step-card">
-            <div class="step-number">4</div>
-            <i class="fas fa-handshake"></i>
-            <h3>Connexion</h3>
-            <p>Trouvez le candidat idéal ou l'entreprise parfaite</p>
-        </div>
-    </div>
-</section>
     </main>
 
     <footer class="main-footer">
@@ -306,7 +308,6 @@ $verified_companies = $pdo->query("
             navLinks.classList.toggle('active');
             this.classList.toggle('active');
 
-            // Change l'icône
             const icon = this.querySelector('i');
             if (icon.classList.contains('fa-bars')) {
                 icon.classList.remove('fa-bars');
@@ -317,7 +318,6 @@ $verified_companies = $pdo->query("
             }
         });
 
-        // Ferme le menu si on clique en dehors
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.nav-links') && 
                 !event.target.closest('.mobile-menu-btn') && 
@@ -355,7 +355,6 @@ $verified_companies = $pdo->query("
                 })
                 .catch(error => console.error('Erreur:', error));
         }
-        // Rafraîchir toutes les 10 secondes
         setInterval(refreshVerifiedCompanies, 10000);
     });
     </script>
