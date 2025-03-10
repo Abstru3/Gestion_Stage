@@ -14,7 +14,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
 $entreprise_id = $_SESSION['user_id'];
 $offre_id = $_GET['id'] ?? 0;
 
-// Récupérer les détails de l'offre
 $stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE id = ? AND entreprise_id = ?");
 $stmt->execute([$offre_id, $entreprise_id]);
 $offre = $stmt->fetch();
@@ -24,27 +23,22 @@ if (!$offre) {
     exit();
 }
 
-// Récupérer l'icône de l'entreprise
 $stmt = $pdo->prepare("SELECT icone FROM entreprises WHERE id = ?");
 $stmt->execute([$entreprise_id]);
 $entreprise = $stmt->fetch();
 $iconeEntreprise = $entreprise['icone'] ?? null;
 
-// Définir le logo à afficher (priorité : logo de l'offre -> icône de l'entreprise -> image par défaut)
 $logo = !empty($offre['logo']) ? $offre['logo'] : (!empty($iconeEntreprise) ? $iconeEntreprise : 'uploads/logos/default.png');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Définir des valeurs par défaut pour les champs optionnels
         $lien_candidature = $_POST['lien_candidature'] ?? null;
         $domaine = $_POST['domaine'] ?? null;
         $pays = $_POST['pays'] ?? 'France';
         $lieu = $_POST['lieu'] ?? null;
 
-        // Gestion de l'upload du logo
-        $logoPath = $offre['logo']; // Conserve l'ancien logo si aucun nouveau n'est téléchargé
+        $logoPath = $offre['logo'];
 
-        // Gestion de l'upload du logo
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/logos/';
             if (!file_exists($uploadDir)) {
@@ -54,14 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fileInfo = pathinfo($_FILES['logo']['name']);
             $extension = strtolower($fileInfo['extension']);
             
-            // Vérifier le type de fichier
             if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                // Générer un nom de fichier unique
                 $newFileName = uniqid() . '.' . $extension;
                 $uploadFile = $uploadDir . $newFileName;
 
                 if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadFile)) {
-                    // Mettre à jour la base de données avec le nouveau nom de fichier
                     $logoPath = 'uploads/logos/' . $newFileName;
                 } else {
                     throw new Exception("Erreur lors du téléchargement du logo.");
@@ -71,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Mise à jour de l'offre de stage avec le logo
         $stmt = $pdo->prepare("UPDATE offres_stages SET 
             titre = ?, 
             description = ?, 
@@ -107,12 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['departement'],
             $lieu,
             $_POST['mode_stage'],
-            $logoPath, // Chemin du logo mis à jour
+            $logoPath,
             $offre_id,
             $entreprise_id
         ]);
 
-        // Stocker le message de succès dans la session
         $_SESSION['success_message'] = "L'offre a été mise à jour avec succès!";
         header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
         exit();
@@ -234,21 +223,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group">
                     <label for="region">Région*</label>
                     <select id="region" name="region" required onchange="updateDepartements()">
-                        <!-- Options seront remplies par JavaScript -->
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="departement">Département*</label>
                     <select id="departement" name="departement" required onchange="updateVilles()">
-                        <!-- Options seront remplies par JavaScript -->
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="ville">Ville*</label>
                     <select id="ville" name="ville" required onchange="updateCodePostal()">
-                        <!-- Options seront remplies par JavaScript -->
                     </select>
                 </div>
 
@@ -299,9 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <!-- Inclure les mêmes scripts JavaScript que dans post_internship.php -->
     <script>
-        // Variables pour pré-remplir les champs de localisation
         const currentRegion = "<?= htmlspecialchars($offre['region']) ?>";
         const currentDepartement = "<?= htmlspecialchars($offre['departement']) ?>";
         const currentVille = "<?= htmlspecialchars($offre['ville']) ?>";

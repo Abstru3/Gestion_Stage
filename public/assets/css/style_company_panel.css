@@ -30,25 +30,25 @@ body {
 header {
     background-color: var(--white);
     border-bottom: 1px solid var(--border-color);
-    padding: 1.25rem 0; /* Slightly reduced padding */
-    margin-bottom: 1.5rem; /* Slightly reduced margin */
+    padding: 1.25rem 0;
+    margin-bottom: 1.5rem;
 }
 
 header h1 {
-    font-size: 1.75rem; /* Slightly smaller font size */
+    font-size: 1.75rem;
     font-weight: 600;
     color: var(--text-color);
 }
 
 nav {
     background-color: var(--white);
-    padding: 0.75rem 0; /* Slightly reduced padding */
+    padding: 0.75rem 0;
     border-bottom: 1px solid var(--border-color);
 }
 
 nav ul {
     display: flex;
-    gap: 1.5rem; /* Slightly reduced gap */
+    gap: 1.5rem;
     justify-content: center;
     list-style: none;
     padding: 0;
@@ -59,9 +59,9 @@ nav a {
     color: var(--text-color);
     text-decoration: none;
     font-weight: 500;
-    padding: 0.4rem 0.9rem; /* Slightly reduced padding */
+    padding: 0.4rem 0.9rem;
     border-radius: var(--radius-md);
-    transition: background-color 0.2s ease-in-out; /* Added easing */
+    transition: background-color 0.2s ease-in-out;
 }
 
 nav a:hover {
@@ -72,34 +72,34 @@ nav a:hover {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem; /* Slightly reduced padding */
+    padding: 0 1rem;
 }
 
 .header-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem; /* Slightly reduced margin */
-    padding: 1rem; /* Reduced padding */
+    margin-bottom: 1.5rem;
+    padding: 1rem;
     border-radius: var(--radius-lg);
 }
 
 .btn-primary {
     background-color: var(--primary-color);
     color: var(--white);
-    padding: 0.6rem 1.2rem; /* Slightly reduced padding */
+    padding: 0.6rem 1.2rem;
     border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem; /* Slightly reduced gap */
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Added transform and easing */
+    gap: 0.4rem;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 }
 
 .btn-primary:hover {
     background-color: #1d4ed8;
-    transform: translateY(-1px); /* Added slight lift on hover */
+    transform: translateY(-1px);
 }
 
 /* Offers Grid */
@@ -111,7 +111,6 @@ nav a:hover {
     margin: 2rem auto;
 }
 
-/* Amélioration des cartes d'offres */
 .offer-card {
     background-color: var(--white);
     border: 1px solid var(--card-border);
@@ -203,7 +202,6 @@ nav a:hover {
     color: var(--text-light);
     transition: all 0.3s ease-out;
     padding: 0.5rem 0;
-    /* Supprimer white-space: pre-line */
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -224,7 +222,6 @@ nav a:hover {
 .offer-description.expanded p {
     display: block;
     max-height: none;
-    /* Ajout de styles pour le texte développé */
     padding: 0.5rem;
     background-color: var(--background);
     border-radius: var(--radius-md);
@@ -261,7 +258,6 @@ nav a:hover {
     transform: rotate(180deg);
 }
 
-/* Amélioration du bouton Voir plus/moins */
 .read-more {
     width: 100%;
     justify-content: center;
@@ -322,25 +318,25 @@ nav a:hover {
 
 /* Footer */
 footer {
-    margin: 1.5rem 0; /* Reduced margin */
+    margin: 1.5rem 0;
     text-align: center;
 }
 
 .index-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem; /* Reduced gap */
-    padding: 0.6rem 1.2rem; /* Reduced padding */
+    gap: 0.4rem; 
+    padding: 0.6rem 1.2rem;
     background-color: var(--secondary-color);
     color: var(--white);
     text-decoration: none;
     border-radius: var(--radius-md);
-    transition: all 0.2s ease-in-out, transform 0.1s ease; /* Added transform and easing */
+    transition: all 0.2s ease-in-out, transform 0.1s ease;
 }
 
 .index-button:hover {
     background-color: #374151;
-    transform: translateY(-1px); /* Added slight lift on hover */
+    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -352,14 +348,14 @@ footer {
 
     .header-actions {
         flex-direction: column;
-        gap: 0.8rem; /* Reduced gap */
+        gap: 0.8rem;
         align-items: stretch;
         text-align: center;
     }
 
     .offer-header {
         flex-direction: column;
-        gap: 0.4rem; /* Reduced gap */
+        gap: 0.4rem;
     }
 
     .offer-actions {
@@ -368,7 +364,7 @@ footer {
 
     nav ul {
         flex-direction: column;
-        gap: 0.4rem; /* Reduced gap */
+        gap: 0.4rem;
         align-items: center;
     }
 

@@ -131,11 +131,10 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 2rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden; /* Pour éviter les débordements pendant l'animation */
-    height: fit-content;  /* Pour s'adapter au contenu */
+    overflow: hidden;
+    height: fit-content;
 }
 
-/* Effet au survol des cards */
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -169,15 +168,13 @@ body {
     hyphens: auto;
 }
 
-/* Éviter les retours à la ligne non désirés */
 .description-text {
-    white-space: normal; /* Garde uniquement les retours à la ligne intentionnels */
-    word-wrap: break-word; /* Permet aux mots longs de se couper */
+    white-space: normal;
+    word-wrap: break-word;
     overflow-wrap: break-word;
     line-height: 1.6;
 }
 
-/* Add specific styles for long words and URLs */
 .description-text a {
     word-break: break-all;
 }
@@ -292,7 +289,6 @@ body {
     text-align: center;
 }
 
-/* Améliorer le style des info-cards dans la sidebar */
 .info-card {
     position: sticky;
     top: 20px;
@@ -340,7 +336,7 @@ body {
     }
 
     .card:hover {
-        transform: translateY(-3px); /* Effet plus subtil sur mobile */
+        transform: translateY(-3px);
     }
     
     .info-card {

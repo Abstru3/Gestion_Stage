@@ -22,13 +22,11 @@ if (!$user) {
 $errors = [];
 $successMessage = "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Traiter la mise à jour du profil ici
     $username = $_POST['username'];
     $email = $_POST['email'];
     $new_password = $_POST['new_password'];
-    $description_entreprise = $_POST['description_entreprise'];  // Récupération de la description
+    $description_entreprise = $_POST['description_entreprise'];
 
-    // Vérification des exigences du mot de passe
     if (!empty($new_password)) {
         if (strlen($new_password) < 8 || !preg_match('/[A-Z]/', $new_password) || !preg_match('/[0-9]/', $new_password)) {
             $errors[] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.";
@@ -37,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Traitement de la photo de profil
     if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/profil/';
         if (!file_exists($uploadDir)) {
@@ -47,18 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fileInfo = pathinfo($_FILES['profile_photo']['name']);
         $extension = strtolower($fileInfo['extension']);
         
-        // Vérifier le type de fichier
         if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-            // Générer un nom de fichier unique
             $newFileName = uniqid() . '.' . $extension;
             $uploadFile = $uploadDir . $newFileName;
 
             if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadFile)) {
-                // Mettre à jour la base de données avec le nouveau nom de fichier
                 $stmt = $pdo->prepare("UPDATE $table SET icone = ? WHERE id = ?");
                 $stmt->execute([$newFileName, $_SESSION['user_id']]);
                 
-                // Rafraîchir les données de l'utilisateur
                 $user = get_user($pdo, $_SESSION['user_id'], $table);
             } else {
                 $errors[] = "Erreur lors du téléchargement de la photo.";
@@ -68,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Mise à jour de la description de l'entreprise
     if (empty($errors)) {
         if (!empty($new_password)) {
             $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ?, description = ? WHERE id = ?");
@@ -78,10 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->execute([$username, $email, $description_entreprise, $_SESSION['user_id']]);
         }
 
-        // Rafraîchir les données de l'utilisateur
         $user = get_user($pdo, $_SESSION['user_id'], $table);
 
-        // Message de succès
         $successMessage = "Votre profil a été mis à jour avec succès !";
     }
 }
@@ -95,10 +85,8 @@ if ($_SESSION['role'] == 'entreprise') {
     $currentThemeColor = $result['theme_color'];
 }
 
-// Traitement de la mise à jour de la couleur
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['theme_color'])) {
     $newColor = $_POST['theme_color'];
-    // Validation du format hexadécimal
     if (preg_match('/^#[a-fA-F0-9]{6}$/', $newColor)) {
         $stmt = $pdo->prepare("UPDATE entreprises SET theme_color = ? WHERE id = ?");
         $stmt->execute([$newColor, $_SESSION['user_id']]);

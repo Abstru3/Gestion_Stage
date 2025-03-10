@@ -10,19 +10,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     exit();
 }
 
-// Récupération des offres de stage de l'entreprise
 try {
     $stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ? ORDER BY date_publication DESC");
     $stmt->execute([$_SESSION['user_id']]);
     $offres = $stmt->fetchAll();
 } catch (PDOException $e) {
-    // Gestion de l'erreur de récupération des offres
     error_log("Erreur lors de la récupération des offres de stage : " . $e->getMessage());
-    $offres = []; // Assurer que $offres est un tableau vide en cas d'erreur
+    $offres = [];
     $error_message = "Une erreur est survenue lors du chargement de vos offres de stage.";
 }
 
-// Remplacer la fonction formatDateFr avec cette version
 function formatDateFr($date) {
     $mois = array(
         'January' => 'janvier',
@@ -113,7 +110,7 @@ function formatDateFr($date) {
                             
                             <div class="detail-group">
                                 <span class="icon">📅</span>
-                                <span>Fin: <?= formatDateFr($offre['date_fin']) ?></span> <!-- Affichage de la date de fin -->
+                                <span>Fin: <?= formatDateFr($offre['date_fin']) ?></span>
                             </div>
 
                             <?php if ($offre['remuneration']): ?>

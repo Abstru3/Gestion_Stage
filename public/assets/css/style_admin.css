@@ -221,7 +221,6 @@ body {
     margin-right: 0.5rem;
 }
 
-/* Ajouter après les styles existants */
 .btn-group {
     display: flex;
     gap: 0.5rem;

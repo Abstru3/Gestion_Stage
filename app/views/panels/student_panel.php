@@ -27,7 +27,6 @@ $search = $_GET['search'] ?? '';
 $sort = $_GET['sort'] ?? 'date_debut';
 $order = $_GET['order'] ?? 'ASC';
 
-// Vérification de la validité du tri et de l'ordre
 $valid_sorts = ['date_debut', 'titre', 'entreprise_nom'];
 $valid_orders = ['ASC', 'DESC'];
 

@@ -2,18 +2,15 @@
 
 // Fonction de connexion
 function login($pdo, $identifier, $password) {
-    // Vérifier d'abord dans la table etudiants
     $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE (email = :identifier OR username = :identifier)");
     $stmt->execute(['identifier' => $identifier]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        // Si pas trouvé dans etudiants, vérifier dans entreprises
         $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE (email = :identifier OR username = :identifier)");
         $stmt->execute(['identifier' => $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Vérifier si le compte entreprise est validé
         if ($user && $user['role'] === 'entreprise' && !$user['valide']) {
             return ['error' => 'Votre compte est en attente de validation par un administrateur.'];
         }

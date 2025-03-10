@@ -162,7 +162,6 @@
     box-shadow: 0 0 0 2px #3498db;
 }
 
-/* Animation modifiée pour l'icône de certification */
 .status-certified i {
     animation: pulse 2s infinite;
 }
@@ -352,7 +351,6 @@
     font-size: 1.1rem;
 }
 
-/* Styles pour les entreprises certifiées */
 .company-profile-container[data-certified="true"] {
     background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 20%, transparent), #ffffff);
     border: 1px solid var(--theme-color);

@@ -60,13 +60,11 @@ const codesPostaux = {
 document.addEventListener('DOMContentLoaded', function() {
     const regionSelect = document.getElementById('region');
     if (regionSelect) {
-        // Remplir les régions
         Object.keys(regions).forEach(region => {
             const option = new Option(region, region);
             regionSelect.add(option);
         });
 
-        // Pré-sélectionner la région si elle existe
         if (typeof currentRegion !== 'undefined') {
             regionSelect.value = currentRegion;
             updateDepartements();

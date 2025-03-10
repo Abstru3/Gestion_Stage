@@ -3,8 +3,6 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Débogage : afficher les informations de session
-error_log("Session data in home.php: " . print_r($_SESSION, true));
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     error_log("User not logged in, redirecting to login page");
@@ -34,7 +32,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit();
 }
 
-// Récupérer les informations utilisateur
 $table = ($_SESSION['role'] == 'etudiant') ? 'etudiants' : 'entreprises';
 $stmt = $pdo->prepare("SELECT * FROM $table WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
@@ -46,7 +43,6 @@ if (!$user) {
     exit();
 }
 
-// Message de bienvenue personnalisé
 $welcome_message = 'Utilisateur';
 if ($_SESSION['role'] == 'etudiant') {
     $welcome_message = $user['nom'] . ' ' . $user['prenom'];
@@ -56,10 +52,8 @@ if ($_SESSION['role'] == 'etudiant') {
     $welcome_message = 'Administrateur';
 }
 
-// Requêtes dynamiques selon le rôle
 $dashboard_data = [];
 if ($_SESSION['role'] == 'etudiant') {
-    // Dernières candidatures et offres récentes
     $stmt_candidatures = $pdo->prepare("
         SELECT c.statut, o.titre, o.date_debut, o.date_fin, e.nom as entreprise_nom
         FROM candidatures c 
@@ -72,7 +66,6 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_candidatures->execute([$_SESSION['user_id']]);
     $dernieres_candidatures = $stmt_candidatures->fetchAll(PDO::FETCH_ASSOC);
 
-    // Offres de stage correspondant au profil
     $stmt_offres = $pdo->prepare("
         SELECT id, titre, description, date_debut, date_fin 
         FROM offres_stages 
@@ -94,7 +87,6 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
     $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ajout de la requête pour les candidatures mises à jour
     $stmt_candidatures_updated = $pdo->prepare("
         SELECT c.id, c.statut, c.date_modification, o.titre, e.nom as entreprise_nom 
         FROM candidatures c
@@ -108,7 +100,6 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_candidatures_updated->execute(['user_id' => $_SESSION['user_id']]);
     $candidatures_updated = $stmt_candidatures_updated->fetchAll(PDO::FETCH_ASSOC);
 
-    // À ajouter quand l'utilisateur consulte ses candidatures
     $update_stmt = $pdo->prepare("
         UPDATE candidatures 
         SET date_lecture = CURRENT_TIMESTAMP 
@@ -128,7 +119,6 @@ if ($_SESSION['role'] == 'etudiant') {
     ];
     
 } elseif ($_SESSION['role'] == 'entreprise') {
-    // Candidatures récentes pour les offres de l'entreprise
     $stmt_candidatures = $pdo->prepare("
         SELECT c.id, c.statut, e.nom, e.prenom, o.titre 
         FROM candidatures c 
@@ -153,7 +143,6 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_messages->execute(['user_id' => $_SESSION['user_id']]);
     $messages_non_lus = $stmt_messages->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ajout de la requête pour les nouvelles candidatures
     $stmt_new_applications = $pdo->prepare("
         SELECT COUNT(*) as count_new, o.titre
         FROM candidatures c
@@ -165,7 +154,6 @@ if ($_SESSION['role'] == 'etudiant') {
     $stmt_new_applications->execute(['user_id' => $_SESSION['user_id']]);
     $new_applications = $stmt_new_applications->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ajouter cette requête dans la section entreprise
     $stmt_pending_applications = $pdo->prepare("
         SELECT COUNT(*) as count_pending, o.titre, o.id as offre_id
         FROM candidatures c
@@ -189,7 +177,6 @@ if ($_SESSION['role'] == 'etudiant') {
         'total_pending_applications' => array_sum(array_column($pending_applications, 'count_pending'))
     ];
 } elseif ($_SESSION['role'] == 'admin') {
-    // Statistiques détaillées et dernières activités
     $derniers_utilisateurs = $pdo->query("
         (SELECT 'Étudiant' as type, nom, prenom, email, date_naissance as date_inscription FROM etudiants ORDER BY id DESC LIMIT 3)
         UNION
@@ -247,17 +234,15 @@ if ($_SESSION['role'] == 'etudiant') {
 
 
 <script>
-// Lorsque l'utilisateur clique sur le bouton de menu, on l'ouvre/ferme
 document.querySelector('.menu-toggle').addEventListener('click', function() {
     const menu = document.querySelector('.menu');
     menu.classList.toggle('open');
 });
 
-// Réinitialiser l'état du menu si la taille de la fenêtre est supérieure à 768px
 window.addEventListener('resize', function() {
     if (window.innerWidth > 768) {
         const menu = document.querySelector('.menu');
-        menu.classList.remove('open'); // Supprime la classe 'open' pour revenir à l'affichage normal
+        menu.classList.remove('open');
     }
 });
 

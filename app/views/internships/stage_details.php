@@ -14,7 +14,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
-// Dans la requête SQL, modifiez pour récupérer le logo de l'offre
 $stmt = $pdo->prepare("
     SELECT o.*, e.nom AS nom_entreprise, e.description AS description_entreprise, 
            e.site_web, o.logo AS offre_logo, DATEDIFF(o.date_fin, o.date_debut) AS duree 
@@ -24,9 +23,6 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$id]);
 $internship = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Supprimez ou commentez cette ligne de débogage
-// var_dump($internship['offre_logo']);
 
 if (!$internship) {
     header('Location: /Gestion_Stage/index.php');

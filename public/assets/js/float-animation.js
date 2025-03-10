@@ -1,14 +1,11 @@
 function initFloatingAnimation() {
-    // Utiliser un Set pour une recherche plus rapide
     const statCards = new Set(document.querySelectorAll('.stat-card'));
     const MAX_VISIBLE_CARDS = 3;
-    const ANIMATION_DURATION = 300; // Réduit pour plus de fluidité
+    const ANIMATION_DURATION = 300;
     
-    // Utiliser requestAnimationFrame pour de meilleures performances
     let animationFrameId = null;
     let isAnimating = false;
 
-    // Optimisation des constantes d'animation
     const animationConfig = {
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         transform: {
@@ -17,7 +14,6 @@ function initFloatingAnimation() {
         }
     };
 
-    // Pré-compiler le template pour l'indicateur
     const indicatorTemplate = document.createElement('template');
     indicatorTemplate.innerHTML = `
         <div class="swap-indicator">
@@ -52,7 +48,6 @@ function initFloatingAnimation() {
             
             card.addEventListener('transitionend', onTransitionEnd);
             
-            // Regrouper les modifications DOM dans un requestAnimationFrame
             requestAnimationFrame(() => {
                 Object.assign(card.style, properties);
             });
@@ -67,20 +62,17 @@ function initFloatingAnimation() {
 
         isAnimating = true;
 
-        // Annuler l'animation précédente si elle existe
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
         }
 
         try {
-            // Animation de sortie
             await animateCard(visibleCard, {
                 transition: `transform ${ANIMATION_DURATION}ms ${animationConfig.easing}`,
                 transform: animationConfig.transform.out,
                 opacity: '0'
             });
 
-            // Échange des cartes avec une seule manipulation du DOM
             requestAnimationFrame(() => {
                 visibleCard.style.display = 'none';
                 visibleCard.classList.add('hidden-card');
@@ -90,10 +82,8 @@ function initFloatingAnimation() {
                 hiddenCard.style.transform = animationConfig.transform.out;
                 hiddenCard.style.opacity = '0';
                 
-                // Force reflow une seule fois
                 hiddenCard.offsetHeight;
                 
-                // Animation d'entrée
                 animateCard(hiddenCard, {
                     transition: `all ${ANIMATION_DURATION}ms ${animationConfig.easing}`,
                     transform: animationConfig.transform.normal,
@@ -101,18 +91,15 @@ function initFloatingAnimation() {
                 });
             });
 
-            // Ajouter l'indicateur de manière optimisée
             addSwapIndicator(hiddenCard);
 
         } finally {
-            // Utiliser setTimeout pour la réinitialisation
             setTimeout(() => {
                 isAnimating = false;
             }, ANIMATION_DURATION);
         }
     }
 
-    // Utiliser la délégation d'événements pour réduire les listeners
     document.addEventListener('click', (e) => {
         const card = e.target.closest('.stat-card:not(.hidden-card)');
         if (card && !isAnimating) {
@@ -120,13 +107,11 @@ function initFloatingAnimation() {
         }
     }, { passive: true });
 
-    // Initialisation optimisée
     requestAnimationFrame(() => {
         initializeCards();
     });
 }
 
-// Styles optimisés
 const style = document.createElement('style');
 style.textContent = `
     .stat-card {

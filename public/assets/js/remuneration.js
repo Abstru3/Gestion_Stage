@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remunerationSelect) {
         toggleAutreMontant();
         
-        // Si la valeur actuelle n'est pas dans les options prédéfinies, sélectionner "autre"
         const currentValue = remunerationSelect.value;
         const predefinedValues = ["417", "500", "600", "700", "800", "900", "1000"];
         
@@ -30,14 +29,12 @@ function toggleAutreMontant() {
         container.style.display = 'block';
         input.required = true;
         input.focus();
-        // Mettre à jour la valeur cachée avec la valeur actuelle de l'input
         if (hiddenInput) {
             hiddenInput.value = input.value;
         }
     } else {
         container.style.display = 'none';
         input.required = false;
-        // Mettre à jour la valeur cachée avec la valeur sélectionnée
         if (hiddenInput) {
             hiddenInput.value = select.value;
         }
@@ -69,7 +66,7 @@ function updateRemuneration(value) {
 }
 
 function showWarning(message) {
-    removeWarning(); // Supprimer l'ancien avertissement s'il existe
+    removeWarning();
     
     const input = document.getElementById('remuneration_autre');
     if (!input) return;

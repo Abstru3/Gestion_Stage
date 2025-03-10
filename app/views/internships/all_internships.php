@@ -6,7 +6,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
 try {
-    // Récupérer les paramètres de filtrage
     $search = $_GET['search'] ?? '';
     $mode_stage = $_GET['mode_stage'] ?? '';
     $sort = $_GET['sort'] ?? 'date_debut';
@@ -16,7 +15,6 @@ try {
     $domaine = $_GET['domaine'] ?? '';
     $duree_min = $_GET['duree_min'] ?? '';
 
-    // Validation et construction de la requête
     $where_conditions = [];
     $params = [];
 
@@ -219,6 +217,8 @@ try {
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
+        <p><a class="index-button" href="/Gestion_Stage/index.php">Retour au menu</a></p>
     </main>
 
     <script>
@@ -228,20 +228,17 @@ try {
         const filterTags = document.getElementById('filterTags');
         const searchForm = document.querySelector('.search-form');
         
-        // Fonction pour soumettre le formulaire
         function submitSearch() {
             searchForm.submit();
         }
 
-        // Gestionnaire pour la barre de recherche
         const searchInput = document.getElementById('search');
         let searchTimeout;
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(submitSearch, 500); // Délai de 500ms
+            searchTimeout = setTimeout(submitSearch, 500);
         });
 
-        // Gestionnaire pour la touche Entrée
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -285,7 +282,6 @@ try {
 
             filterTags.innerHTML = activeFilters.join('');
             
-            // Ajouter les gestionnaires d'événements pour les boutons de suppression
             filterTags.querySelectorAll('.fa-times').forEach(icon => {
                 icon.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -296,20 +292,18 @@ try {
                         if (input.tagName === 'SELECT') {
                             input.selectedIndex = 0;
                         }
-                        submitSearch(); // Soumettre automatiquement après suppression d'un filtre
+                        submitSearch();
                     }
                 });
             });
         }
 
-        // Gestionnaire pour tous les changements de filtres
         filtersPanel.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT' || e.target.type === 'date' || e.target.type === 'number') {
                 submitSearch();
             }
         });
 
-        // Gestionnaire pour le bouton de réinitialisation
         document.querySelector('.btn-reset').addEventListener('click', (e) => {
             e.preventDefault();
             searchForm.reset();
@@ -317,7 +311,6 @@ try {
             submitSearch();
         });
 
-        // Animation des cartes
         const offers = document.querySelectorAll('.offer-card');
         offers.forEach((offer, index) => {
             setTimeout(() => {
@@ -325,7 +318,6 @@ try {
             }, index * 100);
         });
 
-        // Initialiser les tags
         updateFilterTags();
     });
     </script>

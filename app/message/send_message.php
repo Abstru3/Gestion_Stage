@@ -20,7 +20,6 @@ $role = $_SESSION['role'];
 $destinataire_id = isset($_POST['destinataire_id']) ? intval($_POST['destinataire_id']) : null;
 $contenu = isset($_POST['contenu']) ? trim($_POST['contenu']) : '';
 
-// Validation des données
 if (!$destinataire_id || !$contenu) {
     http_response_code(400);
     echo json_encode(['error' => 'Données manquantes']);
@@ -28,7 +27,6 @@ if (!$destinataire_id || !$contenu) {
 }
 
 try {
-    // Définir les préfixes en fonction du rôle
     if ($role === 'etudiant') {
         $expediteur_prefix = 'E';
         $destinataire_prefix = 'C';
@@ -37,11 +35,9 @@ try {
         $destinataire_prefix = 'E';
     }
 
-    // Ajouter les préfixes aux IDs
     $prefixed_expediteur = $expediteur_prefix . $user_id;
     $prefixed_destinataire = $destinataire_prefix . $destinataire_id;
 
-    // Vérifier si une conversation existe déjà
     $check_query = "SELECT MIN(conversation_id) as conv_id 
                    FROM messages 
                    WHERE (expediteur_id = :exp_id AND destinataire_id = :dest_id)
@@ -56,14 +52,12 @@ try {
     
     $conversation_id = $result['conv_id'];
     if (!$conversation_id) {
-        // Nouvelle conversation
         $max_conv_query = "SELECT COALESCE(MAX(conversation_id), 0) + 1 as next_id FROM messages";
         $max_conv_stmt = $pdo->prepare($max_conv_query);
         $max_conv_stmt->execute();
         $conversation_id = $max_conv_stmt->fetch()['next_id'];
     }
 
-    // Insérer le message avec les IDs préfixés
     $query = "INSERT INTO messages (expediteur_id, destinataire_id, contenu, date_envoi, statut, conversation_id) 
               VALUES (:expediteur_id, :destinataire_id, :contenu, NOW(), 'non_lu', :conversation_id)";
 
