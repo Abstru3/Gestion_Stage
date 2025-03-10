@@ -153,10 +153,6 @@ if (!$entreprise) {
                         <?php endif; ?>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">TVA Intracommunautaire</div>
-                        <div><?= htmlspecialchars($entreprise['tva_intracommunautaire'] ?? 'Non renseigné') ?></div>
-                    </div>
-                    <div class="info-item">
                         <div class="info-label">
                             <i class="fas fa-user-check"></i> Stages acceptés
                         </div>

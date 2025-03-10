@@ -233,11 +233,11 @@ if ($_SESSION['role'] == 'etudiant') {
         <li><a href="/Gestion_Stage/app/views/profile.php">👤 Mon profil</a></li>
         <?php if ($_SESSION['role'] == 'etudiant'): ?>
             <li><a href="/Gestion_Stage/app/views/panels/student_panel.php">🔍 Offres de stages</a></li>
-            <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>
+            <!-- <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li> -->
         <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
             <li><a href="/Gestion_Stage/app/views/internships/post_internship.php">➕ Publier une offre</a></li>
             <li><a href="/Gestion_Stage/app/views/panels/company_panel.php">📋 Gérer candidatures</a></li>
-            <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li>
+            <!-- <li><a href="/Gestion_Stage/app/message/inbox.php">📩 Mes Messages</a></li> -->
         <?php elseif ($_SESSION['role'] == 'admin'): ?>
             <li><a href="/Gestion_Stage/app/views/panels/admin_panel.php">🛠️ Panel Admin</a></li>
         <?php endif; ?>

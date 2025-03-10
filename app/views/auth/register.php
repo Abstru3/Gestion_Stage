@@ -124,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $nom_contact = trim(htmlspecialchars($_POST['nom_contact'] ?? ''));
                 $telephone = trim(htmlspecialchars($_POST['telephone'] ?? ''));
                 $site_web = filter_input(INPUT_POST, 'site_web', FILTER_SANITIZE_URL);
-                $tva_intracommunautaire = trim(htmlspecialchars($_POST['tva_intracommunautaire'] ?? ''));
                 $siret = trim(htmlspecialchars($_POST['siret'] ?? ''));
 
                 // Validations supplémentaires
@@ -145,13 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
 
                 $stmt = $pdo->prepare("INSERT INTO entreprises (username, email, password, nom, description, 
-                                     adresse_facturation, nom_contact, telephone, site_web, 
-                                     tva_intracommunautaire, siret) 
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                     adresse_facturation, nom_contact, telephone, site_web, siret) 
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $username, $email, $hashed_password, $nom_entreprise, $description,
-                    $adresse_facturation, $nom_contact, $telephone, $site_web,
-                    $tva_intracommunautaire, $siret
+                    $adresse_facturation, $nom_contact, $telephone, $site_web, $siret
                 ]);
 
                 $pdo->commit();
@@ -327,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                    maxlength="255">
                         </div>
 
-                                                <div class="form-group">
+                        <div class="form-group">
                             <label for="siret">SIRET :*</label>
                             <input type="text" id="siret" name="siret" required 
                                    value="${previousValues.siret}" 
@@ -357,14 +354,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                    value="${previousValues.site_web}" 
                                    placeholder="www.votre-site.com" 
                                    maxlength="255">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="tva_intracommunautaire">Numéro de TVA intracommunautaire :</label>
-                            <input type="text" id="tva_intracommunautaire" name="tva_intracommunautaire" 
-                                   value="${previousValues.tva_intracommunautaire}" 
-                                   placeholder="Numéro de TVA" 
-                                   maxlength="20">
                         </div>
                     </div>
                 `;
