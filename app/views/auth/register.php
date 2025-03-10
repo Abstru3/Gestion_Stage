@@ -6,13 +6,11 @@ session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-// Redirection si déjà connecté
 if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
     exit();
 }
 
-// Définition des constantes pour les messages
 define('ERROR_REQUIRED_FIELDS', "Tous les champs obligatoires doivent être remplis.");
 define('ERROR_INVALID_EMAIL', "Adresse email invalide.");
 define('ERROR_EMAIL_EXISTS', "Cet email est déjà utilisé.");
@@ -33,17 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $honeypot = $_POST['honeypot'] ?? '';
     $errors = [];
 
-    // Vérification du champ honeypot (anti-robots)
     if (!empty($honeypot)) {
         die("Inscription bloquée.");
     }
 
-    // Vérification des champs obligatoires
     if (empty($username) || empty($password) || empty($email) || empty($role)) {
         $errors[] = ERROR_REQUIRED_FIELDS;
     }
 
-    // Vérification des longueurs maximales
     $maxLengths = [
         'username' => 100,
         'email' => 255,
@@ -63,12 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Vérification de l'email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = ERROR_INVALID_EMAIL;
     }
 
-    // Vérification de l'unicité de l'email et du username
     $stmt_email = $pdo->prepare("SELECT 'etudiant' as type FROM etudiants WHERE email = ? 
                                 UNION SELECT 'entreprise' as type FROM entreprises WHERE email = ?");
     $stmt_email->execute([$email, $email]);
@@ -84,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = ERROR_USERNAME_EXISTS;
     }
 
-    // Vérification du mot de passe
     if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
         $errors[] = ERROR_PASSWORD_REQUIREMENTS;
     }
@@ -93,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = ERROR_PASSWORD_MISMATCH;
     }
 
-    // Si aucune erreur, on enregistre dans la base
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -126,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $site_web = filter_input(INPUT_POST, 'site_web', FILTER_SANITIZE_URL);
                 $siret = trim(htmlspecialchars($_POST['siret'] ?? ''));
 
-                // Validations supplémentaires
                 if (empty($nom_entreprise) || empty($description) || empty($adresse_facturation) || empty($siret)) {
                     throw new Exception(ERROR_REQUIRED_FIELDS);
                 }
@@ -214,7 +204,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const role = document.getElementById("role").value;
             const formContent = document.getElementById("dynamic-form-content");
 
-            // Récupération des valeurs précédentes
             const previousValues = {
                 email: <?= json_encode(htmlspecialchars($_POST['email'] ?? '')) ?>,
                 username: <?= json_encode(htmlspecialchars($_POST['username'] ?? '')) ?>,
@@ -229,7 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 siret: <?= json_encode(htmlspecialchars($_POST['siret'] ?? '')) ?>
             };
 
-            // Champs communs
             const commonFields = `
                 <div class="form-section">
                     <h2>Informations de connexion</h2>
@@ -362,7 +350,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             formContent.innerHTML = commonFields + specificFields;
         }
 
-        // Initial call to update the form based on the role selected
         updateForm();
 
         function togglePassword(inputId) {

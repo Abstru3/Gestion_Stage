@@ -31,7 +31,6 @@ body {
     padding: 1rem 0;
 }
 
-/* Ajustement de la navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -47,7 +46,6 @@ body {
     align-items: center;
 }
 
-/* Repositionnement du bouton mobile */
 .mobile-menu-btn {
     display: none;
     font-size: 1.5rem;
@@ -493,7 +491,6 @@ form {
     }
 }
 
-/* Animation pour le menu burger */
 .mobile-menu-btn.active .fas {
     transform: rotate(90deg);
     transition: transform 0.3s ease;
@@ -518,7 +515,6 @@ form {
     color: var(--primary-color);
 }
 
-/* Ajustement pour les petits écrans */
 @media (max-width: 480px) {
     .mode-badge {
         font-size: 0.75rem;
@@ -729,7 +725,6 @@ form {
     box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
 }
 
-/* Ajout des media queries pour la responsivité */
 @media (max-width: 1200px) {
     .companies-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -908,11 +903,6 @@ form {
     color: #777;
     font-size: 1rem;
     line-height: 1.7;
-}
-
-/* Media query pour plus petits écrans */
-@media (max-width: 768px) {
-
 }
 
 .how-it-works-trigger {

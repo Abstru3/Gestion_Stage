@@ -225,7 +225,6 @@ $entreprises = $stmt->fetchAll();
                 <?php endif; ?>
             </div>
 
-            <!-- Ajouter le script d'initialisation de DataTables pour le tableau des entreprises -->
             <script>
                 $(document).ready(function() {
                     $('#entreprisesTable').DataTable({

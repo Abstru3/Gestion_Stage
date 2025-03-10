@@ -12,12 +12,10 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 
 $offre_id = $_GET['offre_id'] ?? 0;
 
-// Récupérer les informations de l'offre de stage
 $stmt = $pdo->prepare("SELECT titre, description FROM offres_stages WHERE id = ?");
 $stmt->execute([$offre_id]);
 $offre = $stmt->fetch();
 
-// Récupérer les candidatures pour l'offre spécifiée
 $stmt = $pdo->prepare("SELECT c.id, c.statut, c.cv, c.lettre_motivation, e.nom, e.prenom, e.email 
                       FROM candidatures c 
                       JOIN etudiants e ON c.etudiant_id = e.id 
@@ -25,7 +23,6 @@ $stmt = $pdo->prepare("SELECT c.id, c.statut, c.cv, c.lettre_motivation, e.nom, 
 $stmt->execute([$offre_id]);
 $applications = $stmt->fetchAll();
 
-// Traitement du formulaire de mise à jour
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $candidature_id = $_POST['candidature_id'];
     $action = $_POST['action'];
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $statut = 'refusee';
     }
 
-    // Mettre à jour le statut
     $stmt = $pdo->prepare("UPDATE candidatures SET statut = ? WHERE id = ?");
     $stmt->execute([$statut, $candidature_id]);
 
@@ -97,14 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <span class="<?php echo $statut_class; ?>"><?php echo htmlspecialchars($statut_text); ?></span>
                         </p>
 
-                        <!-- Affichage du CV -->
                         <?php if (!empty($application['cv'])): ?>
                             <p><strong><i class="fas fa-file-alt"></i> CV:</strong> <a class="btn-CV" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['cv']); ?>" target="_blank">Voir le CV</a></p>
                         <?php else: ?>
                             <p><strong><i class="fas fa-file-alt"></i> CV:</strong> CV non fourni</p>
                         <?php endif; ?>
 
-                        <!-- Affichage de la lettre de motivation -->
                         <?php if (!empty($application['lettre_motivation'])): ?>
                             <p><strong><i class="fas fa-file-alt"></i> Lettre de motivation:</strong> <a class="btn-lettre" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['lettre_motivation']); ?>" target="_blank">Voir la lettre</a></p>
                         <?php else: ?>

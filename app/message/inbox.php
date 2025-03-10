@@ -16,18 +16,15 @@ $selected_entreprise_id = isset($_GET['entreprise_id']) ? intval($_GET['entrepri
 $selected_etudiant_id = isset($_GET['etudiant_id']) ? intval($_GET['etudiant_id']) : null;
 $messages = [];
 
-// Modifier la façon dont nous gérons les IDs
 if ($role === 'etudiant') {
-    $user_prefix = 'E';  // E pour Étudiant
-    $contact_prefix = 'C'; // C pour Company/Entreprise
+    $user_prefix = 'E';
+    $contact_prefix = 'C';
 } else {
-    $user_prefix = 'C';  // C pour Company/Entreprise
-    $contact_prefix = 'E'; // E pour Étudiant
+    $user_prefix = 'C';
+    $contact_prefix = 'E';
 }
 
-// Au début du fichier, après les includes, ajoutez :
 if ($role === 'entreprise') {
-    // Récupérer uniquement les étudiants qui ont candidaté aux offres de l'entreprise
     $etudiant_query = "SELECT DISTINCT e.*, 
     CONCAT(e.nom, ' ', e.prenom) as nom_complet,
     MAX(m.date_envoi) as dernier_message,
@@ -54,7 +51,6 @@ GROUP BY e.id";
     $etudiant_stmt->execute([':user_id' => $user_id]);
     $etudiants = $etudiant_stmt->fetchAll();
 } else {
-    // Remplacer la requête pour les étudiants
     $entreprise_query = "SELECT DISTINCT e.*, 
     MAX(m.date_envoi) as dernier_message,
     c.statut as statut_candidature,
@@ -90,10 +86,8 @@ GROUP BY e.id";
     $entreprises = $entreprise_stmt->fetchAll();
 }
 
-// Vérifier si l'entreprise a initié la conversation
 $conversation_id = null;
 if ($role === 'entreprise' && $selected_etudiant_id) {
-    // Récupérer la première conversation pour cet étudiant
     $conversation_check_query = "SELECT m.id 
                                FROM messages m
                                WHERE m.expediteur_id = :user_id 
@@ -104,7 +98,6 @@ if ($role === 'entreprise' && $selected_etudiant_id) {
     $conversation_check = $conversation_check_stmt->fetch();
     $conversation_id = $conversation_check ? $conversation_check['id'] : null;
 } else {
-    // Récupérer les messages existants pour l'étudiant ou l'entreprise
     if ($role === 'etudiant') {
         $query = "SELECT m.*,
                         CASE 
@@ -125,14 +118,12 @@ if ($role === 'entreprise' && $selected_etudiant_id) {
         $stmt->execute([':user_id' => $user_id]);
         $messages = $stmt->fetchAll();
         
-        // Récupérer l'ID de l'entreprise pour le formulaire de réponse
         if (!empty($messages)) {
             $entreprise_id = ($messages[0]['expediteur_id'] != $user_id) ? 
                             $messages[0]['expediteur_id'] : 
                             $messages[0]['destinataire_id'];
         }
     } else {
-        // Pour les entreprises : garder le code existant
         $query = "SELECT m.*, 
                 e.id as entreprise_id, 
                 e.nom as expediteur_nom, 
@@ -150,7 +141,6 @@ if ($role === 'entreprise' && $selected_etudiant_id) {
     }
 }
 
-// Remplacer la section de récupération des messages par :
 $messages = [];
 
 if ($role === 'etudiant' && $selected_entreprise_id) {
@@ -195,7 +185,6 @@ if ($role === 'etudiant' && $selected_entreprise_id) {
 }
 
 if ($role === 'etudiant' && $conversation_id) {
-    // Vérifier si l'entreprise a initié la conversation
     $first_message_check_query = "SELECT * FROM messages WHERE conversation_id = :conversation_id ORDER BY date_envoi ASC LIMIT 1";
     $first_message_check_stmt = $pdo->prepare($first_message_check_query);
     $first_message_check_stmt->execute([':conversation_id' => $conversation_id]);
@@ -205,9 +194,7 @@ if ($role === 'etudiant' && $conversation_id) {
     $can_reply = false;
 }
 
-// Dans le fichier inbox.php, après la récupération des messages
 if ($role === 'etudiant' && $selected_entreprise_id) {
-    // Marquer les messages comme lus
     $update_query = "UPDATE messages 
                     SET statut = 'lu' 
                     WHERE expediteur_id = CONCAT('C', :entreprise_id)
@@ -220,7 +207,6 @@ if ($role === 'etudiant' && $selected_entreprise_id) {
         ':user_id' => $user_id
     ]);
 } elseif ($role === 'entreprise' && $selected_etudiant_id) {
-    // Marquer les messages comme lus
     $update_query = "UPDATE messages 
                     SET statut = 'lu' 
                     WHERE expediteur_id = CONCAT('E', :etudiant_id)
@@ -250,9 +236,8 @@ if ($role === 'etudiant' && $selected_entreprise_id) {
     <h1>Boîte de réception</h1>
     <script>
 $(document).ready(function() {
-    // Au chargement de la page, charger directement la conversation si une ID est présente dans l'URL
     if (window.location.search) {
-        loadMessages(true); // true indique que c'est le chargement initial
+        loadMessages(true);
     }
 
     function scrollToBottom() {
@@ -282,10 +267,8 @@ $(document).ready(function() {
                     scrollToBottom();
                     initializeMessageForm();
                     
-                    // Si c'est le chargement initial, marquer comme active
                     if (isInitialLoad) {
                         updateActiveConversation();
-                        // Supprimer la notification si elle existe
                         if (entrepriseId) {
                             $(`.conversation-item a[href*="entreprise_id=${entrepriseId}"]`).find('.notification-badge').remove();
                         } else if (etudiantId) {
@@ -303,22 +286,18 @@ $(document).ready(function() {
         const form = $('#messageForm');
         if (!form.length) return;
 
-        // Gérer l'événement keydown sur le textarea
         form.find('textarea[name="contenu"]').on('keydown', function(e) {
-            // Si c'est la touche Entrée
             if (e.key === 'Enter') {
-                // Si Shift n'est pas pressé, envoyer le message
                 if (!e.shiftKey) {
-                    e.preventDefault(); // Empêcher le saut de ligne
+                    e.preventDefault();
                     const contenu = $(this).val().trim();
-                    if (contenu) { // Vérifier que le message n'est pas vide
+                    if (contenu) {
                         form.submit();
                     }
                 }
             }
         });
 
-        // Le reste du code existant pour le form.on('submit')...
         form.off('submit').on('submit', function(e) {
             e.preventDefault();
             const form = $(this);
@@ -348,7 +327,7 @@ $(document).ready(function() {
                     if (response.success) {
                         form[0].reset();
                         loadMessages();
-                        setTimeout(scrollToBottom, 100); // Ajouter un petit délai
+                        setTimeout(scrollToBottom, 100);
                     } else {
                         alert('Erreur lors de l\'envoi du message: ' + (response.message || ''));
                     }
@@ -360,7 +339,6 @@ $(document).ready(function() {
         });
     }
 
-    // Gérer le clic sur une conversation
     $(document).on('click', '.conversation-item a', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
@@ -373,9 +351,7 @@ $(document).ready(function() {
         loadMessages(true);
         updateActiveConversation();
         
-        // Si c'est un étudiant qui clique sur une conversation d'entreprise
         if ('<?php echo $role; ?>' === 'etudiant' && entrepriseId) {
-            // Assurez-vous que le cadre existe dans le DOM
             if ($('.company-info-frame').length === 0) {
                 $('body').append('<div class="company-info-frame" style="display: none;"></div>');
             }
@@ -385,10 +361,8 @@ $(document).ready(function() {
                 method: 'GET',
                 data: { entreprise_id: entrepriseId },
                 success: function(response) {
-                    console.log('Réponse reçue:', response); // Debug
                     const companyInfoFrame = $('.company-info-frame');
                     companyInfoFrame.html(response);
-                    // Forcer les styles directement
                     companyInfoFrame.attr('style', `
                         display: block !important;
                         position: fixed;
@@ -412,16 +386,13 @@ $(document).ready(function() {
         }
     });
 
-    // Fonction pour mettre à jour la classe active
     function updateActiveConversation() {
         const currentUrl = new URL(window.location.href);
         const etudiantId = currentUrl.searchParams.get('etudiant_id');
         const entrepriseId = currentUrl.searchParams.get('entreprise_id');
 
-        // Supprimer la classe active de toutes les conversations
         $('.conversation-item').removeClass('active');
 
-        // Ajouter la classe active à la conversation sélectionnée
         if (etudiantId) {
             $(`.conversation-item a[href*="etudiant_id=${etudiantId}"]`).parent().addClass('active');
         } else if (entrepriseId) {
@@ -429,7 +400,6 @@ $(document).ready(function() {
         }
     }
 
-    // Mettre à jour lors du clic sur une conversation
     $(document).on('click', '.conversation-item a', function(e) {
         e.preventDefault();
         const href = $(this).attr('href');
@@ -438,10 +408,8 @@ $(document).ready(function() {
         loadMessages();
     });
 
-    // Mettre à jour au chargement de la page
     updateActiveConversation();
     
-    // Activer le défilement horizontal tactile
     const conversationList = document.querySelector('.conversation-list');
     let isScrolling = false;
     let startX;
@@ -470,7 +438,6 @@ $(document).ready(function() {
 </head>
 <body>
     <div class="container inbox-container">
-        <!-- Liste des conversations pour les entreprises -->
         <div class="conversation-list">
     <?php if ($role === 'entreprise'): ?>
         <h3>Conversations avec les candidats</h3>
@@ -652,7 +619,6 @@ $(document).ready(function() {
     <?php endif; ?>
 </div>
 
-<!-- Modifier la section reply-section -->
 <div class="reply-section" style="display: none;">
     <form id="messageForm" class="reply-box">
         <?php if ($role === 'etudiant'): ?>

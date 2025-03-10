@@ -226,7 +226,7 @@ th {
         margin: 10px;
     }
 }
-/* Ajouter un style pour le logo */
+
 .logo-entreprise {
     max-width: 200px;
     max-height: 100px;
@@ -253,7 +253,6 @@ th {
     border-radius: 5px;
 }
 
-/* Grille du tableau de bord */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -354,7 +353,7 @@ th {
 }
 
 .notification-badge.pending {
-    background-color: #ffc107;  /* Couleur jaune pour "en attente" */
+    background-color: #ffc107;
     color: #ffffff;
 }
 
@@ -537,11 +536,10 @@ button.btn-primary:hover {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    display: inline-flex; /* Affiche le menu normalement */
+    display: inline-flex;
     flex-direction: row;
     flex-direction: column;
     gap: 1rem;
-     /* Cache les éléments du menu par défaut sur les petits écrans */
 }
 
 .menu li {
@@ -577,14 +575,14 @@ button.btn-primary:hover {
 
 @media screen and (max-width: 780px) {
     .burger-menu {
-        display: block; /* Affiche le burger */
+        display: block;
     }
     .menu {
-        display: none; /* Cache le menu par défaut */
+        display: none;
     }
 
     .menu.open {
-        display: block; /* Afficher le menu quand l'onglet est ouvert */
+        display: block;
     }
 
     .menu-toggle {
@@ -594,13 +592,13 @@ button.btn-primary:hover {
 
 @media screen and (min-width: 781px) {
     .menu-toggle {
-        display: none; /* Cache aussi l'icône du burger */
+        display: none;
     }
     .burger-menu {
-        display: none; /* Cache le burger */
+        display: none;
     }
     .menu {
-        display: inline-flex; /* Affiche le menu normalement */
+        display: inline-flex;
         flex-direction: row;
     }
 }

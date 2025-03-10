@@ -13,7 +13,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 $etudiant_id = $_SESSION['user_id'];
 $offre_id = $_POST['offre_id'];
 
-// Vérifier si l'étudiant existe
 $stmt = $pdo->prepare("SELECT id FROM etudiants WHERE id = ?");
 $stmt->execute([$etudiant_id]);
 $etudiant = $stmt->fetch();
@@ -22,7 +21,6 @@ if (!$etudiant) {
     exit();
 }
 
-// Vérifier si l'étudiant a déjà postulé
 $stmt = $pdo->prepare("SELECT * FROM candidatures WHERE etudiant_id = ? AND offre_id = ?");
 $stmt->execute([$etudiant_id, $offre_id]);
 if ($stmt->rowCount() > 0) {
@@ -31,7 +29,6 @@ if ($stmt->rowCount() > 0) {
     exit();
 }
 
-// Gestion des fichiers
 $upload_dir = $_SERVER['DOCUMENT_ROOT'] . "/Gestion_Stage/public/uploads/candidatures/";
 if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0777, true);
@@ -48,7 +45,7 @@ function upload_file($file, $upload_dir, $allowed_types) {
     if ($file && $file['error'] === UPLOAD_ERR_OK) {
         $file_ext = pathinfo($file['name'], PATHINFO_EXTENSION);
         if (!array_key_exists($file_ext, $allowed_types) || mime_content_type($file['tmp_name']) !== $allowed_types[$file_ext]) {
-            return null;  // Type non autorisé
+            return null;
         }
         $file_name = uniqid() . '.' . $file_ext;
         if (move_uploaded_file($file['tmp_name'], $upload_dir . $file_name)) {
@@ -67,7 +64,6 @@ if (!$cv_name || !$motivation_name) {
     exit();
 }
 
-// Enregistrer la candidature
 $stmt = $pdo->prepare("INSERT INTO candidatures (etudiant_id, offre_id, statut, cv, lettre_motivation) VALUES (?, ?, 'en_attente', ?, ?)");
 if ($stmt->execute([$etudiant_id, $offre_id, $cv_name, $motivation_name])) {
     $_SESSION['success'] = "Votre candidature a été envoyée avec succès.";

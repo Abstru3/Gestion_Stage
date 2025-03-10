@@ -16,7 +16,6 @@ $role = $_SESSION['role'];
 $selected_etudiant_id = isset($_GET['etudiant_id']) ? intval($_GET['etudiant_id']) : null;
 $selected_entreprise_id = isset($_GET['entreprise_id']) ? intval($_GET['entreprise_id']) : null;
 
-// Define prefixes based on role
 $exp_prefix = $role === 'etudiant' ? 'E' : 'C';
 $dest_prefix = $role === 'etudiant' ? 'C' : 'E';
 $prefixed_user_id = $exp_prefix . $user_id;
@@ -26,7 +25,6 @@ try {
         throw new Exception("Database connection not established.");
     }
 
-    // Query to get messages based on role
     if ($role === 'etudiant') {
         if (!$selected_entreprise_id) {
             echo "<p class='empty-message'><i class='fas fa-comments'></i> Select a conversation to show messages</p>";
@@ -49,7 +47,7 @@ try {
             ':entreprise_id' => $selected_entreprise_id
         ];
 
-    } else { // entreprise
+    } else {
         if (!$selected_etudiant_id) {
             echo "<p class='empty-message'><i class='fas fa-comments'></i> Select a student to show messages</p>";
             exit;
@@ -116,7 +114,6 @@ try {
         echo '</ul></div>';
     }
 
-    // Update message status to 'lu'
     if ($role === 'etudiant') {
         $update_query = "UPDATE messages 
                          SET statut = 'lu' 
@@ -144,7 +141,6 @@ try {
 ?>
 
 <script>
-// Dans le script existant, modifiez la fonction loadMessages
 function loadMessages() {
     const entrepriseId = new URLSearchParams(window.location.search).get('entreprise_id');
     const etudiantId = new URLSearchParams(window.location.search).get('etudiant_id');
@@ -161,7 +157,6 @@ function loadMessages() {
             $('#messageContent').html(response);
             scrollToBottom();
             
-            // Afficher la section de réponse uniquement pour les conversations actives
             if ((etudiantId && '<?php echo $role; ?>' === 'entreprise') || 
                 (entrepriseId && '<?php echo $role; ?>' === 'etudiant')) {
                 $('.reply-section').show();

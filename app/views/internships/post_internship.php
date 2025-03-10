@@ -7,13 +7,11 @@ ob_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-// Vérification de l'authentification
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     header('Location: /Gestion_Stage/app/views/auth/login.php');
     exit();
 }
 
-// Récupération des informations de l'entreprise
 $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $entreprise = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -22,16 +20,13 @@ $currentStep = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 $error = '';
 $success = '';
 
-// Initialiser le tableau de formulaire si nécessaire
 if (!isset($_SESSION['form_data'])) {
     $_SESSION['form_data'] = [];
 }
 
-// Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['form_data'] = array_merge($_SESSION['form_data'], $_POST);
 
-    // Gestion de l'upload du logo si présent
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/logos/';
         if (!file_exists($uploadDir)) {
@@ -41,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fileInfo = pathinfo($_FILES['logo']['name']);
         $extension = strtolower($fileInfo['extension']);
         
-        // Vérifier le type de fichier
         if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
             $newFileName = uniqid() . '.' . $extension;
             $uploadFile = $uploadDir . $newFileName;
@@ -68,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['final_submit'])) {
         try {
-            // Vérification des champs obligatoires
             $_fields = ['titre', 'description', 'email_contact', 'date_debut', 'domaine', 'remuneration', 'ville', 'code_postal', 'region', 'departement'];
 
             foreach ($_fields as $field) {
@@ -77,12 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Gestion de la rémunération
             $remuneration = $_SESSION['form_data']['remuneration'] === 'autre' 
                 ? ($_SESSION['form_data']['remuneration_autre'] ?? null) 
                 : $_SESSION['form_data']['remuneration'];
 
-            // Préparer les données pour l'insertion
             $data = [
                 'entreprise_id' => $_SESSION['user_id'],
                 'titre' => $_SESSION['form_data']['titre'],
@@ -103,18 +94,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'lieu' => $_SESSION['form_data']['lieu'] ?? null
             ];
 
-            // Construire la requête SQL dynamiquement avec les champs disponibles
             $fields = array_keys($data);
             $placeholders = array_map(function($field) { return ":$field"; }, $fields);
             
             $sql = "INSERT INTO offres_stages (" . implode(", ", $fields) . ") 
                     VALUES (" . implode(", ", $placeholders) . ")";
 
-            // Prépare et exécute la requête SQL
             $stmt = $pdo->prepare($sql);
             $stmt->execute($data);
 
-            // Nettoyage et redirection
             unset($_SESSION['form_data']);
             $_SESSION['success_message'] = "Offre de stage publiée avec succès!";
             header("Location: /Gestion_Stage/app/views/panels/company_panel.php");
@@ -284,7 +272,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    oninput="updateRemuneration(this.value)">
                             <small>Minimum légal : 417€</small>
                         </div>
-                        <!-- Champ caché pour stocker la valeur finale de la rémunération -->
                         <input type="hidden" id="remuneration_hidden" name="remuneration" 
                                value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
                     </div>
@@ -300,7 +287,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <input type="hidden" name="lieu" value="">
                     <input type="hidden" name="lien_candidature" value="">
-                    <!-- Ajouter les champs cachés de l'étape 1 -->
                     <input type="hidden" name="email_contact" value="<?= htmlspecialchars(getFormValue('email_contact')) ?>">
 
                     <div class="form-navigation">
@@ -358,7 +344,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                pattern="[0-9]{5}" placeholder="Ex: 58000">
                     </div>
 
-                    <!-- Ajouter les champs cachés des étapes précédentes -->
                     <input type="hidden" name="email_contact" value="<?= htmlspecialchars(getFormValue('email_contact')) ?>">
                     <input type="hidden" name="titre" value="<?= htmlspecialchars(getFormValue('titre')) ?>">
                     <input type="hidden" name="description" value="<?= htmlspecialchars(getFormValue('description')) ?>">

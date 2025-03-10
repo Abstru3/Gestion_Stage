@@ -1,13 +1,10 @@
 <?php
-// Connexion à la base de données
-require_once 'db_connection.php'; // Adapte selon ton projet
+require_once 'db_connection.php';
 
-// Récupérer tous les utilisateurs et leurs rôles
 $sql = "SELECT users.id, users.username, users.email, users.role_id, roles.name AS role_name FROM users JOIN roles ON users.role_id = roles.id";
 $stmt = $pdo->query($sql);
 $users = $stmt->fetchAll();
 
-// Récupérer tous les rôles
 $sql_roles = "SELECT * FROM roles";
 $stmt_roles = $pdo->query($sql_roles);
 $roles = $stmt_roles->fetchAll();

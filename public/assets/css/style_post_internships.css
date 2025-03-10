@@ -1,14 +1,14 @@
 :root {
-    --primary-color: #2563EB; /* Bleu plus moderne */
-    --secondary-color: #4A5568; /* Gris bleuté */
-    --success-color: #48BB78; /* Vert vif */
+    --primary-color: #2563EB;
+    --secondary-color: #4A5568;
+    --success-color: #48BB78;
     --error-color: #E53E3E;
-    --border-color: #CBD5E0; /* Gris très clair */
-    --text-color: #2D3748; /* Gris foncé */
-    --bg-light: #F7FAFC; /* Blanc cassé */
-    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Ombre légère */
+    --border-color: #CBD5E0;
+    --text-color: #2D3748;
+    --bg-light: #F7FAFC;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     --transition-duration: 0.3s;
-    --font-family: 'Nunito', sans-serif; /* Police moderne */
+    --font-family: 'Nunito', sans-serif;
 }
 
 body {
@@ -88,7 +88,6 @@ label {
     color: var(--text-color);
 }
 
-/* Ajoutez ces styles pour les champs obligatoires */
 label[for*="*"]::after,
 label:has(+ input[required])::after,
 label:has(+ select[required])::after,
@@ -231,7 +230,6 @@ button:hover {
     font-size: 1rem;
 }
 
-/* Ajouter ces styles */
 .hidden {
     display: none;
 }

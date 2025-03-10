@@ -155,7 +155,6 @@ button:hover {
     transition: background-color 0.2s ease;
 }
 
-/* Ajouter après les styles existants */
 .password-input-container {
     position: relative;
     width: 100%;
@@ -185,7 +184,7 @@ button:hover {
 
 .password-input-container input {
     width: 85%;
-    padding-right: 40px; /* Espace pour l'icône */
+    padding-right: 40px;
 }
 
 .password-input-container input:focus {

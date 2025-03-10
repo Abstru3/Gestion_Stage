@@ -51,7 +51,7 @@
 .offer-header {
     position: relative;
     padding: 1.5rem;
-    padding-top: 40px; /* Espace pour le badge */
+    padding-top: 40px;
     background: var(--primary-color);
     color: white;
 }
@@ -119,7 +119,7 @@
 
 @media (max-width: 768px) {
     .offers-grid {
-        grid-template-columns: 1fr; /* Une seule colonne */
+        grid-template-columns: 1fr;
         gap: 1.5rem;
         padding: 1rem;
     }
@@ -139,7 +139,7 @@
 
     .offer-details {
         display: flex;
-        flex-direction: column; /* Empiler les informations */
+        flex-direction: column;
         gap: 0.8rem;
         margin-top: 1rem;
     }
@@ -152,7 +152,7 @@
     }
 
     .offer-details i {
-        width: 20px; /* Largeur fixe pour aligner les icônes */
+        width: 20px;
         text-align: center;
     }
 

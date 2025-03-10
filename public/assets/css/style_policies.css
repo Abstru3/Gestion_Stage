@@ -1,12 +1,12 @@
 /* Variables globales */
 :root {
-    --policy-primary: #2d3e50; /* Dark blue-gray */
-    --policy-secondary: #3498db; /* Light blue */
-    --policy-text: #333; /* Dark gray */
-    --policy-bg: #f5f6fa; /* Very light gray */
-    --policy-border: #ddd; /* Light gray border */
-    --policy-shadow: rgba(0,0,0,0.1); /* Subtle shadow */
-    --policy-radius: 8px; /* Slightly rounded corners */
+    --policy-primary: #2d3e50;
+    --policy-secondary: #3498db;
+    --policy-text: #333;
+    --policy-bg: #f5f6fa;
+    --policy-border: #ddd;
+    --policy-shadow: rgba(0,0,0,0.1);
+    --policy-radius: 8px;
     --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -89,7 +89,7 @@ body {
 }
 
 .policy-list li::before {
-    content: '\2022'; /* Use a bullet point */
+    content: '\2022';
     color: var(--policy-secondary);
     display: inline-block;
     width: 1em;
