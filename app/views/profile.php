@@ -135,61 +135,110 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['theme_color'])) {
             </div>
         <?php endif; ?>
 
-        <form action="" method="post" enctype="multipart/form-data">
-            <label for="username">Nom d'utilisateur:</label>
-            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+        <div class="container">
+            <form action="" method="post" enctype="multipart/form-data">
+                <!-- Section Identifiants -->
+                <div class="profile-section">
+                    <label>Identifiants</label>
+                    <div class="section-content">
+                        <div class="input-group">
+                            <label for="username">Nom d'utilisateur</label>
+                            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="new_password">Nouveau mot de passe (facultatif)</label>
+                            <input type="password" id="new_password" name="new_password">
+                            <p class="help-text">Laissez vide pour conserver le mot de passe actuel</p>
+                        </div>
+                    </div>
+                </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                <!-- Section Photo -->
+                <div class="profile-section">
+                    <label>Photo de profil</label>
+                    <div class="section-content">
+                        <div class="photo-preview">
+                            <?php if (!empty($user['icone'])): ?>
+                                <img src="/Gestion_Stage/public/uploads/profil/<?php echo htmlspecialchars($user['icone']); ?>" alt="Photo de profil">
+                            <?php else: ?>
+                                <i class="fas <?php echo $_SESSION['role'] == 'etudiant' ? 'fa-user-graduate' : 'fa-building'; ?>"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="upload-controls">
+                            <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                            <p class="help-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</p>
+                        </div>
+                    </div>
+                </div>
 
-            <label for="new_password">Nouveau mot de passe (laisser vide pour ne pas changer):</label>
-            <input type="password" id="new_password" name="new_password">
+                <?php if ($_SESSION['role'] == 'etudiant'): ?>
+                    <!-- Section Informations Étudiant -->
+                    <div class="profile-section">
+                        <label>Informations personnelles</label>
+                        <div class="section-content">
+                            <div class="input-group">
+                                <label for="nom">Nom</label>
+                                <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($user['nom']); ?>" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="prenom">Prénom</label>
+                                <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom']); ?>" required>
+                            </div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Section Informations Entreprise -->
+                    <div class="profile-section">
+                        <label>Informations de l'entreprise</label>
+                        <div class="section-content">
+                            <div class="input-group">
+                                <label for="nom_entreprise">Nom de l'entreprise</label>
+                                <input type="text" id="nom_entreprise" name="nom_entreprise" value="<?php echo htmlspecialchars($user['nom']); ?>" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="description_entreprise">Description</label>
+                                <textarea id="description_entreprise" name="description_entreprise" rows="4" required><?php echo htmlspecialchars($user['description']); ?></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label for="siret">SIRET</label>
+                                <input type="text" id="siret" name="siret" value="<?php echo htmlspecialchars($user['siret']); ?>" required>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
-            <div class="photo-upload">
-                <label for="profile_photo">Photo de profil:</label>
-                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
-                <p class="help-text">Formats acceptés: JPG, PNG, GIF. Taille maximale: 2MB</p>
-            </div>
-
-            <?php if ($_SESSION['role'] == 'etudiant'): ?>
-                <label for="nom">Nom:</label>
-                <input type="text" id="nom" name="nom" value="<?php echo htmlspecialchars($user['nom']); ?>" required>
-
-                <label for="prenom">Prénom:</label>
-                <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom']); ?>" required>
-            <?php elseif ($_SESSION['role'] == 'entreprise'): ?>
-                <label for="nom_entreprise">Nom de l'entreprise:</label>
-                <input type="text" id="nom_entreprise" name="nom_entreprise" value="<?php echo htmlspecialchars($user['nom']); ?>" required>
-                
-                <label for="description_entreprise">Description de l'entreprise:</label>
-                <textarea id="description_entreprise" name="description_entreprise" rows="4" required><?php echo htmlspecialchars($user['description']); ?></textarea>
-                
-                <label for="siret">SIRET:</label>
-                <input type="text" id="siret" name="siret" value="<?php echo htmlspecialchars($user['siret']); ?>" required>
-            <?php endif; ?>
-
-            <button type="submit">Mettre à jour le profil</button>
-
-            <?php if ($_SESSION['role'] == 'entreprise' && $isCertified): ?>
+                <?php if ($_SESSION['role'] == 'entreprise' && $isCertified): ?>
                 <div class="theme-color-section">
-                <br><label for="profile_photo">Couleur du profil</label>
-                    <form action="" method="post" class="color-picker-form">
-                        <div class="color-picker-container">
-                            <label for="theme_color">Sélectionnez une couleur :</label>
+                    <label>Couleur du profil</label>
+                    <div class="color-picker-wrapper">
+                        <div class="color-preview-box" onclick="document.getElementById('theme_color').click()">
+                            <div class="color-display" style="background-color: <?php echo htmlspecialchars($currentThemeColor ?? '#3498db'); ?>"></div>
+                            <div class="color-info">
+                                <span class="color-name">Couleur actuelle</span>
+                                <span class="color-value"><?php echo htmlspecialchars($currentThemeColor ?? '#3498db'); ?></span>
+                            </div>
+                        </div>
+                        <form method="post" class="color-picker-form">
                             <input type="color" 
                                 id="theme_color" 
                                 name="theme_color" 
                                 value="<?php echo htmlspecialchars($currentThemeColor ?? '#3498db'); ?>"
                                 class="color-picker-input">
-                        </div>
-                        <button type="submit" class="color-submit-btn">Appliquer la couleur</button>
-                    </form>
-                    <?php if (isset($currentThemeColor)): ?>
-                        <p class="current-color">Couleur actuelle : <span><?php echo htmlspecialchars($currentThemeColor); ?></span></p>
-                    <?php endif; ?>
+                            <button type="submit" class="color-submit-btn">
+                                <i class="fas fa-check"></i> Appliquer
+                            </button>
+                        </form>
+                    </div>
                 </div>
             <?php endif; ?>
-        </form>
+
+                <button type="submit" class="submit-btn">Mettre à jour le profil</button>
+            </form>
+        </div>
 
         <?php if ($_SESSION['role'] == 'entreprise'): ?>
             <p>

@@ -54,11 +54,12 @@ try {
 
     $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
-    $query = "SELECT o.*, e.nom as entreprise_nom, o.date_debut, o.date_fin 
+    $query = "SELECT o.*, e.nom as entreprise_nom, e.certification as entreprise_certification, 
+              o.date_debut, o.date_fin 
               FROM offres_stages o 
               JOIN entreprises e ON o.entreprise_id = e.id 
               $where_clause 
-              ORDER BY $sort $order";
+              ORDER BY e.certification DESC, $sort $order";
 
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
@@ -180,7 +181,7 @@ try {
                 <p class="no-results">Aucun stage ne correspond à vos critères de recherche.</p>
             <?php else: ?>
                 <?php foreach ($internships as $internship): ?>
-                    <div class="offer-card">
+                    <div class="offer-card <?php echo $internship['entreprise_certification'] ? 'certified-company' : ''; ?>">
                         <div class="offer-header">
                             <div class="mode-badge">
                                 <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
