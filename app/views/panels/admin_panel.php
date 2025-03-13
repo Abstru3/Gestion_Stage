@@ -17,9 +17,9 @@ $total_students = $pdo->query("SELECT COUNT(*) FROM etudiants")->fetchColumn();
 $total_companies = $pdo->query("SELECT COUNT(*) FROM entreprises")->fetchColumn();
 
 $users = $pdo->query("
-    SELECT id, email, telephone, adresse, 'etudiant' as role FROM etudiants
+    SELECT id, email, telephone, adresse, 'etudiant' as role, bloque FROM etudiants
     UNION ALL
-    SELECT id, email, telephone, adresse, 'entreprise' as role FROM entreprises
+    SELECT id, email, telephone, adresse, 'entreprise' as role, bloque FROM entreprises
     ORDER BY id DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -123,6 +123,8 @@ $entreprises = $stmt->fetchAll();
                                 <th>Téléphone</th>
                                 <th>Adresse</th>
                                 <th>Rôle</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -133,6 +135,23 @@ $entreprises = $stmt->fetchAll();
                                     <td><?= htmlspecialchars($user['telephone'] ?? 'Non renseigné') ?></td>
                                     <td><?= htmlspecialchars($user['adresse'] ?? 'Non renseigné') ?></td>
                                     <td><?= htmlspecialchars($user['role']) ?></td>
+                                    <td>
+                                        <?php if ($user['bloque']): ?>
+                                            <span class="badge bg-danger">Bloqué</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success">Actif</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="/Gestion_Stage/app/actions/toggle_user_block.php" class="d-inline">
+                                            <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                            <input type="hidden" name="type" value="<?= $user['role'] ?>">
+                                            <button type="submit" class="btn btn-<?= $user['bloque'] ? 'success' : 'danger' ?> btn-sm">
+                                                <i class="fas <?= $user['bloque'] ? 'fa-unlock' : 'fa-lock' ?>"></i>
+                                                <?= $user['bloque'] ? 'Débloquer' : 'Bloquer' ?>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

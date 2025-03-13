@@ -2,22 +2,28 @@
 
 // Fonction de connexion
 function login($pdo, $identifier, $password) {
-    $stmt = $pdo->prepare("SELECT * FROM etudiants WHERE (email = :identifier OR username = :identifier)");
+    $stmt = $pdo->prepare("SELECT *, 'etudiant' as role_type FROM etudiants WHERE (email = :identifier OR username = :identifier)");
     $stmt->execute(['identifier' => $identifier]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE (email = :identifier OR username = :identifier)");
+        $stmt = $pdo->prepare("SELECT *, 'entreprise' as role_type FROM entreprises WHERE (email = :identifier OR username = :identifier)");
         $stmt->execute(['identifier' => $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && $user['role'] === 'entreprise' && !$user['valide']) {
-            return ['error' => 'Votre compte est en attente de validation par un administrateur.'];
-        }
     }
 
-    if ($user && password_verify($password, $user['password'])) {
-        return $user;
+    if ($user) {
+        if ($user['bloque']) {
+            return ['error' => 'Votre compte a été bloqué. Veuillez contacter l\'administrateur.'];
+        }
+
+        if ($user['role_type'] === 'entreprise' && !$user['valide']) {
+            return ['error' => 'Votre compte est en attente de validation par un administrateur.'];
+        }
+
+        if (password_verify($password, $user['password'])) {
+            return $user;
+        }
     }
 
     return false;
