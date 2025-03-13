@@ -7,6 +7,13 @@ $isStudent = isset($_SESSION['role']) && $_SESSION['role'] === 'etudiant';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
+if ($isStudent) {
+    $stmt = $pdo->prepare("SELECT cv FROM etudiants WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $student = $stmt->fetch();
+    $hasCV = !empty($student['cv']);
+}
+
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: /Gestion_Stage/index.php');
     exit();
@@ -125,31 +132,34 @@ if (!$internship) {
                     </div>
 
                     <?php if ($isStudent): ?>
-                    <div class="card application-card">
-                        <h2><i class="fas fa-paper-plane"></i> Postuler</h2>
-                        <form class="application-form" action="/Gestion_Stage/app/views/internships/apply.php" 
-                              method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
-                            
-                            <div class="form-group">
-                                <label for="cv">
-                                    <i class="fas fa-file-pdf"></i> CV (PDF)
-                                </label>
-                                <input type="file" id="cv" name="cv" accept=".pdf" required>
-                            </div>
+                        <div class="card application-card">
+                            <h2><i class="fas fa-paper-plane"></i> Postuler</h2>
+                            <?php if (!$hasCV): ?>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <p>Vous devez d'abord ajouter votre CV dans votre profil pour pouvoir postuler.</p>
+                                    <a href="/Gestion_Stage/app/views/profile.php" class="btn btn-primary">
+                                        <i class="fas fa-user"></i> Accéder à mon profil
+                                    </a>
+                                </div>
+                            <?php else: ?>
+                                <form class="application-form" action="/Gestion_Stage/app/views/internships/apply.php" 
+                                      method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
+                                    
+                                    <div class="form-group">
+                                        <label for="lettre_motivation">
+                                            <i class="fas fa-file-alt"></i> Lettre de motivation (PDF)
+                                        </label>
+                                        <input type="file" id="lettre_motivation" name="lettre_motivation" accept=".pdf" required>
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="lettre_motivation">
-                                    <i class="fas fa-file-alt"></i> Lettre de motivation (PDF)
-                                </label>
-                                <input type="file" id="lettre_motivation" name="lettre_motivation" accept=".pdf" required>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> Envoyer ma candidature
-                            </button>
-                        </form>
-                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Envoyer ma candidature
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
                     <?php endif; ?>
                 </aside>
             </div>

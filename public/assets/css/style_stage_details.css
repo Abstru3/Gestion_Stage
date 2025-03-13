@@ -294,6 +294,39 @@ body {
     top: 20px;
 }
 
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    margin: 20px;
+}
+
+.alert i {
+    margin-right: 0.5rem;
+}
+
+.alert p {
+    margin: 0.5rem 0;
+}
+
+.alert .btn {
+    margin-top: 1rem;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
 /* Responsive */
 @media (max-width: 1224px) {
     .offer-grid {

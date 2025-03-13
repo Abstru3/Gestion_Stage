@@ -16,7 +16,7 @@ $stmt = $pdo->prepare("SELECT titre, description FROM offres_stages WHERE id = ?
 $stmt->execute([$offre_id]);
 $offre = $stmt->fetch();
 
-$stmt = $pdo->prepare("SELECT c.id, c.statut, c.cv, c.lettre_motivation, e.nom, e.prenom, e.email 
+$stmt = $pdo->prepare("SELECT c.id, c.statut, c.lettre_motivation, e.nom, e.prenom, e.email, e.cv as cv_etudiant 
                       FROM candidatures c 
                       JOIN etudiants e ON c.etudiant_id = e.id 
                       WHERE c.offre_id = ?");
@@ -93,8 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <span class="<?php echo $statut_class; ?>"><?php echo htmlspecialchars($statut_text); ?></span>
                         </p>
 
-                        <?php if (!empty($application['cv'])): ?>
-                            <p><strong><i class="fas fa-file-alt"></i> CV:</strong> <a class="btn-CV" href="/Gestion_Stage/public/uploads/candidatures/<?php echo htmlspecialchars($application['cv']); ?>" target="_blank">Voir le CV</a></p>
+                        <?php if (!empty($application['cv_etudiant'])): ?>
+                            <p><strong><i class="fas fa-file-alt"></i> CV:</strong> 
+                                <a class="btn-CV" href="/Gestion_Stage/public/uploads/cv/<?php echo htmlspecialchars($application['cv_etudiant']); ?>" target="_blank">Voir le CV</a>
+                            </p>
                         <?php else: ?>
                             <p><strong><i class="fas fa-file-alt"></i> CV:</strong> CV non fourni</p>
                         <?php endif; ?>
