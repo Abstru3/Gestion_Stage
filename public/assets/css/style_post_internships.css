@@ -247,8 +247,8 @@ optgroup {
 
 .index-button {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    bottom: 1%;
+    left: 1%;
     background: #3498db;
     color: white;
     padding: 7px 12px;

@@ -112,8 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -126,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
 </head>
 <body>
+
     <div class="container">
     <div class="steps">
             <div class="step <?= $currentStep >= 1 ? 'active' : '' ?>">1</div>
@@ -360,6 +359,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </form>
     </div>
+    <a class="index-button" href="/Gestion_Stage/app/views/home.php">Retour home</a>
+    
 
     <script src="/Gestion_Stage/public/assets/js/location.js"></script>
     <script src="/Gestion_Stage/public/assets/js/remuneration.js"></script>
