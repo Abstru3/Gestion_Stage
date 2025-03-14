@@ -255,13 +255,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label for="prenom">Prénom</label>
                                 <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom']); ?>" required>
                             </div>
-                            <div class="input-group">
-                                <label for="cv">CV (PDF uniquement)</label>
-                                <input type="file" id="cv" name="cv" accept="application/pdf">
-                                <p class="help-text">Format accepté: PDF. Taille maximale: 2MB</p>
-                            </div>
                         </div>
                     </div>
+                    <!-- Section CV -->
                     <div class="profile-section">
                         <label>CV</label>
                         <div class="section-content">
