@@ -239,28 +239,102 @@ optgroup {
 }
 
 .return-button-container {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
+    position: relative;
+    bottom: 1%;
+    left: 1%;
     z-index: 1000;
 }
 
+/* Style pour le bouton de retour */
 .index-button {
-    position: fixed;
-    bottom: 1%;
-    left: 1%;
-    background: #3498db;
-    color: white;
-    padding: 7px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    z-index: 1001;
-    width: auto;
     display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 20px auto;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
 }
 
 .index-button:hover {
-    background: #4ea8e4;
+    background: linear-gradient(135deg, #2980b9, #1c6ea4);
+    transform: translateY(-2px);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+/* Style pour l'interface */
+.offre-type-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    gap: 20px;
+}
+
+.offre-type-btn {
+    padding: 12px 24px;
+    border: 2px solid #3498db;
+    background-color: white;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.offre-type-btn.active {
+    background-color: #3498db;
+    color: white !important;
+}
+
+.offre-type-btn:hover:not(.active) {
+    background-color: #f0f8ff;
+}
+
+.index-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 20px auto;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.index-button:hover {
+    background: linear-gradient(135deg, #2980b9, #1c6ea4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Style différent selon le type d'offre */
+.alternance-mode .step.active {
+    background-color: #c8c218;
+}
+
+.alternance-mode .step-connector.active {
+    background-color: #c8c218;
+}
+
+.alternance-info-box {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.alternance-info-box h4 {
+    margin-top: 0;
+    color: #3498db;
 }

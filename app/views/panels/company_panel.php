@@ -15,12 +15,14 @@ try {
     $stmt->execute([$_SESSION['user_id']]);
     $offres = $stmt->fetchAll();
 } catch (PDOException $e) {
-    error_log("Erreur lors de la récupération des offres de stage : " . $e->getMessage());
+    error_log("Erreur lors de la récupération des offres : " . $e->getMessage());
     $offres = [];
-    $error_message = "Une erreur est survenue lors du chargement de vos offres de stage.";
+    $error_message = "Une erreur est survenue lors du chargement de vos offres.";
 }
 
 function formatDateFr($date) {
+    if (empty($date)) return 'Non spécifiée';
+    
     $mois = array(
         'January' => 'janvier',
         'February' => 'février',
@@ -45,6 +47,27 @@ function formatDateFr($date) {
     
     return $dateEnglish;
 }
+
+function formatRemuneration($remuneration, $type_offre) {
+    if (empty($remuneration)) return 'Non spécifiée';
+    
+    // Si c'est une alternance avec notation en pourcentage du SMIC
+    if ($type_offre === 'alternance' && strpos($remuneration, 'smic') !== false) {
+        switch ($remuneration) {
+            case 'smic27': return '27% du SMIC';
+            case 'smic43': return '43% du SMIC';
+            case 'smic53': return '53% du SMIC';
+            case 'smic100': return '100% du SMIC';
+            default: return $remuneration;
+        }
+    } else {
+        // Format monétaire standard pour les stages et les autres cas
+        return number_format($remuneration, 0, ',', ' ') . ' €/mois';
+    }
+}
+
+// Filtrer par type d'offre (stage ou alternance)
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 ?>
 
 <!DOCTYPE html>
@@ -56,6 +79,81 @@ function formatDateFr($date) {
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_company_panel.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
+    <style>
+        /* Style pour les filtres */
+        .filter-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .filter-tab {
+            padding: 10px 15px;
+            margin-right: 5px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #f5f5f5;
+        }
+        
+        .filter-tab.active {
+            background-color: #fff;
+            border-bottom: 2px solid #fff;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+        
+        .filter-tab:hover:not(.active) {
+            background-color: #e9e9e9;
+        }
+        
+        /* Style pour les badges de type d'offre */
+        .offer-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+        
+        .offer-type-badge.stage {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .offer-type-badge.alternance {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Style pour les infos spécifiques à l'alternance */
+        .alternance-details {
+            background-color: #fff8f8;
+            border-left: 3px solid #e74c3c;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .alternance-details h4 {
+            color: #e74c3c;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        
+        .alternance-details .detail-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .alternance-details .detail-label {
+            font-weight: bold;
+            width: 45%;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -75,9 +173,27 @@ function formatDateFr($date) {
 
     <main class="container">
         <div class="header-actions">
-            <h2>Mes offres de stages</h2>
-            <a href="/Gestion_Stage/app/views/internships/post_internship.php" class="btn btn-primary">
-                <span class="icon">➕</span> Publier une nouvelle offre
+            <h2>Mes offres</h2>
+            <div class="button-group">
+                <a href="/Gestion_Stage/app/views/internships/post_internship.php?type=stage" class="btn btn-primary">
+                    <span class="icon">➕</span> Publier une offre de stage
+                </a>
+                <a href="/Gestion_Stage/app/views/internships/post_internship.php?type=alternance" class="btn btn-secondary">
+                    <span class="icon">➕</span> Publier une offre d'alternance
+                </a>
+            </div>
+        </div>
+        
+        <!-- Filtres pour les types d'offres -->
+        <div class="filter-tabs">
+            <a href="?filter=all" class="filter-tab <?= $filter === 'all' ? 'active' : '' ?>">
+                Toutes les offres
+            </a>
+            <a href="?filter=stage" class="filter-tab <?= $filter === 'stage' ? 'active' : '' ?>">
+                Stages
+            </a>
+            <a href="?filter=alternance" class="filter-tab <?= $filter === 'alternance' ? 'active' : '' ?>">
+                Alternances
             </a>
         </div>
 
@@ -85,15 +201,25 @@ function formatDateFr($date) {
             <div class="error"><?= htmlspecialchars($error_message) ?></div>
         <?php elseif (empty($offres)): ?>
             <div class="empty-state">
-                <p>Vous n'avez pas encore publié d'offres de stage.</p>
+                <p>Vous n'avez pas encore publié d'offres.</p>
                 <p>Commencez par créer votre première offre !</p>
             </div>
         <?php else: ?>
             <div class="offers-grid">
-                <?php foreach ($offres as $offre): ?>
+                <?php foreach ($offres as $offre): 
+                    // Filtrer selon le type sélectionné
+                    if ($filter !== 'all' && $offre['type_offre'] !== $filter) {
+                        continue;
+                    }
+                ?>
                     <div class="offer-card">
                         <div class="offer-header">
-                            <h3><?= htmlspecialchars($offre['titre']) ?></h3>
+                            <h3>
+                                <?= htmlspecialchars($offre['titre']) ?>
+                                <span class="offer-type-badge <?= $offre['type_offre'] ?>">
+                                    <?= $offre['type_offre'] === 'alternance' ? 'Alternance' : 'Stage' ?>
+                                </span>
+                            </h3>
                             <span class="offer-type"><?= $offre['mode_stage'] ?></span>
                         </div>
                         
@@ -110,19 +236,66 @@ function formatDateFr($date) {
                             
                             <div class="detail-group">
                                 <span class="icon">📅</span>
-                                <span>Fin: <?= formatDateFr($offre['date_fin']) ?></span>
+                                <span>Fin: <?= $offre['date_fin'] ? formatDateFr($offre['date_fin']) : ($offre['type_offre'] === 'alternance' ? 'Selon contrat' : 'Non spécifiée') ?></span>
                             </div>
 
                             <?php if ($offre['remuneration']): ?>
                             <div class="detail-group">
                                 <span class="icon">💰</span>
-                                <span>Rémunération: <?= number_format($offre['remuneration'], 2, ',', ' ') ?> €/mois</span>
+                                <span>Rémunération: <?= formatRemuneration($offre['remuneration'], $offre['type_offre']) ?></span>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <!-- Informations spécifiques à l'alternance -->
+                            <?php if ($offre['type_offre'] === 'alternance'): ?>
+                            <div class="alternance-details">
+                                <h4>Détails de l'alternance</h4>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Type de contrat:</span>
+                                    <span><?= $offre['type_contrat'] === 'apprentissage' ? 'Apprentissage' : 'Professionnalisation' ?></span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Durée:</span>
+                                    <span><?= $offre['duree_contrat'] ?> mois</span>
+                                </div>
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Rythme:</span>
+                                    <span>
+                                        <?php
+                                        switch ($offre['rythme_alternance']) {
+                                            case '1sem_1sem': echo "1 sem. entreprise / 1 sem. formation"; break;
+                                            case '2sem_1sem': echo "2 sem. entreprise / 1 sem. formation"; break;
+                                            case '3sem_1sem': echo "3 sem. entreprise / 1 sem. formation"; break;
+                                            case '1mois_1sem': echo "1 mois entreprise / 1 sem. formation"; break;
+                                            case 'autre': echo "Autre rythme"; break;
+                                            default: echo $offre['rythme_alternance'];
+                                        }
+                                        ?>
+                                    </span>
+                                </div>
+                                
+                                <?php if (!empty($offre['niveau_etude'])): ?>
+                                <div class="detail-row">
+                                    <span class="detail-label">Niveau requis:</span>
+                                    <span><?= htmlspecialchars($offre['niveau_etude']) ?></span>
+                                </div>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($offre['formation_visee'])): ?>
+                                <div class="detail-row">
+                                    <span class="detail-label">Formation visée:</span>
+                                    <span><?= htmlspecialchars($offre['formation_visee']) ?></span>
+                                </div>
+                                <?php endif; ?>
                             </div>
                             <?php endif; ?>
                         </div>
 
                         <div class="offer-description" data-description="<?= htmlspecialchars($offre['description']) ?>">
-                            <h4>Description du stage</h4>
+                            <h4>Description <?= $offre['type_offre'] === 'alternance' ? "de l'alternance" : "du stage" ?></h4>
                             <p><?= nl2br(htmlspecialchars(substr($offre['description'], 0, 250))) ?>...</p>
                             <button class="read-more">
                                 <span>Voir plus</span>
