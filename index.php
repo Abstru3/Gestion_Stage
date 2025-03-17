@@ -160,7 +160,10 @@ $verified_companies = $pdo->query("
                 <?php if (!empty($recent_internships)): ?>
 
                     <?php foreach ($recent_internships as $internship): ?>
-                        <div class="offer-card">
+                        <div class="offer-card <?php 
+                            echo isset($internship['entreprise_certification']) && $internship['entreprise_certification'] ? 'certified-company ' : ''; 
+                            echo isset($internship['type_offre']) && $internship['type_offre'] === 'alternance' ? 'alternance-card' : 'stage-card';
+                        ?>" data-type="<?php echo $internship['type_offre'] ?? 'stage'; ?>">
                             <div class="offer-header">
                                 <div class="mode-badge">
                                     <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
@@ -168,7 +171,9 @@ $verified_companies = $pdo->query("
                                 </div>
                                 <div class="offer-header-content">
                                     <div>
-                                        <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
+                                        <h3>
+                                            <?php echo htmlspecialchars($internship['titre']); ?>
+                                        </h3>
                                         <span class="company-name">
                                             <?php echo htmlspecialchars($internship['nom_entreprise'] ?? 'Entreprise inconnue'); ?>
                                         </span>
