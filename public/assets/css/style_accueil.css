@@ -833,139 +833,113 @@ form {
     transform: translateY(-2px);
 }
 
-/* Section Comment ça marche */
-.how-it-works {
-    padding: 5rem 2rem;
-    background: var(--light-gray);
-}
-
-.how-it-works h2 {
-    text-align: center;
-    margin-bottom: 3rem;
-    color: var(--primary-color);
-    font-size: 2.2rem;
-}
-
-.steps-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 3rem;
-    max-width: 1200px;
-    margin: 2rem auto;
-}
-
-.step-card {
-    position: relative;
-    padding: 3rem 2rem;
-    text-align: center;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.step-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-}
-
-.step-number {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary-color);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-
-.step-card i {
-    font-size: 3rem;
-    color: var(--secondary-color);
-    margin: 1.5rem 0;
-}
-
-.step-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
-}
-
-.step-card p {
-    color: #777;
-    font-size: 1rem;
-    line-height: 1.7;
-}
-
+/* point d'interrogation */
 .how-it-works-trigger {
     position: relative;
     cursor: pointer;
-    margin: 0 1rem;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    height: 100%;
+    justify-content: center;
+    margin-right: 15px;
+    z-index: 1000;
 }
 
 .how-it-works-trigger i {
     font-size: 1.5rem;
-    color: white;
-    transition: color 0.3s ease;
-    padding: 0.5rem;
-    margin-right: -1.5rem;
+    color: #3498db;
+    transition: all 0.3s ease;
 }
 
 .fa-question-circle:hover {
-    color: white;
-}
-
-.how-it-works-trigger:hover .steps-popup i {
-    color: var(--secondary-color-hover);
+    transform: scale(1.1);
+    color: #2980b9;
 }
 
 .steps-popup {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
+    position: absolute; /* Position absolue par rapport à son parent */
+    top: 120%; /* Juste en dessous du bouton */
+    right: -20px; /* Léger décalage vers la droite */
+    width: 90vw; /* 90% de la largeur de la fenêtre */
+    max-width: 800px;
+    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    padding: 2rem;
-    width: max-content;
-    z-index: 1000;
-    min-width: 800px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
 }
 
 .how-it-works-trigger:hover .steps-popup {
-    display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
 .steps-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    animation: fadeIn 0.3s ease;
+    gap: 15px;
+    animation: fadeIn 0.5s ease;
+}
+/* Styles améliorés pour le point d'interrogation et la popup */
+.how-it-works-trigger {
+    position: relative;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    z-index: 1000;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+.how-it-works-trigger i {
+    font-size: 1.5rem;
+    color: #ffffff;
+    transition: transform 0.3s ease;
+}
+
+.steps-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0;
+    visibility: hidden;
+    width: 80%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+    padding: 25px;
+    z-index: 2000;
+    transition: all 0.3s ease;
+}
+
+.steps-popup.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
 .step-card {
-    background: #f8f9fa;
-    padding: 1.5rem;
+    background-color: #f8f9fa;
+    padding: 15px;
     border-radius: 8px;
     text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
+    position: relative;
 }
 
 .step-card:hover {
@@ -973,42 +947,87 @@ form {
 }
 
 .step-number {
-    background: var(--primary-color);
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background-color: #3498db;
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
     font-weight: bold;
+    font-size: 0.9rem;
 }
 
 .step-card i {
     font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+    color: #3498db;
+    margin-bottom: 10px;
 }
 
 .step-card h3 {
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
+    margin: 10px 0;
+    font-size: 1rem;
 }
 
 .step-card p {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 0.85rem;
+    color: #6c757d;
 }
 
+/* Overlay pour le fond sombre quand la popup est ouverte */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1500;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Style du bouton de fermeture */
+.close-popup {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    z-index: 2001;
+}
+
+.close-popup:hover {
+    background-color: #f8f9fa;
+}
+
+
+
 @media (max-width: 992px) {
-    .steps-popup {
-        min-width: 90vw;
-        right: -45vw;
-    }
-    
     .steps-container {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .steps-popup {
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
     }
 }
 
@@ -1016,11 +1035,18 @@ form {
     .steps-container {
         grid-template-columns: 1fr;
     }
+    
+    .steps-popup {
+        width: 95%;
+        padding: 20px 15px;
+    }
+    
+    .how-it-works-trigger i {
+        font-size: 1.3rem;
+    }
 }
 
 /* Couleurs distinctes pour les cartes de stage et d'alternance */
-
-
 .alternance-card .offer-header {
     background: linear-gradient(135deg, #c0392b, #e74c3c);
 }

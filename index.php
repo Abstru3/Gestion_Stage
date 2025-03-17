@@ -363,5 +363,45 @@ $verified_companies = $pdo->query("
         setInterval(refreshVerifiedCompanies, 10000);
     });
     </script>
+    <div id="popupOverlay" class="popup-overlay"></div>
+
+    <script>
+// Gestion simplifiée de la popup d'information
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments DOM
+    const trigger = document.querySelector('.how-it-works-trigger');
+    const popup = document.querySelector('.steps-popup');
+    const overlay = document.getElementById('popupOverlay');
+    
+    // Créer le bouton de fermeture
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-popup';
+    closeBtn.innerHTML = '&times;';
+    popup.appendChild(closeBtn);
+    
+    // Ouvrir la popup
+    trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        popup.classList.add('visible');
+        overlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Fermer la popup (fonction commune)
+    const close = function() {
+        popup.classList.remove('visible');
+        overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+    };
+    
+    // Événements pour fermeture
+    closeBtn.onclick = close;
+    overlay.onclick = close;
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    
+    // Empêcher la propagation de clic dans la popup
+    popup.onclick = e => e.stopPropagation();
+});
+</script>
 </body>
 </html>
