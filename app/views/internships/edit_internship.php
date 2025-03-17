@@ -35,6 +35,17 @@ $logo = !empty($offre['logo']) ? $offre['logo'] : (!empty($iconeEntreprise) ? $i
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
+        // Vérification et nettoyage des dates
+        $date_debut = !empty($_POST['date_debut']) && validateDate($_POST['date_debut']) ? 
+            $_POST['date_debut'] : null;
+        $date_fin = !empty($_POST['date_fin']) && validateDate($_POST['date_fin']) ? 
+            $_POST['date_fin'] : null;
+            
+        if (!$date_debut) {
+            throw new Exception("La date de début est invalide ou manquante.");
+        }
+        
+        // Reste du code pour traiter les autres champs...
         $lien_candidature = $_POST['lien_candidature'] ?? null;
         $domaine = $_POST['domaine'] ?? null;
         $pays = $_POST['pays'] ?? 'France';
@@ -42,74 +53,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $logoPath = $offre['logo'];
 
-        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/logos/';
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            $fileInfo = pathinfo($_FILES['logo']['name']);
-            $extension = strtolower($fileInfo['extension']);
-            
-            if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $newFileName = uniqid() . '.' . $extension;
-                $uploadFile = $uploadDir . $newFileName;
-
-                if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadFile)) {
-                    $logoPath = 'uploads/logos/' . $newFileName;
-                } else {
-                    throw new Exception("Erreur lors du téléchargement du logo.");
-                }
-            } else {
-                throw new Exception("Format de fichier non autorisé. Utilisez JPG, PNG ou GIF.");
-            }
-        }
-
         // Traitement de la rémunération
         $remuneration = $_POST['remuneration'];
         $type_remuneration = null;
 
-        // Pour les alternances, récupérer le type de rémunération
+        // Pour les alternances, gérer correctement le type de rémunération
         if ($type_offre === 'alternance' && strpos($_POST['remuneration'], 'smic') !== false) {
             $type_remuneration = $_POST['remuneration'];
-            // Valeurs approximatives pour 2025
+            
+            // Convertir les pourcentages SMIC en valeurs numériques approximatives
             switch ($type_remuneration) {
                 case 'smic27': $remuneration = 486; break; // 27% de 1800€
                 case 'smic43': $remuneration = 774; break; // 43% de 1800€
                 case 'smic53': $remuneration = 954; break; // 53% de 1800€
                 case 'smic100': $remuneration = 1800; break; // 100% de 1800€
+                default: $remuneration = null;
             }
-        } elseif ($_POST['remuneration'] === 'autre' && !empty($_POST['remuneration_autre'])) {
+        } else if ($_POST['remuneration'] === 'autre' && !empty($_POST['remuneration_autre'])) {
             $remuneration = $_POST['remuneration_autre'];
         }
 
         // Base SQL pour les champs communs
         $sql = "UPDATE offres_stages SET 
-            titre = ?, 
-            description = ?, 
-            email_contact = ?, 
-            lien_candidature = ?,
-            date_debut = ?, 
-            date_fin = ?,
-            domaine = ?, 
-            remuneration = ?,
-            type_remuneration = ?,
-            pays = ?, 
-            ville = ?, 
-            code_postal = ?, 
-            region = ?, 
-            departement = ?, 
-            lieu = ?, 
-            mode_stage = ?, 
-            logo = ?";
+                titre = ?, 
+                description = ?, 
+                email_contact = ?, 
+                lien_candidature = ?,
+                date_debut = ?, 
+                date_fin = ?,
+                domaine = ?, 
+                remuneration = ?,
+                type_remuneration = ?,
+                pays = ?, 
+                ville = ?, 
+                code_postal = ?, 
+                region = ?, 
+                departement = ?, 
+                lieu = ?, 
+                mode_stage = ?, 
+                logo = ?";
         
         $params = [ 
             $_POST['titre'],
             $_POST['description'],
             $_POST['email_contact'],
             $lien_candidature,
-            $_POST['date_debut'],
-            $_POST['date_fin'],
+            $date_debut,  // Date validée
+            $date_fin,    // Date validée
             $domaine,
             $remuneration,
             $type_remuneration,
@@ -125,22 +115,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Ajouter des champs spécifiques pour l'alternance
         if ($type_offre === 'alternance') {
-            $sql .= ", niveau_etude = ?, type_contrat = ?, rythme_alternance = ?";
-            if (isset($_POST['formation_visee'])) {
-                $sql .= ", formation_visee = ?";
-                $params[] = $_POST['formation_visee'];
-            }
-            if (isset($_POST['ecole_partenaire'])) {
-                $sql .= ", ecole_partenaire = ?";
-                $params[] = $_POST['ecole_partenaire'];
-            }
+            $sql .= ", niveau_etude = ?, 
+                    type_contrat = ?, 
+                    rythme_alternance = ?, 
+                    formation_visee = ?, 
+                    ecole_partenaire = ?";
             
-            // Ajouter les paramètres pour les champs d'alternance
-            array_splice($params, -0, 0, [
-                $_POST['niveau_etude'] ?? null,
-                $_POST['type_contrat'] ?? null,
-                $_POST['rythme_alternance'] ?? null
-            ]);
+            $params[] = $_POST['niveau_etude'] ?? null;
+            $params[] = $_POST['type_contrat'] ?? null;
+            $params[] = $_POST['rythme_alternance'] ?? null;
+            $params[] = $_POST['formation_visee'] ?? null;
+            $params[] = $_POST['ecole_partenaire'] ?? null;
         }
         
         $sql .= " WHERE id = ? AND entreprise_id = ?";
@@ -158,6 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $error = "Erreur lors de la mise à jour: " . $e->getMessage();
     }
+}
+
+// Ajoutez cette fonction de validation de date
+function validateDate($date, $format = 'Y-m-d') {
+    $d = DateTime::createFromFormat($format, $date);
+    return $d && $d->format($format) === $date;
 }
 
 ?>
