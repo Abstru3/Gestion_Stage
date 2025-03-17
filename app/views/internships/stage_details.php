@@ -35,6 +35,42 @@ if (!$internship) {
     header('Location: /Gestion_Stage/index.php');
     exit();
 }
+
+// Calculer la durée en mois pour les alternances
+$duree_mois = null;
+if ($internship['type_offre'] === 'alternance' && !empty($internship['date_debut']) && !empty($internship['date_fin'])) {
+    $date_debut = new DateTime($internship['date_debut']);
+    $date_fin = new DateTime($internship['date_fin']);
+    $interval = $date_debut->diff($date_fin);
+    
+    // Calculer le nombre total de mois (années * 12 + mois)
+    $duree_mois = $interval->y * 12 + $interval->m;
+    
+    // Ajouter un mois supplémentaire si plus de 15 jours
+    if ($interval->d > 15) {
+        $duree_mois++;
+    }
+}
+
+// Formatter la rémunération selon le type d'offre
+function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
+    if (empty($remuneration)) return 'Non spécifiée';
+    
+    // Si c'est une alternance avec notation en pourcentage du SMIC
+    if ($type_offre === 'alternance' && strpos($type_remuneration, 'smic') !== false) {
+        switch ($type_remuneration) {
+            case 'smic27': return '27% du SMIC';
+            case 'smic43': return '43% du SMIC';
+            case 'smic53': return '53% du SMIC';
+            case 'smic100': return '100% du SMIC';
+            default: return number_format($remuneration, 0, ',', ' ') . ' €/mois';
+        }
+    } else {
+        // Format monétaire standard pour les stages et les autres cas
+        return number_format($remuneration, 0, ',', ' ') . ' €/mois';
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -46,17 +82,107 @@ if (!$internship) {
     <!-- <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css"> -->
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_stage_details.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
+    <style>
+        /* Style spécifique pour les alternances */
+        body.alternance-mode {
+            --primary-color: #e74c3c;
+            --secondary-color: #c0392b;
+            --accent-light: #f9ebea;
+        }
+        
+        .offer-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 15px;
+            text-transform: uppercase;
+            vertical-align: middle;
+        }
+        
+        .offer-type-badge.stage {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .offer-type-badge.alternance {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Style pour le bloc d'infos d'alternance */
+        .alternance-details {
+            background-color: #f8f9ff;
+            border-left: 4px solid #e74c3c;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+        
+        .alternance-details h3 {
+            color: #e74c3c;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.15rem;
+            border-bottom: 1px solid #e0e6ff;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .alternance-details h3 i {
+            margin-right: 10px;
+        }
+        
+        .alternance-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .alternance-info-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background-color: #f1f5ff;
+            border-radius: 6px;
+        }
+        
+        .alternance-info-item i {
+            min-width: 25px;
+            margin-right: 12px;
+            color: #4361ee;
+        }
+        
+        .alternance-info-item .label {
+            font-weight: 600;
+            margin-right: 8px;
+            color: #4a4a4a;
+        }
+        
+        .alternance-info-item .value {
+            color: #2a2a2a;
+            font-weight: 500;
+        }
+    </style>
 </head>
-<body>
+<body class="<?php echo $internship['type_offre'] === 'alternance' ? 'alternance-mode' : ''; ?>">
     <div class="container">
         <nav class="breadcrumb">
             <a href="/Gestion_Stage/index.php"><i class="fas fa-home"></i> Accueil</a> >
-            <span>Détails du stage</span>
+            <span>Détails de <?php echo $internship['type_offre'] === 'alternance' ? "l'alternance" : "l'offre"; ?></span>
         </nav>
 
         <main class="offer-container">
             <div class="offer-header">
-                <h1><?php echo htmlspecialchars($internship['titre']); ?></h1>
+                <h1>
+                    <?php echo htmlspecialchars($internship['titre']); ?>
+                    <span class="offer-type-badge <?php echo $internship['type_offre']; ?>">
+                        <?php echo $internship['type_offre'] === 'alternance' ? 'Alternance' : 'Stage'; ?>
+                    </span>
+                </h1>
                 <div class="company-badge">
                     <?php if (!empty($internship['offre_logo'])): ?>
                         <img src="/Gestion_Stage/public/uploads/logos/<?php echo htmlspecialchars(basename($internship['offre_logo'])); ?>" 
@@ -74,14 +200,80 @@ if (!$internship) {
 
             <div class="offer-grid">
                 <div class="offer-main">
-                <div class="card">
-                    <h2><i class="fas fa-info-circle"></i> Description du stage</h2>
-                    <div class="card-content">
-                        <div class="description-text">
-                            <?php echo nl2br(htmlspecialchars($internship['description'])); ?>
+                    <div class="card">
+                        <h2><i class="fas fa-info-circle"></i> Description de <?php echo $internship['type_offre'] === 'alternance' ? "l'alternance" : "l'offre"; ?></h2>
+                        <div class="card-content">
+                            <div class="description-text">
+                                <?php echo nl2br(htmlspecialchars($internship['description'])); ?>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <?php if($internship['type_offre'] === 'alternance'): ?>
+                    <!-- Section spécifique à l'alternance -->
+                    <div class="alternance-details">
+                        <h3><i class="fas fa-graduation-cap"></i> Détails de l'alternance</h3>
+                        
+                        <div class="alternance-info-grid">
+                            <div class="alternance-info-item">
+                                <i class="fas fa-file-contract"></i>
+                                <span class="label">Type de contrat:</span>
+                                <span class="value">
+                                    <?php echo $internship['type_contrat'] === 'apprentissage' ? 'Apprentissage' : 'Professionnalisation'; ?>
+                                </span>
+                            </div>
+                            
+                            <?php if($duree_mois): ?>
+                            <div class="alternance-info-item">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span class="label">Durée:</span>
+                                <span class="value"><?php echo $duree_mois; ?> mois</span>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <div class="alternance-info-item">
+                                <i class="fas fa-sync-alt"></i>
+                                <span class="label">Rythme:</span>
+                                <span class="value">
+                                    <?php
+                                    switch ($internship['rythme_alternance']) {
+                                        case '1sem_1sem': echo "1 sem. entreprise / 1 sem. formation"; break;
+                                        case '2sem_1sem': echo "2 sem. entreprise / 1 sem. formation"; break;
+                                        case '3sem_1sem': echo "3 sem. entreprise / 1 sem. formation"; break;
+                                        case '1mois_1sem': echo "1 mois entreprise / 1 sem. formation"; break;
+                                        case 'autre': echo "Autre rythme"; break;
+                                        default: echo htmlspecialchars($internship['rythme_alternance']);
+                                    }
+                                    ?>
+                                </span>
+                            </div>
+                            
+                            <?php if(!empty($internship['niveau_etude'])): ?>
+                            <div class="alternance-info-item">
+                                <i class="fas fa-user-graduate"></i>
+                                <span class="label">Niveau requis:</span>
+                                <span class="value"><?php echo htmlspecialchars($internship['niveau_etude']); ?></span>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <?php if(!empty($internship['formation_visee'])): ?>
+                            <div class="alternance-info-item">
+                                <i class="fas fa-award"></i>
+                                <span class="label">Formation visée:</span>
+                                <span class="value"><?php echo htmlspecialchars($internship['formation_visee']); ?></span>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <?php if(!empty($internship['ecole_partenaire'])): ?>
+                            <div class="alternance-info-item">
+                                <i class="fas fa-university"></i>
+                                <span class="label">École partenaire:</span>
+                                <span class="value"><?php echo htmlspecialchars($internship['ecole_partenaire']); ?></span>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <div class="card">
                         <h2><i class="fas fa-building"></i> À propos de l'entreprise</h2>
@@ -112,9 +304,23 @@ if (!$internship) {
                                 <i class="fas fa-calendar-alt"></i>
                                 <span>Début : <?php echo date('d/m/Y', strtotime($internship['date_debut'])); ?></span>
                             </li>
+                            <?php if(!empty($internship['date_fin'])): ?>
+                            <li>
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Fin : <?php echo date('d/m/Y', strtotime($internship['date_fin'])); ?></span>
+                            </li>
+                            <?php endif; ?>
                             <li>
                                 <i class="fas fa-clock"></i>
-                                <span>Durée : <?php echo $internship['duree'] . ' jours'; ?></span>
+                                <span>Durée : 
+                                    <?php 
+                                    if($internship['type_offre'] === 'alternance' && $duree_mois) {
+                                        echo $duree_mois . ' mois';
+                                    } else {
+                                        echo $internship['duree'] . ' jours'; 
+                                    }
+                                    ?>
+                                </span>
                             </li>
                             <li>
                                 <i class="fas fa-map-marker-alt"></i>
@@ -122,12 +328,18 @@ if (!$internship) {
                             </li>
                             <li>
                                 <i class="fas fa-euro-sign"></i>
-                                <span>Rémunération : <?php echo htmlspecialchars($internship['remuneration']); ?> €/mois</span>
+                                <span>Rémunération : <?php echo formatRemuneration($internship['remuneration'], $internship['type_offre'], $internship['type_remuneration']); ?></span>
                             </li>
                             <li>
                                 <i class="fas fa-laptop-house"></i>
                                 <span>Mode : <?php echo htmlspecialchars($internship['mode_stage']); ?></span>
                             </li>
+                            <?php if($internship['type_offre'] === 'alternance'): ?>
+                            <li>
+                                <i class="fas fa-file-contract"></i>
+                                <span>Type : <?php echo $internship['type_contrat'] === 'apprentissage' ? 'Contrat d\'apprentissage' : 'Contrat de professionnalisation'; ?></span>
+                            </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
 

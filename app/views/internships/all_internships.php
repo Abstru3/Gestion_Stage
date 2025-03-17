@@ -14,6 +14,7 @@ try {
     $date_debut = $_GET['date_debut'] ?? '';
     $domaine = $_GET['domaine'] ?? '';
     $duree_min = $_GET['duree_min'] ?? '';
+    $type_offre = $_GET['type_offre'] ?? '';
 
     $where_conditions = [];
     $params = [];
@@ -52,10 +53,15 @@ try {
         $params[':duree_min'] = $duree_min;
     }
 
+    if (!empty($type_offre)) {
+        $where_conditions[] = "o.type_offre = :type_offre";
+        $params[':type_offre'] = $type_offre;
+    }
+
     $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
     $query = "SELECT o.*, e.nom as entreprise_nom, e.certification as entreprise_certification, 
-              o.date_debut, o.date_fin 
+              o.date_debut, o.date_fin, o.type_offre, o.type_remuneration
               FROM offres_stages o 
               JOIN entreprises e ON o.entreprise_id = e.id 
               $where_clause 
@@ -114,74 +120,130 @@ try {
                     <div id="filterTags" class="filter-tags"></div>
 
                     <div class="filters-panel" id="filtersPanel">
+                        <h3 class="filter-section-title">Affiner votre recherche</h3>
+                        
+                        <!-- Mettre en avant le filtre type d'offre -->
+                        <div class="filter-section highlighted-section">
+                            <h4>Type d'offre</h4>
+                            <div class="filter-type-buttons">
+                                <button type="button" class="type-btn <?php echo !isset($_GET['type_offre']) || $_GET['type_offre'] === '' ? 'active' : ''; ?>" 
+                                        data-value="">Tous</button>
+                                <button type="button" class="type-btn stage-btn <?php echo isset($_GET['type_offre']) && $_GET['type_offre'] === 'stage' ? 'active' : ''; ?>" 
+                                        data-value="stage">Stages</button>
+                                <button type="button" class="type-btn alternance-btn <?php echo isset($_GET['type_offre']) && $_GET['type_offre'] === 'alternance' ? 'active' : ''; ?>" 
+                                        data-value="alternance">Alternances</button>
+                                <input type="hidden" name="type_offre" id="type_offre" value="<?php echo htmlspecialchars($type_offre); ?>">
+                            </div>
+                        </div>
+                        
                         <div class="filters-grid">
-                            <div class="filter-group">
-                                <select name="mode_stage" id="mode_stage">
-                                    <option value="">Mode de stage</option>
-                                    <option value="presentiel" <?php echo $mode_stage === 'presentiel' ? 'selected' : ''; ?>>Présentiel</option>
-                                    <option value="distanciel" <?php echo $mode_stage === 'distanciel' ? 'selected' : ''; ?>>Distanciel</option>
-                                    <option value="hybride" <?php echo $mode_stage === 'hybride' ? 'selected' : ''; ?>>Hybride</option>
-                                </select>
+                            <div class="filter-section">
+                                <h4>Modalités</h4>
+                                <div class="filter-group">
+                                    <label for="mode_stage">Mode de travail</label>
+                                    <select name="mode_stage" id="mode_stage">
+                                        <option value="">Tous les modes</option>
+                                        <option value="presentiel" <?php echo $mode_stage === 'presentiel' ? 'selected' : ''; ?>>Présentiel</option>
+                                        <option value="distanciel" <?php echo $mode_stage === 'distanciel' ? 'selected' : ''; ?>>Distanciel</option>
+                                        <option value="hybride" <?php echo $mode_stage === 'hybride' ? 'selected' : ''; ?>>Hybride</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label for="date_debut">Date de début</label>
+                                    <input type="date" name="date_debut" id="date_debut" value="<?php echo htmlspecialchars($date_debut); ?>">
+                                </div>
                             </div>
-
-                            <div class="filter-group">
-                                <select name="domaine" id="domaine">
-                                    <option value="">Domaine</option>
-                                    <optgroup label="Informatique">
-                                        <option value="developpement_web" <?php echo $domaine === 'developpement_web' ? 'selected' : ''; ?>>Développement Web</option>
-                                        <option value="developpement_mobile" <?php echo $domaine === 'developpement_mobile' ? 'selected' : ''; ?>>Développement Mobile</option>
-                                        <option value="reseaux" <?php echo $domaine === 'reseaux' ? 'selected' : ''; ?>>Réseaux</option>
-                                        <option value="cybersecurite" <?php echo $domaine === 'cybersecurite' ? 'selected' : ''; ?>>Cybersécurité</option>
-                                        <option value="data" <?php echo $domaine === 'data' ? 'selected' : ''; ?>>Data/IA</option>
-                                    </optgroup>
-                                    <optgroup label="Commerce">
-                                        <option value="marketing_digital" <?php echo $domaine === 'marketing_digital' ? 'selected' : ''; ?>>Marketing Digital</option>
-                                        <option value="commerce_international" <?php echo $domaine === 'commerce_international' ? 'selected' : ''; ?>>Commerce International</option>
-                                        <option value="vente" <?php echo $domaine === 'vente' ? 'selected' : ''; ?>>Vente</option>
-                                    </optgroup>
-                                    <optgroup label="Autres">
-                                        <option value="finance" <?php echo $domaine === 'finance' ? 'selected' : ''; ?>>Finance</option>
-                                        <option value="ressources_humaines" <?php echo $domaine === 'ressources_humaines' ? 'selected' : ''; ?>>Ressources Humaines</option>
-                                        <option value="communication" <?php echo $domaine === 'communication' ? 'selected' : ''; ?>>Communication</option>
-                                        <option value="logistique" <?php echo $domaine === 'logistique' ? 'selected' : ''; ?>>Logistique</option>
-                                        <option value="autre" <?php echo $domaine === 'autre' ? 'selected' : ''; ?>>Autre</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <input type="number" 
-                                       name="remuneration_min"
-                                       id="remuneration_min"
-                                       placeholder="Rémunération min. (€)"
-                                       min="0"
-                                       value="<?php echo htmlspecialchars($remuneration_min); ?>">
-                            </div>
-
-                            <div class="filter-group">
-                                <input type="date"
-                                       name="date_debut"
-                                       id="date_debut"
-                                       value="<?php echo htmlspecialchars($date_debut); ?>">
+                            
+                            <div class="filter-section">
+                                <h4>Domaine et Rémunération</h4>
+                                <div class="filter-group">
+                                    <label for="domaine">Secteur d'activité</label>
+                                    <select name="domaine" id="domaine">
+                                        <option value="">Tous les domaines</option>
+                                        <optgroup label="Informatique">
+                                            <option value="developpement_web" <?php echo $domaine === 'developpement_web' ? 'selected' : ''; ?>>Développement Web</option>
+                                            <option value="developpement_mobile" <?php echo $domaine === 'developpement_mobile' ? 'selected' : ''; ?>>Développement Mobile</option>
+                                            <option value="reseaux" <?php echo $domaine === 'reseaux' ? 'selected' : ''; ?>>Réseaux</option>
+                                            <option value="cybersecurite" <?php echo $domaine === 'cybersecurite' ? 'selected' : ''; ?>>Cybersécurité</option>
+                                            <option value="data" <?php echo $domaine === 'data' ? 'selected' : ''; ?>>Data/IA</option>
+                                        </optgroup>
+                                        <optgroup label="Commerce">
+                                            <option value="marketing_digital" <?php echo $domaine === 'marketing_digital' ? 'selected' : ''; ?>>Marketing Digital</option>
+                                            <option value="commerce_international" <?php echo $domaine === 'commerce_international' ? 'selected' : ''; ?>>Commerce International</option>
+                                            <option value="vente" <?php echo $domaine === 'vente' ? 'selected' : ''; ?>>Vente</option>
+                                        </optgroup>
+                                        <optgroup label="Autres">
+                                            <option value="finance" <?php echo $domaine === 'finance' ? 'selected' : ''; ?>>Finance</option>
+                                            <option value="ressources_humaines" <?php echo $domaine === 'ressources_humaines' ? 'selected' : ''; ?>>Ressources Humaines</option>
+                                            <option value="communication" <?php echo $domaine === 'communication' ? 'selected' : ''; ?>>Communication</option>
+                                            <option value="logistique" <?php echo $domaine === 'logistique' ? 'selected' : ''; ?>>Logistique</option>
+                                            <option value="autre" <?php echo $domaine === 'autre' ? 'selected' : ''; ?>>Autre</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="remuneration_min">Rémunération minimale</label>
+                                    <div class="input-with-icon">
+                                        <input type="number" 
+                                               name="remuneration_min"
+                                               id="remuneration_min"
+                                               placeholder="Ex: 600"
+                                               min="0"
+                                               value="<?php echo htmlspecialchars($remuneration_min); ?>">
+                                        <span class="input-icon">€</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="filter-actions">
-                            <button type="reset" class="btn-reset">Réinitialiser</button>
-                            <button type="submit" class="btn-apply">Appliquer</button>
+                            <button type="reset" class="btn-reset">
+                                <i class="fas fa-undo"></i> Réinitialiser
+                            </button>
+                            <button type="submit" class="btn-apply">
+                                <i class="fas fa-search"></i> Appliquer les filtres
+                            </button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
 
-        <h2>Offres de stages disponibles</h2>
+        <!-- Onglets pour filtrer par type d'offre -->
+        <div class="type-filter-tabs">
+            <a href="?<?php echo http_build_query(array_merge($_GET, ['type_offre' => ''])); ?>" 
+               class="tab <?php echo !isset($_GET['type_offre']) || $_GET['type_offre'] === '' ? 'active' : ''; ?>">
+                Toutes les offres
+            </a>
+            <a href="?<?php echo http_build_query(array_merge($_GET, ['type_offre' => 'stage'])); ?>" 
+               class="tab stage-tab <?php echo isset($_GET['type_offre']) && $_GET['type_offre'] === 'stage' ? 'active' : ''; ?>">
+                Stages
+            </a>
+            <a href="?<?php echo http_build_query(array_merge($_GET, ['type_offre' => 'alternance'])); ?>" 
+               class="tab alternance-tab <?php echo isset($_GET['type_offre']) && $_GET['type_offre'] === 'alternance' ? 'active' : ''; ?>">
+                Alternances
+            </a>
+        </div>
+
+        <h2>
+            <?php if ($type_offre === 'stage'): ?>
+                Stages disponibles
+            <?php elseif ($type_offre === 'alternance'): ?>
+                Alternances disponibles
+            <?php else: ?>
+                Offres disponibles
+            <?php endif; ?>
+        </h2>
         <div class="offers-grid">
             <?php if (empty($internships)): ?>
                 <p class="no-results">Aucun stage ne correspond à vos critères de recherche.</p>
             <?php else: ?>
                 <?php foreach ($internships as $internship): ?>
-                    <div class="offer-card <?php echo $internship['entreprise_certification'] ? 'certified-company' : ''; ?>">
+                    <div class="offer-card <?php 
+                        echo $internship['entreprise_certification'] ? 'certified-company ' : ''; 
+                        echo $internship['type_offre'] === 'alternance' ? 'alternance-card' : '';
+                    ?>">
                         <div class="offer-header">
                             <div class="mode-badge">
                                 <i class="fas <?php echo $internship['mode_stage'] === 'distanciel' ? 'fa-laptop-house' : 'fa-building'; ?>"></i>
@@ -189,7 +251,12 @@ try {
                             </div>
                             <div class="offer-header-content">
                                 <div>
-                                    <h3><?php echo htmlspecialchars($internship['titre']); ?></h3>
+                                    <h3>
+                                        <?php echo htmlspecialchars($internship['titre']); ?>
+                                        <span class="offer-type-badge <?php echo $internship['type_offre']; ?>">
+                                            <?php echo $internship['type_offre'] === 'alternance' ? 'Alternance' : 'Stage'; ?>
+                                        </span>
+                                    </h3>
                                     <span class="company-name">
                                         <?php echo htmlspecialchars($internship['entreprise_nom'] ?? 'Entreprise inconnue'); ?>
                                     </span>
@@ -320,6 +387,21 @@ try {
         });
 
         updateFilterTags();
+
+        // Gestion des boutons de type d'offre
+        const typeButtons = document.querySelectorAll('.type-btn');
+        const typeInput = document.getElementById('type_offre');
+
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Désactiver tous les boutons
+                typeButtons.forEach(b => b.classList.remove('active'));
+                // Activer le bouton cliqué
+                this.classList.add('active');
+                // Mettre à jour l'input caché
+                typeInput.value = this.dataset.value;
+            });
+        });
     });
     </script>
 </body>
