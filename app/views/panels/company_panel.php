@@ -79,81 +79,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_company_panel.css">
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
-    <style>
-        /* Style pour les filtres */
-        .filter-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .filter-tab {
-            padding: 10px 15px;
-            margin-right: 5px;
-            cursor: pointer;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            background-color: #f5f5f5;
-        }
-        
-        .filter-tab.active {
-            background-color: #fff;
-            border-bottom: 2px solid #fff;
-            margin-bottom: -1px;
-            font-weight: bold;
-        }
-        
-        .filter-tab:hover:not(.active) {
-            background-color: #e9e9e9;
-        }
-        
-        /* Style pour les badges de type d'offre */
-        .offer-type-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-left: 10px;
-            text-transform: uppercase;
-        }
-        
-        .offer-type-badge.stage {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .offer-type-badge.alternance {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        /* Style pour les infos spécifiques à l'alternance */
-        .alternance-details {
-            background-color: #fff8f8;
-            border-left: 3px solid #e74c3c;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        
-        .alternance-details h4 {
-            color: #e74c3c;
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-        
-        .alternance-details .detail-row {
-            display: flex;
-            margin-bottom: 5px;
-        }
-        
-        .alternance-details .detail-label {
-            font-weight: bold;
-            width: 45%;
-        }
-    </style>
+    
 </head>
 <body>
     <header>
@@ -244,55 +170,88 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
                                 <span class="icon">💰</span>
                                 <span>Rémunération: <?= formatRemuneration($offre['remuneration'], $offre['type_offre']) ?></span>
                             </div>
-                            <?php endif; ?>
                             
-                            <!-- Informations spécifiques à l'alternance -->
-                            <?php if ($offre['type_offre'] === 'alternance'): ?>
-                            <div class="alternance-details">
-                                <h4>Détails de l'alternance</h4>
-                                
-                                <div class="detail-row">
-                                    <span class="detail-label">Type de contrat:</span>
-                                    <span><?= $offre['type_contrat'] === 'apprentissage' ? 'Apprentissage' : 'Professionnalisation' ?></span>
-                                </div>
-                                
-                                <div class="detail-row">
-                                    <span class="detail-label">Durée:</span>
-                                    <span><?= $offre['duree_contrat'] ?> mois</span>
-                                </div>
-                                
-                                <div class="detail-row">
-                                    <span class="detail-label">Rythme:</span>
-                                    <span>
-                                        <?php
-                                        switch ($offre['rythme_alternance']) {
-                                            case '1sem_1sem': echo "1 sem. entreprise / 1 sem. formation"; break;
-                                            case '2sem_1sem': echo "2 sem. entreprise / 1 sem. formation"; break;
-                                            case '3sem_1sem': echo "3 sem. entreprise / 1 sem. formation"; break;
-                                            case '1mois_1sem': echo "1 mois entreprise / 1 sem. formation"; break;
-                                            case 'autre': echo "Autre rythme"; break;
-                                            default: echo $offre['rythme_alternance'];
-                                        }
-                                        ?>
-                                    </span>
-                                </div>
-                                
-                                <?php if (!empty($offre['niveau_etude'])): ?>
-                                <div class="detail-row">
-                                    <span class="detail-label">Niveau requis:</span>
-                                    <span><?= htmlspecialchars($offre['niveau_etude']) ?></span>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($offre['formation_visee'])): ?>
-                                <div class="detail-row">
-                                    <span class="detail-label">Formation visée:</span>
-                                    <span><?= htmlspecialchars($offre['formation_visee']) ?></span>
-                                </div>
-                                <?php endif; ?>
-                            </div>
+                            
+                            
                             <?php endif; ?>
                         </div>
+
+                        <!-- Interface améliorée pour les informations spécifiques à l'alternance -->
+                        <?php if ($offre['type_offre'] === 'alternance'): ?>
+                            <div class="alternance-details">
+                                <h4><span class="icon">📋</span> Détails de l'alternance</h4>
+                                
+                                <div class="alternance-info-grid">
+                                    <div class="alternance-info-item">
+                                        <span class="icon">📄</span>
+                                        <span class="label">Contrat:</span>
+                                        <span class="value">
+                                            <?= $offre['type_contrat'] === 'apprentissage' ? 'Apprentissage' : 'Professionnalisation' ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="alternance-info-item">
+                                        <span class="icon">⏱️</span>
+                                        <span class="label">Durée:</span>
+                                        <span class="value">
+                                            <?php
+                                            if (!empty($offre['date_debut']) && !empty($offre['date_fin'])) {
+                                                $date_debut = new DateTime($offre['date_debut']);
+                                                $date_fin = new DateTime($offre['date_fin']);
+                                                $interval = $date_debut->diff($date_fin);
+                                                
+                                                // Calculate total months (years * 12 + months)
+                                                $months = $interval->y * 12 + $interval->m;
+                                                
+                                                // Add an additional month if there are more than 15 days
+                                                if ($interval->d > 15) {
+                                                    $months++;
+                                                }
+                                                
+                                                echo $months . ' mois';
+                                            } else {
+                                                echo 'Selon contrat';
+                                            }
+                                            ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="alternance-info-item">
+                                        <span class="icon">🔄</span>
+                                        <span class="label">Rythme:</span>
+                                        <span class="value">
+                                            <?php
+                                            switch ($offre['rythme_alternance']) {
+                                                case '1sem_1sem': echo "1 sem. entreprise / 1 sem. formation"; break;
+                                                case '2sem_1sem': echo "2 sem. entreprise / 1 sem. formation"; break;
+                                                case '3sem_1sem': echo "3 sem. entreprise / 1 sem. formation"; break;
+                                                case '1mois_1sem': echo "1 mois entreprise / 1 sem. formation"; break;
+                                                case 'autre': echo "Autre rythme"; break;
+                                                default: echo $offre['rythme_alternance'];
+                                            }
+                                            ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <?php if (!empty($offre['niveau_etude'])): ?>
+                                    <div class="alternance-info-item">
+                                        <span class="icon">🎓</span>
+                                        <span class="label">Niveau requis:</span>
+                                        <span class="value"><?= htmlspecialchars($offre['niveau_etude']) ?></span>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($offre['formation_visee'])): ?>
+                                    <div class="alternance-info-item">
+                                        <span class="icon">🏆</span>
+                                        <span class="label">Formation visée:</span>
+                                        <span class="value"><?= htmlspecialchars($offre['formation_visee']) ?></span>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        
 
                         <div class="offer-description" data-description="<?= htmlspecialchars($offre['description']) ?>">
                             <h4>Description <?= $offre['type_offre'] === 'alternance' ? "de l'alternance" : "du stage" ?></h4>

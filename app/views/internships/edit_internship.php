@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Ajouter des champs spécifiques pour l'alternance
         if ($type_offre === 'alternance') {
-            $sql .= ", niveau_etude = ?, duree_contrat = ?, type_contrat = ?, rythme_alternance = ?";
+            $sql .= ", niveau_etude = ?, type_contrat = ?, rythme_alternance = ?";
             if (isset($_POST['formation_visee'])) {
                 $sql .= ", formation_visee = ?";
                 $params[] = $_POST['formation_visee'];
@@ -138,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Ajouter les paramètres pour les champs d'alternance
             array_splice($params, -0, 0, [
                 $_POST['niveau_etude'] ?? null,
-                $_POST['duree_contrat'] ?? null,
                 $_POST['type_contrat'] ?? null,
                 $_POST['rythme_alternance'] ?? null
             ]);
@@ -318,16 +317,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="bac+3" <?= $offre['niveau_etude'] === 'bac+3' ? 'selected' : '' ?>>Bac+3</option>
                         <option value="bac+5" <?= $offre['niveau_etude'] === 'bac+5' ? 'selected' : '' ?>>Bac+5</option>
                         <option value="autre" <?= $offre['niveau_etude'] === 'autre' ? 'selected' : '' ?>>Autre</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="duree_contrat">Durée du contrat d'alternance*</label>
-                    <select id="duree_contrat" name="duree_contrat" required>
-                        <option value="">Sélectionner une durée</option>
-                        <option value="12" <?= $offre['duree_contrat'] === '12' ? 'selected' : '' ?>>12 mois</option>
-                        <option value="24" <?= $offre['duree_contrat'] === '24' ? 'selected' : '' ?>>24 mois</option>
-                        <option value="36" <?= $offre['duree_contrat'] === '36' ? 'selected' : '' ?>>36 mois</option>
                     </select>
                 </div>
 
