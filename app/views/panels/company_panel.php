@@ -138,14 +138,14 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
         </div>
     </header>
     
-    <nav>
-    <button class="menu-toggle" aria-label="Ouvrir le menu">☰</button>
+    <nav class="main-nav">
+    <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
     <ul class="menu">
-            <li><a href="/Gestion_Stage/app/views/home.php">🏠 Mon espace</a></li>
-            <li><a href="/Gestion_Stage/app/views/profile.php">👤 Mon profil</a></li>
-            <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
-        </ul>
-    </nav>
+        <li><a href="/Gestion_Stage/app/views/home.php">🏠 Mon espace</a></li>
+        <li><a href="/Gestion_Stage/app/views/profile.php">👤 Mon profil</a></li>
+        <li><a href="/Gestion_Stage/app/views/auth/logout.php">🚪 Déconnexion</a></li>
+    </ul>
+</nav>
 
     <main class="container">
         <div class="header-actions">
@@ -424,6 +424,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
             sortMenu.classList.remove('show');
         }
+    });
+});
+</script>
+<script>
+// JavaScript pour le menu de navigation responsif
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.menu');
+    
+    menuToggle.addEventListener('click', function() {
+        menu.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+        
+        // Changer l'accessibilité
+        const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true' || false;
+        menuToggle.setAttribute('aria-expanded', !isExpanded);
     });
 });
 </script>
