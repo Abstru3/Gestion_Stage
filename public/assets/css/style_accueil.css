@@ -906,7 +906,7 @@ form {
 
 .steps-popup {
     position: fixed;
-    top: 50%;
+    top: 30%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.95);
     opacity: 0;
@@ -1017,15 +1017,13 @@ form {
     background-color: #f8f9fa;
 }
 
-
-
 @media (max-width: 992px) {
     .steps-container {
         grid-template-columns: repeat(2, 1fr);
     }
     
     .steps-popup {
-        width: 90%;
+        width: 65%;
         max-height: 80vh;
         overflow-y: auto;
     }
@@ -1037,7 +1035,7 @@ form {
     }
     
     .steps-popup {
-        width: 95%;
+        width: 65%;
         padding: 20px 15px;
     }
     
