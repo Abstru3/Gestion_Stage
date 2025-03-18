@@ -319,11 +319,11 @@ optgroup {
 
 /* Style différent selon le type d'offre */
 .alternance-mode .step.active {
-    background-color: #c8c218;
+    background-color: #ee7d0c;
 }
 
 .alternance-mode .step-connector.active {
-    background-color: #c8c218;
+    background-color: #ee7d0c;
 }
 
 .alternance-info-box {

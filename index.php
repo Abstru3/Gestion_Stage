@@ -373,12 +373,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const popup = document.querySelector('.steps-popup');
     const overlay = document.getElementById('popupOverlay');
     
-    // Créer le bouton de fermeture
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'close-popup';
-    closeBtn.innerHTML = '&times;';
-    popup.appendChild(closeBtn);
-    
     // Ouvrir la popup
     trigger.addEventListener('click', function(e) {
         e.preventDefault();

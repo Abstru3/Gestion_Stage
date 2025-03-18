@@ -858,10 +858,10 @@ form {
 }
 
 .steps-popup {
-    position: absolute; /* Position absolue par rapport à son parent */
-    top: 120%; /* Juste en dessous du bouton */
-    right: -20px; /* Léger décalage vers la droite */
-    width: 90vw; /* 90% de la largeur de la fenêtre */
+    position: absolute;
+    top: 120%;
+    right: -20px;
+    width: 90vw;
     max-width: 800px;
     background-color: white;
     border-radius: 10px;
@@ -872,6 +872,10 @@ form {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s ease;
+}
+
+.steps-popup h3 {
+    color: black;
 }
 
 .how-it-works-trigger:hover .steps-popup {
@@ -885,7 +889,7 @@ form {
     gap: 15px;
     animation: fadeIn 0.5s ease;
 }
-/* Styles améliorés pour le point d'interrogation et la popup */
+
 .how-it-works-trigger {
     position: relative;
     cursor: pointer;
@@ -990,31 +994,6 @@ form {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-}
-
-/* Style du bouton de fermeture */
-.close-popup {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #6c757d;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-    z-index: 2001;
-}
-
-.close-popup:hover {
-    background-color: #f8f9fa;
 }
 
 @media (max-width: 992px) {

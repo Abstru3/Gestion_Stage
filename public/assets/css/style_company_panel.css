@@ -443,6 +443,10 @@ footer {
     background-color: #e9e9e9;
 }
 
+.filter-tab:hover {
+    text-decoration: none;
+}
+
 /* Style pour les badges de type d'offre */
 .offer-type-badge {
     display: inline-block;
@@ -460,14 +464,14 @@ footer {
 }
 
 .offer-type-badge.alternance {
-    background-color: #e74c3c;
+    background-color: #e7863c;
     color: white;
 }
 
 /* Style amélioré pour les infos spécifiques à l'alternance */
 .alternance-details {
     background-color: #f8f9ff;
-    border-left: 4px solid #e74b3c;
+    border-left: 4px solid #e7863c;
     padding: 18px;
     margin: 20px 0;
     border-radius: 8px;
@@ -481,7 +485,7 @@ footer {
 }
 
 .alternance-details h4 {
-    color: #e74b3c;
+    color: #e7863c;
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 1.15em;
@@ -552,7 +556,7 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: #e74c3c;
+    background-color: #e7a03c;
     color: white;
     border-radius: 50%;
     min-width: 20px;
@@ -737,4 +741,8 @@ footer {
     .sort-menu {
         width: 100%;
     }
+}
+
+.btn-secondary:hover {
+    background-color: rgb(241, 110, 10);
 }
