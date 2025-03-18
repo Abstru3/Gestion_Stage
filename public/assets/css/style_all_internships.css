@@ -8,6 +8,9 @@
     --text-color: #333;
     --light-gray: #f5f6fa;
     --border-radius: 8px;
+    --alternance-primary: #ff9f43;      /* Orange plus clair */
+    --alternance-secondary: #ffd60a;     /* Jaune doré */
+    --alternance-hover: #fa8231;         /* Orange plus foncé pour le hover */
 }
 
 .container-all-internships {
@@ -99,6 +102,43 @@
     background: var(--secondary-color-hover);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.offer-card.certified-company.alternance-card {
+    border: 2px solid var(--alternance-primary);
+    background: linear-gradient(to bottom right, #fff, #fff9e6);
+    box-shadow: 0 4px 15px rgba(255, 159, 67, 0.15);
+}
+
+.offer-card.certified-company.alternance-card::before {
+    background: var(--alternance-primary);
+}
+
+.offer-card.certified-company.alternance-card .offer-header {
+    background: linear-gradient(135deg, 
+        var(--alternance-primary) 0%, 
+        var(--alternance-secondary) 100%
+    );
+}
+
+.offer-card.certified-company.alternance-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(230, 126, 34, 0.2);
+}
+
+.offer-card.certified-company.alternance-card .btn-details {
+    background: var(--alternance-secondary);
+}
+
+.offer-card.certified-company.alternance-card .btn-details:hover {
+    background: var(--alternance-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+}
+
+.offer-card.certified-company.alternance-card .mode-badge {
+    background: rgba(255, 248, 230, 0.95);
+    color: var(--alternance-primary);
 }
 
 .offer-header {
@@ -597,7 +637,7 @@
 }
 
 .offer-type-badge.alternance {
-    background-color: #e74c3c;
+    background-color: var(--alternance-primary);
     color: white;
 }
 

@@ -144,13 +144,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Récupérer les champs spécifiques à l'étudiant
                 $nom = $_POST['nom'];
                 $prenom = $_POST['prenom'];
+                $preference = $_POST['preference'] ?: null; // Convertit une chaîne vide en NULL
 
                 if (!empty($new_password)) {
-                    $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ?, nom = ?, prenom = ? WHERE id = ?");
-                    $stmt->execute([$username, $email, $hashed_password, $nom, $prenom, $_SESSION['user_id']]);
+                    $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ?, nom = ?, prenom = ?, preference = ? WHERE id = ?");
+                    $stmt->execute([$username, $email, $hashed_password, $nom, $prenom, $preference, $_SESSION['user_id']]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, nom = ?, prenom = ? WHERE id = ?");
-                    $stmt->execute([$username, $email, $nom, $prenom, $_SESSION['user_id']]);
+                    $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, nom = ?, prenom = ?, preference = ? WHERE id = ?");
+                    $stmt->execute([$username, $email, $nom, $prenom, $preference, $_SESSION['user_id']]);
                 }
             }
 
@@ -254,6 +255,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="input-group">
                                 <label for="prenom">Prénom</label>
                                 <input type="text" id="prenom" name="prenom" value="<?php echo htmlspecialchars($user['prenom']); ?>" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="preference">Préférence</label>
+                                <select id="preference" name="preference">
+                                    <option value="">Aucune préférence</option>
+                                    <option value="stage" <?php echo ($user['preference'] === 'stage') ? 'selected' : ''; ?>>Stage</option>
+                                    <option value="alternance" <?php echo ($user['preference'] === 'alternance') ? 'selected' : ''; ?>>Alternance</option>
+                                </select>
+                                <p class="help-text">Choisissez votre type de contrat recherché</p>
                             </div>
                         </div>
                     </div>

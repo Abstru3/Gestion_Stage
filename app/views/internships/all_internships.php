@@ -241,8 +241,14 @@ try {
             <?php else: ?>
                 <?php foreach ($internships as $internship): ?>
                     <div class="offer-card <?php 
-                        echo $internship['entreprise_certification'] ? 'certified-company ' : ''; 
-                        echo $internship['type_offre'] === 'alternance' ? 'alternance-card' : '';
+                        $classes = [];
+                        if ($internship['entreprise_certification']) {
+                            $classes[] = 'certified-company';
+                        }
+                        if ($internship['type_offre'] === 'alternance') {
+                            $classes[] = 'alternance-card';
+                        }
+                        echo implode(' ', $classes);
                     ?>">
                         <div class="offer-header">
                             <div class="mode-badge">
