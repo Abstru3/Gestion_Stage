@@ -7,11 +7,28 @@ $isStudent = isset($_SESSION['role']) && $_SESSION['role'] === 'etudiant';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
+// Variables pour les contrôles
+$hasCV = false;
+$alreadyApplied = false;
+$applicationStatus = null;
+
 if ($isStudent) {
     $stmt = $pdo->prepare("SELECT cv FROM etudiants WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $student = $stmt->fetch();
     $hasCV = !empty($student['cv']);
+    
+    // Vérifier si l'étudiant a déjà postulé à cette offre
+    if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+        $stmt = $pdo->prepare("SELECT statut FROM candidatures WHERE etudiant_id = ? AND offre_id = ?");
+        $stmt->execute([$_SESSION['user_id'], $_GET['id']]);
+        $application = $stmt->fetch();
+        
+        if ($application) {
+            $alreadyApplied = true;
+            $applicationStatus = $application['statut'];
+        }
+    }
 }
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -260,35 +277,51 @@ function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
                     </div>
 
                     <?php if ($isStudent): ?>
-                        <div class="card application-card">
-                            <h2><i class="fas fa-paper-plane"></i> Postuler</h2>
-                            <?php if (!$hasCV): ?>
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <p>Vous devez d'abord ajouter votre CV dans votre profil pour pouvoir postuler.</p>
-                                    <a href="/Gestion_Stage/app/views/profile.php" class="btn btn-primary">
-                                        <i class="fas fa-user"></i> Accéder à mon profil
-                                    </a>
-                                </div>
-                            <?php else: ?>
-                                <form class="application-form" action="/Gestion_Stage/app/views/internships/apply.php" 
-                                      method="post" enctype="multipart/form-data">
-                                    <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
-                                    
-                                    <div class="form-group">
-                                        <label for="lettre_motivation">
-                                            <i class="fas fa-file-alt"></i> Lettre de motivation (PDF)
-                                        </label>
-                                        <input type="file" id="lettre_motivation" name="lettre_motivation" accept=".pdf" required>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane"></i> Envoyer ma candidature
-                                    </button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
+    <div class="card application-card">
+        <h2><i class="fas fa-paper-plane"></i> Postuler</h2>
+        <?php if ($alreadyApplied): ?>
+            <div class="alert <?php echo $applicationStatus === 'acceptee' ? 'alert-success' : ($applicationStatus === 'refusee' ? 'alert-danger' : 'alert-info'); ?>">
+                <i class="fas <?php echo $applicationStatus === 'acceptee' ? 'fa-check-circle' : ($applicationStatus === 'refusee' ? 'fa-times-circle' : 'fa-info-circle'); ?>"></i>
+                <p>
+                    <?php if ($applicationStatus === 'acceptee'): ?>
+                        Votre candidature a été acceptée !
+                    <?php elseif ($applicationStatus === 'refusee'): ?>
+                        Votre candidature a été refusée.
+                    <?php else: ?>
+                        Vous avez déjà postulé à cette offre. Votre candidature est en cours d'examen.
                     <?php endif; ?>
+                </p>
+                <a href="/Gestion_Stage/app/views/panels/student_panel.php" class="btn btn-primary">
+                    <i></i> Voir mes candidatures
+                </a>
+            </div>
+        <?php elseif (!$hasCV): ?>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Vous devez d'abord ajouter votre CV dans votre profil pour pouvoir postuler.</p>
+                <a href="/Gestion_Stage/app/views/profile.php" class="btn btn-primary">
+                    <i class="fas fa-user"></i> Accéder à mon profil
+                </a>
+            </div>
+        <?php else: ?>
+            <form class="application-form" action="/Gestion_Stage/app/views/internships/apply.php" 
+                  method="post" enctype="multipart/form-data">
+                <input type="hidden" name="offre_id" value="<?php echo $internship['id']; ?>">
+                
+                <div class="form-group">
+                    <label for="lettre_motivation">
+                        <i class="fas fa-file-alt"></i> Lettre de motivation (PDF)
+                    </label>
+                    <input type="file" id="lettre_motivation" name="lettre_motivation" accept=".pdf" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Envoyer ma candidature
+                </button>
+            </form>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
                 </aside>
             </div>
 

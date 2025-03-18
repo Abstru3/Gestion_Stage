@@ -1,0 +1,10 @@
+[2025-03-18 11:48:24][INFO][User:1] Traitement d'une nouvelle candidature
+[2025-03-18 11:48:24][INFO][User:1] Candidature pour l'offre ID: 34
+[2025-03-18 11:48:24][INFO][User:1] Répertoire d'upload: C:/Users/besja/Desktop/UwAmp/UwAmp/www//Gestion_Stage/public/uploads/candidatures/
+[2025-03-18 11:48:24][INFO][User:1] Fichier à télécharger: C:/Users/besja/Desktop/UwAmp/UwAmp/www//Gestion_Stage/public/uploads/candidatures/67d95d883e13a_lettre_1.pdf
+[2025-03-18 11:48:24][INFO][User:1] Fichier téléchargé avec succès
+[2025-03-18 11:48:24][INFO][User:1] SQL: INSERT INTO candidatures (etudiant_id, offre_id, lettre_motivation, date_candidature, statut) 
+                            VALUES (?, ?, ?, NOW(), 'en_attente')
+[2025-03-18 11:48:24][INFO][User:1] Paramètres: étudiant_id=1, offre_id=34, lettre=67d95d883e13a_lettre_1.pdf
+[2025-03-18 11:48:24][ERROR][User:1] Erreur PDO: SQLSTATE[HY000]: General error: 1364 Field 'cv' doesn't have a default value
+[2025-03-18 11:48:24][INFO][User:1] Suppression du fichier téléchargé suite à l'erreur

@@ -24,6 +24,9 @@ if (empty($student['cv'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
     $offre_id = (int)$_POST['offre_id'];
     
+    // Récupérer le CV de l'étudiant pour l'insérer dans la candidature
+    $etudiant_cv = $student['cv'];
+    
     // Vérifier si l'étudiant n'a pas déjà postulé
     $stmt = $pdo->prepare("SELECT id FROM candidatures WHERE etudiant_id = ? AND offre_id = ?");
     $stmt->execute([$_SESSION['user_id'], $offre_id]);
@@ -47,18 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
 
             if (move_uploaded_file($_FILES['lettre_motivation']['tmp_name'], $uploadFile)) {
                 try {
-                    // Insertion de la candidature sans le CV
-                    $stmt = $pdo->prepare("INSERT INTO candidatures (etudiant_id, offre_id, lettre_motivation, date_candidature, statut) 
-                                          VALUES (?, ?, ?, NOW(), 'en_attente')");
+                    // Insertion de la candidature AVEC le CV
+                    $stmt = $pdo->prepare("INSERT INTO candidatures (etudiant_id, offre_id, cv, lettre_motivation, date_candidature, statut) 
+                                          VALUES (?, ?, ?, ?, NOW(), 'en_attente')");
                     
                     // Log des valeurs pour déboguer
                     error_log("Tentative d'insertion - etudiant_id: " . $_SESSION['user_id'] . 
                               ", offre_id: " . $offre_id . 
+                              ", cv: " . $etudiant_cv . 
                               ", lettre: " . $newFileName);
                     
                     $stmt->execute([
                         $_SESSION['user_id'],
                         $offre_id,
+                        $etudiant_cv,       // Ajout du CV
                         $newFileName
                     ]);
 
