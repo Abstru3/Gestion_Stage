@@ -34,7 +34,14 @@ try {
     }
 
     if (!empty($remuneration_min)) {
-        $where_conditions[] = "o.remuneration >= :remuneration_min";
+        $remuneration_min = floatval($remuneration_min);
+        
+        // S'assurer que la rémunération est un nombre et qu'elle est filtrée correctement
+        $where_conditions[] = "(
+            o.remuneration IS NOT NULL AND 
+            o.remuneration != '' AND 
+            CAST(o.remuneration AS DECIMAL(10,2)) >= :remuneration_min
+        )";
         $params[':remuneration_min'] = $remuneration_min;
     }
 
@@ -380,9 +387,34 @@ try {
 
         document.querySelector('.btn-reset').addEventListener('click', (e) => {
             e.preventDefault();
+            
+            // Réinitialiser tous les champs du formulaire
             searchForm.reset();
+            
+            // Réinitialiser explicitement chaque champ pour être sûr
+            document.getElementById('search').value = '';
+            document.getElementById('mode_stage').selectedIndex = 0;
+            document.getElementById('remuneration_min').value = '';
+            document.getElementById('date_debut').value = '';
+            document.getElementById('domaine').selectedIndex = 0;
+            document.getElementById('type_offre').value = '';
+            
+            // Réinitialiser les boutons de type d'offre
+            typeButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.value === '') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Mettre à jour les tags de filtre
             updateFilterTags();
+            
+            // Option 1: Soumettre le formulaire réinitialisé
             submitSearch();
+            
+            // Option 2 (alternative): Rediriger vers la page sans paramètres
+            // window.location.href = window.location.pathname;
         });
 
         const offers = document.querySelectorAll('.offer-card');
