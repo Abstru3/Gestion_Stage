@@ -10,13 +10,62 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     exit();
 }
 
+// Récupération du paramètre de tri
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'date_desc';
+
 try {
+    // Modification de la requête pour récupérer les offres
     $stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ? ORDER BY date_publication DESC");
     $stmt->execute([$_SESSION['user_id']]);
     $offres = $stmt->fetchAll();
+    
+    // Initialiser le compteur à 0 pour toutes les offres
+    $applications_count = [];
+    foreach ($offres as $offre) {
+        $applications_count[$offre['id']] = 0;
+    }
+    
+    // Récupérer le nombre de candidatures pour toutes les offres en une seule requête
+    $offre_ids = array_column($offres, 'id');
+    
+    if (!empty($offre_ids)) {
+        $placeholders = implode(',', array_fill(0, count($offre_ids), '?'));
+        $stmt = $pdo->prepare("
+            SELECT offre_id, COUNT(*) as count 
+            FROM candidatures 
+            WHERE offre_id IN ($placeholders) 
+            GROUP BY offre_id
+        ");
+        $stmt->execute($offre_ids);
+        
+        while ($row = $stmt->fetch()) {
+            $applications_count[$row['offre_id']] = $row['count'];
+        }
+    }
+    
+    // Appliquer le tri sélectionné
+    if ($sort === 'candidates_desc') {
+        // Tri par nombre de candidatures décroissant
+        uasort($offres, function($a, $b) use ($applications_count) {
+            return $applications_count[$b['id']] <=> $applications_count[$a['id']];
+        });
+    } elseif ($sort === 'candidates_asc') {
+        // Tri par nombre de candidatures croissant
+        uasort($offres, function($a, $b) use ($applications_count) {
+            return $applications_count[$a['id']] <=> $applications_count[$b['id']];
+        });
+    } elseif ($sort === 'date_asc') {
+        // Tri par date de publication croissante
+        usort($offres, function($a, $b) {
+            return strtotime($a['date_publication']) <=> strtotime($b['date_publication']);
+        });
+    }
+    // Le tri par défaut est déjà date_desc, appliqué par la requête SQL
+    
 } catch (PDOException $e) {
     error_log("Erreur lors de la récupération des offres : " . $e->getMessage());
     $offres = [];
+    $applications_count = [];
     $error_message = "Une erreur est survenue lors du chargement de vos offres.";
 }
 
@@ -78,6 +127,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     <title>NeversStage - Panneau Entreprise</title>
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style.css">
     <link rel="stylesheet" href="/Gestion_Stage/public/assets/css/style_company_panel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" type="image/png" href="../../../public/assets/images/logo_reduis.png">
     
 </head>
@@ -110,18 +160,56 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
             </div>
         </div>
         
-        <!-- Filtres pour les types d'offres -->
-        <div class="filter-tabs">
-            <a href="?filter=all" class="filter-tab <?= $filter === 'all' ? 'active' : '' ?>">
-                Toutes les offres
+        <!-- Nouvelle interface de tri avec icône -->
+<div class="filter-sort-container">
+    <div class="filter-tabs">
+        <a href="?filter=all" class="filter-tab <?= $filter === 'all' ? 'active' : '' ?>">
+            Toutes les offres
+        </a>
+        <a href="?filter=stage" class="filter-tab <?= $filter === 'stage' ? 'active' : '' ?>">
+            Stages
+        </a>
+        <a href="?filter=alternance" class="filter-tab <?= $filter === 'alternance' ? 'active' : '' ?>">
+            Alternances
+        </a>
+    </div>
+    
+    <div class="sort-dropdown">
+        <button id="sort-toggle" class="sort-toggle" aria-label="Options de tri">
+            <span class="filter-icon"></span> <!-- ou 🔎 ou 📊 ou 🗂️ -->
+            <span class="current-sort-label">
+                <?php
+                switch($sort) {
+                    case 'date_desc': echo 'Récent → ancien'; break;
+                    case 'date_asc': echo 'Ancien → récent'; break;
+                    case 'candidates_desc': echo 'Candidatures ↓'; break;
+                    case 'candidates_asc': echo 'Candidatures ↑'; break;
+                    default: echo 'Trier par'; break;
+                }
+                ?>
+            </span>
+        </button>
+        <div id="sort-menu" class="sort-menu">
+            <div class="sort-menu-header">Trier par</div>
+            <a href="?filter=<?= $filter ?>&sort=date_desc" class="sort-option <?= $sort === 'date_desc' ? 'active' : '' ?>">
+                <span class="sort-icon">📅</span>
+                <span>Date (récent → ancien)</span>
             </a>
-            <a href="?filter=stage" class="filter-tab <?= $filter === 'stage' ? 'active' : '' ?>">
-                Stages
+            <a href="?filter=<?= $filter ?>&sort=date_asc" class="sort-option <?= $sort === 'date_asc' ? 'active' : '' ?>">
+                <span class="sort-icon">📅</span>
+                <span>Date (ancien → récent)</span>
             </a>
-            <a href="?filter=alternance" class="filter-tab <?= $filter === 'alternance' ? 'active' : '' ?>">
-                Alternances
+            <a href="?filter=<?= $filter ?>&sort=candidates_desc" class="sort-option <?= $sort === 'candidates_desc' ? 'active' : '' ?>">
+                <span class="sort-icon">👥</span>
+                <span>Candidatures (décroissant)</span>
+            </a>
+            <a href="?filter=<?= $filter ?>&sort=candidates_asc" class="sort-option <?= $sort === 'candidates_asc' ? 'active' : '' ?>">
+                <span class="sort-icon">👥</span>
+                <span>Candidatures (croissant)</span>
             </a>
         </div>
+    </div>
+</div>
 
         <?php if (isset($error_message)): ?>
             <div class="error"><?= htmlspecialchars($error_message) ?></div>
@@ -266,8 +354,14 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
                             <a class="btn btn-edit" href="/Gestion_Stage/app/views/internships/edit_internship.php?id=<?= $offre['id'] ?>">
                                 <span class="icon">✏️</span> Modifier
                             </a>
-                            <a class="btn btn-view" href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?= $offre['id'] ?>">
-                                <span class="icon">👥</span> Voir les candidatures
+                            <a class="btn btn-view <?= $applications_count[$offre['id']] > 0 ? 'has-applications' : 'no-applications' ?>" 
+                               href="/Gestion_Stage/app/views/internships/view_applications.php?offre_id=<?= $offre['id'] ?>">
+                                <span class="icon">👥</span> Candidatures
+                                <?php if ($applications_count[$offre['id']] > 0): ?>
+                                    <span class="applications-badge"><?= $applications_count[$offre['id']] ?></span>
+                                <?php else: ?>
+                                    <span class="applications-empty">0</span>
+                                <?php endif; ?>
                             </a>
                         </div>
                     </div>
@@ -282,26 +376,54 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
         </a>
     </footer>
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.offer-description').forEach(description => {
-        const readMoreBtn = description.querySelector('.read-more');
-        const paragraph = description.querySelector('p');
-        const fullText = description.dataset.description;
-        let isExpanded = false;
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.offer-description').forEach(description => {
+            const readMoreBtn = description.querySelector('.read-more');
+            const paragraph = description.querySelector('p');
+            const fullText = description.dataset.description;
+            let isExpanded = false;
 
-        readMoreBtn.addEventListener('click', () => {
-            isExpanded = !isExpanded;
-            
-            if (isExpanded) {
-                description.classList.add('expanded');
-                paragraph.textContent = fullText;
-                readMoreBtn.querySelector('span:first-child').textContent = 'Voir moins';
-            } else {
-                description.classList.remove('expanded');
-                paragraph.textContent = fullText.substring(0, 250) + '...';
-                readMoreBtn.querySelector('span:first-child').textContent = 'Voir plus';
-            }
+            readMoreBtn.addEventListener('click', () => {
+                isExpanded = !isExpanded;
+                
+                if (isExpanded) {
+                    description.classList.add('expanded');
+                    paragraph.textContent = fullText;
+                    readMoreBtn.querySelector('span:first-child').textContent = 'Voir moins';
+                } else {
+                    description.classList.remove('expanded');
+                    paragraph.textContent = fullText.substring(0, 250) + '...';
+                    readMoreBtn.querySelector('span:first-child').textContent = 'Voir plus';
+                }
+            });
         });
+    });
+function applySorting(sortValue) {
+    // Récupérer le filtre actuel
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentFilter = urlParams.get('filter') || 'all';
+    
+    // Rediriger avec le nouveau tri et le filtre actuel
+    window.location.href = `?filter=${currentFilter}&sort=${sortValue}`;
+}
+</script>
+<script>
+// JavaScript pour le menu déroulant de tri
+document.addEventListener('DOMContentLoaded', function() {
+    const sortToggle = document.getElementById('sort-toggle');
+    const sortMenu = document.getElementById('sort-menu');
+    
+    // Fonction pour afficher/cacher le menu de tri
+    sortToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        sortMenu.classList.toggle('show');
+    });
+    
+    // Fermer le menu si on clique ailleurs sur la page
+    document.addEventListener('click', function(e) {
+        if (!sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
+            sortMenu.classList.remove('show');
+        }
     });
 });
 </script>

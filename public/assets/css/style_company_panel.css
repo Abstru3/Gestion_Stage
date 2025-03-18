@@ -215,7 +215,7 @@ nav a:hover {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 4.8em;
+    max-height: 5.6em;
 }
 
 /* État développé */
@@ -512,5 +512,196 @@ footer {
     
     .alternance-details {
         padding: 15px;
+    }
+}
+/* Badge pour le nombre de candidatures */
+.applications-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+/* Style pour le bouton "Aucune candidature" */
+.btn-view:has(:not(.applications-badge)) {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sort-container label {
+    font-weight: 500;
+    color: #555;
+}
+
+.sort-select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: auto;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.sort-select:hover, .sort-select:focus {
+    border-color: #aaa;
+    outline: none;
+}
+/* Import de Font Awesome pour l'icône de filtre */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Conteneur pour la zone de filtres et de tri */
+.filter-sort-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Style pour le menu déroulant de tri */
+.sort-dropdown {
+    position: relative;
+}
+
+/* Bouton de tri avec icône */
+.sort-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #fff;
+    border: 1px solid #e1e5e9;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #445;
+    transition: all 0.2s ease;
+}
+
+.sort-toggle:hover {
+    background-color: #f8f9fa;
+    border-color: #c0d1dd;
+}
+
+.sort-toggle .filter-icon::before {
+    content: "\f0b0"; /* Code unicode pour l'icône de filtre */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #3498db;
+    font-size: 1rem;
+}
+
+/* Menu déroulant */
+.sort-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px;
+    max-height: 0;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+    transform: translateY(10px);
+    z-index: 100;
+}
+
+.sort-menu.show {
+    max-height: 300px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* En-tête du menu de tri */
+.sort-menu-header {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: #334;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+/* Options de tri */
+.sort-option {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #445;
+    transition: background-color 0.2s;
+    gap: 0.75rem;
+}
+
+.sort-option:hover {
+    background-color: #f5f8fa;
+}
+
+.sort-option.active {
+    background-color: #e8f4fd;
+    color: #3498db;
+    font-weight: 500;
+}
+
+/* Icône des options */
+.sort-icon {
+    font-size: 1rem;
+}
+
+/* Styles responsive */
+@media (max-width: 768px) {
+    .filter-sort-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-tabs {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none; /* Pour Firefox */
+        -ms-overflow-style: none; /* Pour Internet Explorer et Edge */
+    }
+    
+    .filter-tabs::-webkit-scrollbar {
+        display: none; /* Pour Chrome, Safari et Opera */
+    }
+    
+    .sort-dropdown {
+        width: 100%;
+    }
+    
+    .sort-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .sort-menu {
+        width: 100%;
     }
 }
