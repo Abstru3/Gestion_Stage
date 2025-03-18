@@ -413,3 +413,201 @@ body {
         font-size: 0.85rem;
     }
 }
+/* Style spécifique pour les alternances */
+body.alternance-mode {
+    --primary-color: #FF8C00; /* darkorange au lieu de #e74c3c */
+    --secondary-color: #E27000; /* Version plus foncée de darkorange */
+    --accent-light: #FFF3E6; /* Version très claire de darkorange */
+}
+
+.offer-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-left: 15px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.offer-type-badge.stage {
+    background-color: #3498db;
+    color: white;
+}
+
+.offer-type-badge.alternance {
+    background-color: #FF8C00; /* darkorange au lieu de #e74c3c */
+    color: white;
+}
+
+/* Style pour le bloc d'infos d'alternance */
+.alternance-details {
+    background-color: #f8f9ff;
+    border-left: 4px solid #FF8C00; /* darkorange au lieu de #e74c3c */
+    padding: 18px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.alternance-details h3 {
+    color: #FF8C00; /* darkorange au lieu de #e74c3c */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.15rem;
+    border-bottom: 1px solid #e0e6ff;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.alternance-details h3 i {
+    margin-right: 10px;
+}
+
+.alternance-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.alternance-info-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background-color: #f1f5ff;
+    border-radius: 6px;
+}
+
+.alternance-info-item i {
+    min-width: 25px;
+    margin-right: 12px;
+    color: #4361ee;
+}
+
+.alternance-info-item .label {
+    font-weight: 600;
+    margin-right: 8px;
+    color: #4a4a4a;
+}
+
+.alternance-info-item .value {
+    color: #2a2a2a;
+    font-weight: 500;
+}
+
+/* Style pour les alternances */
+body.alternance-mode {
+    --primary-color: #FF8C00;
+    --secondary-color: #E27000;
+    --accent-light: #FFF3E6;
+}
+
+body.alternance-mode .offer-header {
+    background: linear-gradient(135deg, #FF8C00, #E27000);
+    border-bottom: 3px solid #E27000;
+}
+
+.offer-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-left: 15px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.offer-type-badge.stage {
+    background-color: #3498db;
+    color: white;
+}
+
+.offer-type-badge.alternance {
+    background-color: #FF8C00;
+    color: white;
+}
+
+.alternance-details {
+    background-color: #fff9f3;
+    border-left: 4px solid #FF8C00;
+    padding: 18px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.alternance-details h3 {
+    color: #FF8C00;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.15rem;
+    border-bottom: 1px solid #ffeacc;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.alternance-details h3 i {
+    margin-right: 10px;
+}
+
+.alternance-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.alternance-info-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background-color: #f1f5ff;
+    border-radius: 6px;
+}
+
+.alternance-info-item i {
+    min-width: 25px;
+    margin-right: 12px;
+    color: #4361ee;
+}
+
+.alternance-info-item .label {
+    font-weight: 600;
+    margin-right: 8px;
+    color: #4a4a4a;
+}
+
+.alternance-info-item .value {
+    color: #2a2a2a;
+    font-weight: 500;
+}
+
+body.alternance-mode .btn-primary {
+    background-color: #FF8C00;
+    border-color: #E27000;
+}
+
+body.alternance-mode .btn-primary:hover {
+    background-color: #E27000;
+    border-color: #CC6600;
+}
+
+body.alternance-mode .btn-link {
+    color: #FF8C00;
+}
+
+body.alternance-mode .btn-link:hover {
+    color: #E27000;
+}
+
+body.alternance-mode .card h2 i,
+body.alternance-mode .info-list li i {
+    color: #FF8C00;
+}
+
+body.alternance-mode .card {
+    border-top: 3px solid #FF8C00;
+}

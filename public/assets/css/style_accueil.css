@@ -1048,7 +1048,7 @@ form {
 
 /* Couleurs distinctes pour les cartes de stage et d'alternance */
 .alternance-card .offer-header {
-    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    background: darkorange
 }
 
 /* Légende des types d'offres */
