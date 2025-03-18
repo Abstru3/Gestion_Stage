@@ -176,7 +176,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
     
     <div class="sort-dropdown">
         <button id="sort-toggle" class="sort-toggle" aria-label="Options de tri">
-            <span class="filter-icon"></span> <!-- ou 🔎 ou 📊 ou 🗂️ -->
+            <span class="filter-icon"></span>
             <span class="current-sort-label">
                 <?php
                 switch($sort) {

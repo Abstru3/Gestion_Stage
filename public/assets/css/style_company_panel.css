@@ -85,7 +85,7 @@ nav a:hover {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background-color: #437eff;
     color: var(--white);
     padding: 0.6rem 1.2rem;
     border-radius: var(--radius-md);
