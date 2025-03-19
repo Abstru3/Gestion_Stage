@@ -445,11 +445,11 @@ body {
         font-size: 0.85rem;
     }
 }
-/* Style spécifique pour les alternances */
+
 body.alternance-mode {
-    --primary-color: #FF8C00; /* darkorange au lieu de #e74c3c */
-    --secondary-color: #E27000; /* Version plus foncée de darkorange */
-    --accent-light: #FFF3E6; /* Version très claire de darkorange */
+    --primary-color: #FF8C00;
+    --secondary-color: #E27000;
+    --accent-light: #FFF3E6;
 }
 
 .offer-type-badge {
@@ -469,14 +469,13 @@ body.alternance-mode {
 }
 
 .offer-type-badge.alternance {
-    background-color: #FF8C00; /* darkorange au lieu de #e74c3c */
+    background-color: #FF8C00;
     color: white;
 }
 
-/* Style pour le bloc d'infos d'alternance */
 .alternance-details {
     background-color: #f8f9ff;
-    border-left: 4px solid #FF8C00; /* darkorange au lieu de #e74c3c */
+    border-left: 4px solid #FF8C00;
     padding: 18px;
     margin: 20px 0;
     border-radius: 8px;
@@ -484,7 +483,7 @@ body.alternance-mode {
 }
 
 .alternance-details h3 {
-    color: #FF8C00; /* darkorange au lieu de #e74c3c */
+    color: #FF8C00;
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 1.15rem;
@@ -529,7 +528,6 @@ body.alternance-mode {
     font-weight: 500;
 }
 
-/* Style pour les alternances */
 body.alternance-mode {
     --primary-color: #FF8C00;
     --secondary-color: #E27000;

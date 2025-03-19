@@ -23,7 +23,6 @@ $roles = $stmt_roles->fetchAll();
     <div class="container mt-5">
         <h2>Gestion des Rôles des Utilisateurs</h2>
 
-        <!-- Tableau des utilisateurs -->
         <table class="table table-bordered mt-4">
             <thead>
                 <tr>
@@ -42,7 +41,6 @@ $roles = $stmt_roles->fetchAll();
                         <td><?= htmlspecialchars($user['email']) ?></td>
                         <td><?= htmlspecialchars($user['role_name']) ?></td>
                         <td>
-                            <!-- Formulaire pour changer le rôle -->
                             <form method="POST" action="update_role.php">
                                 <select name="role_id" class="form-control">
                                     <?php foreach ($roles as $role) : ?>

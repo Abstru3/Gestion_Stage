@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
 
 $offre_id = $_GET['offre_id'] ?? 0;
 
-// Paramètres de filtrage et tri
 $statusFilter = $_GET['status'] ?? 'all';
 $sortBy = $_GET['sort'] ?? 'date_desc';
 
@@ -20,18 +19,15 @@ $stmt = $pdo->prepare("SELECT titre, description, type_offre FROM offres_stages 
 $stmt->execute([$offre_id]);
 $offre = $stmt->fetch();
 
-// Base de la requête SQL
 $sql = "SELECT c.id, c.statut, c.lettre_motivation, c.date_candidature, e.nom, e.prenom, e.email, e.cv as cv_etudiant 
         FROM candidatures c 
         JOIN etudiants e ON c.etudiant_id = e.id 
         WHERE c.offre_id = :offre_id";
 
-// Ajout du filtre par statut
 if ($statusFilter !== 'all') {
     $sql .= " AND c.statut = :status";
 }
 
-// Ajout du tri
 switch ($sortBy) {
     case 'date_asc':
         $sql .= " ORDER BY c.date_candidature ASC";
@@ -49,7 +45,7 @@ switch ($sortBy) {
 }
 
 $stmt = $pdo->prepare($sql);
-$stmt->bindParam(':offre_id', $offre_id); // Utilisation de paramètre nommé
+$stmt->bindParam(':offre_id', $offre_id);
 
 if ($statusFilter !== 'all') {
     $stmt->bindParam(':status', $statusFilter);
@@ -58,7 +54,6 @@ if ($statusFilter !== 'all') {
 $stmt->execute();
 $applications = $stmt->fetchAll();
 
-// Traitement des actions sur les candidatures
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $candidature_id = $_POST['candidature_id'];
     $action = $_POST['action'];
@@ -72,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = $pdo->prepare("UPDATE candidatures SET statut = ? WHERE id = ?");
     $stmt->execute([$statut, $candidature_id]);
 
-    // Rediriger vers la même page avec les mêmes filtres
     header("Location: view_applications.php?offre_id=$offre_id&status=$statusFilter&sort=$sortBy");
     exit();
 }
@@ -91,7 +85,6 @@ function getInitials($name) {
     return substr($initials, 0, 2);
 }
 
-// Statistiques des candidatures
 $stats = [
     'total' => count($applications),
     'en_attente' => 0,
@@ -215,7 +208,6 @@ foreach ($statResults as $statResult) {
                     <?php endif; ?>
                 </div>
             <?php else: ?>
-                <!-- Résumé des résultats filtrés -->
                 <div class="results-summary">
                     <?= count($applications) ?> candidature(s) <?= $statusFilter !== 'all' ? 'avec le statut "' . ($statusFilter === 'en_attente' ? 'En attente' : ($statusFilter === 'acceptee' ? 'Acceptée' : 'Refusée')) . '"' : '' ?>
                 </div>
@@ -326,7 +318,6 @@ foreach ($statResults as $statResult) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle afficher plus/moins pour la description
             const description = document.getElementById('job-description');
             const expandBtn = document.getElementById('expand-btn');
             
@@ -343,29 +334,24 @@ foreach ($statResults as $statResult) {
             }
         });
         
-        // Fonctions pour le filtrage et le tri
         function applyFilters() {
             const statusFilter = document.getElementById('status-filter').value;
             const sortBy = document.getElementById('sort-by').value;
             const currentUrl = new URL(window.location.href);
             
-            // Mettre à jour les paramètres d'URL
             currentUrl.searchParams.set('status', statusFilter);
             currentUrl.searchParams.set('sort', sortBy);
             
-            // Rediriger vers l'URL avec les filtres
             window.location.href = currentUrl.toString();
         }
         
         function clearFilters() {
             const currentUrl = new URL(window.location.href);
             
-            // Garder seulement l'ID de l'offre
             const offreId = currentUrl.searchParams.get('offre_id');
             currentUrl.search = '';
             currentUrl.searchParams.set('offre_id', offreId);
             
-            // Rediriger vers l'URL sans filtres
             window.location.href = currentUrl.toString();
         }
     </script>

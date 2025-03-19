@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit();
 }
 
-// Fonction pour formater les statuts
 function formatStatus($status) {
     switch ($status) {
         case 'en_attente':

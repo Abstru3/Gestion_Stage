@@ -16,9 +16,6 @@ $stmt = $pdo->prepare("SELECT * FROM entreprises WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $entreprise = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Cette partie pose problème car elle est traitée après les gestionnaires de POST
-// Déplaçons ce code plus tôt, avant tout traitement POST
-
 $currentStep = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 $error = '';
 $success = '';
@@ -27,15 +24,12 @@ if (!isset($_SESSION['form_data'])) {
     $_SESSION['form_data'] = [];
 }
 
-// Modifier cette partie pour s'assurer que le paramètre GET type est prioritaire sur la session
-// et qu'il est pris en compte même après un POST
 if (isset($_GET['type']) && in_array($_GET['type'], ['stage', 'alternance'])) {
     $_SESSION['form_data']['type_offre'] = $_GET['type'];
 } elseif (!isset($_SESSION['form_data']['type_offre'])) {
-    $_SESSION['form_data']['type_offre'] = 'stage'; // Valeur par défaut
+    $_SESSION['form_data']['type_offre'] = 'stage';
 }
 
-// Puis traiter les soumissions de formulaire POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['type_offre'])) {
         $_SESSION['form_data']['type_offre'] = $_POST['type_offre'];
@@ -78,10 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['final_submit'])) {
         try {
-            // Champs requis adaptés selon le type d'offre
             $_fields = ['titre', 'description', 'email_contact', 'date_debut', 'domaine', 'remuneration', 'ville', 'code_postal', 'region', 'departement'];
             
-            // Ajout de validation pour les champs spécifiques à l'alternance
             if ($_SESSION['form_data']['type_offre'] === 'alternance') {
                 $_fields[] = 'niveau_etude';
                 $_fields[] = 'type_contrat';
@@ -94,18 +86,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Pour les alternances, séparer le type de rémunération et le montant
             $type_remuneration = null;
             if ($_SESSION['form_data']['type_offre'] === 'alternance' && 
                 strpos($_SESSION['form_data']['remuneration'], 'smic') !== false) {
                 $type_remuneration = $_SESSION['form_data']['remuneration'];
                 
-                // Valeurs approximatives pour 2025
                 switch ($type_remuneration) {
-                    case 'smic27': $remuneration = 486; break; // 27% de 1800€
-                    case 'smic43': $remuneration = 774; break; // 43% de 1800€
-                    case 'smic53': $remuneration = 954; break; // 53% de 1800€
-                    case 'smic100': $remuneration = 1800; break; // 100% de 1800€
+                    case 'smic27': $remuneration = 486; break;
+                    case 'smic43': $remuneration = 774; break;
+                    case 'smic53': $remuneration = 954; break;
+                    case 'smic100': $remuneration = 1800; break;
                     default: $remuneration = null;
                 }
             } else {
@@ -136,7 +126,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'type_offre' => $_SESSION['form_data']['type_offre']
             ];
             
-            // Ajout des données spécifiques à l'alternance
             if ($_SESSION['form_data']['type_offre'] === 'alternance') {
                 $data['niveau_etude'] = $_SESSION['form_data']['niveau_etude'];
                 $data['type_contrat'] = $_SESSION['form_data']['type_contrat'];
@@ -156,7 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             unset($_SESSION['form_data']);
             
-            // Message de succès adapté selon le type d'offre
             if ($_SESSION['form_data']['type_offre'] === 'alternance') {
                 $_SESSION['success_message'] = "Offre d'alternance publiée avec succès!";
             } else {
@@ -189,7 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
     <h1><?= $_SESSION['form_data']['type_offre'] === 'alternance' ? 'Publier une offre d\'alternance' : 'Publier une offre de stage' ?></h1>
     
-    <!-- Sélecteur du type d'offre -->
     <form method="POST" action="" class="offre-type-selector">
         <button type="submit" style="color:#3498db" name="type_offre" value="stage" class="offre-type-btn <?= $_SESSION['form_data']['type_offre'] === 'stage' ? 'active' : '' ?>">Stage</button>
         <button type="submit" style="color:#3498db" name="type_offre" value="alternance" class="offre-type-btn <?= $_SESSION['form_data']['type_offre'] === 'alternance' ? 'active' : '' ?>">Alternance</button>
@@ -326,7 +313,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <?php if($_SESSION['form_data']['type_offre'] === 'alternance'): ?>
-                    <!-- Options de rémunération spécifiques à l'alternance -->
                     <div class="form-group">
                         <label for="remuneration">Rémunération mensuelle*</label>
                         <select id="remuneration" name="remuneration" onchange="toggleAutreMontant()">
@@ -350,7 +336,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <small>La rémunération en alternance dépend de l'âge et du niveau d'études</small>
                     </div>
                     <?php else: ?>
-                    <!-- Rémunération pour les stages -->
                     <div class="form-group">
                         <label for="remuneration">Rémunération mensuelle*</label>
                         <select id="remuneration" name="remuneration" onchange="toggleAutreMontant()">
@@ -388,7 +373,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <?php if($_SESSION['form_data']['type_offre'] === 'alternance'): ?>
-                    <!-- Champs spécifiques à l'alternance -->
                     <div class="form-group">
                         <label for="niveau_etude">Niveau d'étude requis*</label>
                         <select id="niveau_etude" name="niveau_etude" required>
@@ -503,21 +487,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="domaine" value="<?= htmlspecialchars(getFormValue('domaine')) ?>">
                     
                     <?php if ($_SESSION['form_data']['type_offre'] === 'alternance' && strpos(getFormValue('remuneration'), 'smic') !== false): ?>
-                        <!-- Pour les alternances avec rémunération en SMIC -->
                         <input type="hidden" name="remuneration" value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
                     <?php elseif (getFormValue('remuneration') === 'autre'): ?>
-                        <!-- Pour les "autre montant" -->
                         <input type="hidden" name="remuneration" value="<?= htmlspecialchars(getFormValue('remuneration_autre')) ?>">
                         <input type="hidden" name="remuneration_autre" value="<?= htmlspecialchars(getFormValue('remuneration_autre')) ?>">
                     <?php else: ?>
-                        <!-- Pour les montants standard -->
                         <input type="hidden" name="remuneration" value="<?= htmlspecialchars(getFormValue('remuneration')) ?>">
                     <?php endif; ?>
                     
                     <input type="hidden" name="mode_stage" value="<?= htmlspecialchars(getFormValue('mode_stage')) ?>">
                     
                     <?php if($_SESSION['form_data']['type_offre'] === 'alternance'): ?>
-                        <!-- Champs spécifiques à l'alternance -->
                         <input type="hidden" name="niveau_etude" value="<?= htmlspecialchars(getFormValue('niveau_etude')) ?>">
                         <input type="hidden" name="type_contrat" value="<?= htmlspecialchars(getFormValue('type_contrat')) ?>">
                         <input type="hidden" name="rythme_alternance" value="<?= htmlspecialchars(getFormValue('rythme_alternance')) ?>">
@@ -545,11 +525,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="/Gestion_Stage/public/assets/js/location.js"></script>
     <script src="/Gestion_Stage/public/assets/js/remuneration.js"></script>
     <script>
-       // Script pour gérer les options spécifiques à l'alternance
     function toggleAutreMontant() {
         const remunerationSelect = document.getElementById('remuneration');
         
-        // Vérifier si l'élément existe avant d'accéder à ses propriétés
         if (remunerationSelect) {
             const autreMontantContainer = document.getElementById('autre_montant_container');
             
@@ -561,17 +539,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Initialiser l'affichage au chargement - uniquement si nous sommes dans l'étape 2
     document.addEventListener('DOMContentLoaded', function() {
-        // Vérifier si l'élément existe avant d'appeler la fonction
         if (document.getElementById('remuneration')) {
             toggleAutreMontant();
         }
     });
 
     function updateRemuneration(value) {
-        // Cette fonction peut rester simple - elle est appelée uniquement 
-        // quand l'utilisateur entre un montant manuel
         const input = document.getElementById('remuneration_autre');
         
         if (parseInt(value) < 417) {
@@ -588,7 +562,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function formatRemuneration($remuneration, $type_offre, $type_remuneration = null) {
     if (empty($remuneration)) return 'Non spécifiée';
     
-    // Si c'est une alternance avec un type de rémunération en SMIC
     if ($type_offre === 'alternance' && !empty($type_remuneration)) {
         switch ($type_remuneration) {
             case 'smic27': return '27% du SMIC (' . number_format($remuneration, 0, ',', ' ') . ' €)';
@@ -598,7 +571,6 @@ function formatRemuneration($remuneration, $type_offre, $type_remuneration = nul
             default: return number_format($remuneration, 0, ',', ' ') . ' €/mois';
         }
     } else {
-        // Format monétaire standard pour les stages et les autres cas
         return number_format($remuneration, 0, ',', ' ') . ' €/mois';
     }
 }

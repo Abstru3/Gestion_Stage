@@ -27,10 +27,8 @@ class SimplePdfAnalyzer {
             $text = strtolower($content);
             $matches = [];
             
-            // Parcours de toutes les catégories et sous-catégories
             foreach ($this->keywords as $category => $subcategories) {
                 foreach ($subcategories as $subcategory => $keywords) {
-                    // Variable pour suivre si des mots-clés ont été trouvés dans cette sous-catégorie
                     $keywordFound = false;
                     
                     foreach ($keywords as $keyword) {
@@ -41,17 +39,11 @@ class SimplePdfAnalyzer {
                             if (!isset($matches[$category][$subcategory])) {
                                 $matches[$category][$subcategory] = [];
                             }
-                            // Vérifie si le fichier n'est pas déjà listé pour cette sous-catégorie
                             if (!in_array(basename($pdfPath), $matches[$category][$subcategory])) {
                                 $matches[$category][$subcategory][] = basename($pdfPath);
                             }
                             $keywordFound = true;
                         }
-                    }
-                    
-                    // Debug - afficher les correspondances trouvées
-                    if ($keywordFound) {
-                        error_log("Correspondance trouvée dans $category -> $subcategory pour " . basename($pdfPath));
                     }
                 }
             }

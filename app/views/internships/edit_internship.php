@@ -23,7 +23,6 @@ if (!$offre) {
     exit();
 }
 
-// Déterminer le type d'offre (stage ou alternance)
 $type_offre = $offre['type_offre'] ?? 'stage';
 
 $stmt = $pdo->prepare("SELECT icone FROM entreprises WHERE id = ?");
@@ -35,7 +34,6 @@ $logo = !empty($offre['logo']) ? $offre['logo'] : (!empty($iconeEntreprise) ? $i
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Vérification et nettoyage des dates
         $date_debut = !empty($_POST['date_debut']) && validateDate($_POST['date_debut']) ? 
             $_POST['date_debut'] : null;
         $date_fin = !empty($_POST['date_fin']) && validateDate($_POST['date_fin']) ? 
@@ -45,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("La date de début est invalide ou manquante.");
         }
         
-        // Reste du code pour traiter les autres champs...
         $lien_candidature = $_POST['lien_candidature'] ?? null;
         $domaine = $_POST['domaine'] ?? null;
         $pays = $_POST['pays'] ?? 'France';
@@ -53,27 +50,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $logoPath = $offre['logo'];
 
-        // Traitement de la rémunération
         $remuneration = $_POST['remuneration'];
         $type_remuneration = null;
 
-        // Pour les alternances, gérer correctement le type de rémunération
         if ($type_offre === 'alternance' && strpos($_POST['remuneration'], 'smic') !== false) {
             $type_remuneration = $_POST['remuneration'];
             
-            // Convertir les pourcentages SMIC en valeurs numériques approximatives
             switch ($type_remuneration) {
-                case 'smic27': $remuneration = 486; break; // 27% de 1800€
-                case 'smic43': $remuneration = 774; break; // 43% de 1800€
-                case 'smic53': $remuneration = 954; break; // 53% de 1800€
-                case 'smic100': $remuneration = 1800; break; // 100% de 1800€
+                case 'smic27': $remuneration = 486; break;
+                case 'smic43': $remuneration = 774; break;
+                case 'smic53': $remuneration = 954; break;
+                case 'smic100': $remuneration = 1800; break;
                 default: $remuneration = null;
             }
         } else if ($_POST['remuneration'] === 'autre' && !empty($_POST['remuneration_autre'])) {
             $remuneration = $_POST['remuneration_autre'];
         }
 
-        // Base SQL pour les champs communs
         $sql = "UPDATE offres_stages SET 
                 titre = ?, 
                 description = ?, 
@@ -98,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['description'],
             $_POST['email_contact'],
             $lien_candidature,
-            $date_debut,  // Date validée
-            $date_fin,    // Date validée
+            $date_debut,
+            $date_fin,
             $domaine,
             $remuneration,
             $type_remuneration,
@@ -113,7 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $logoPath
         ];
 
-        // Ajouter des champs spécifiques pour l'alternance
         if ($type_offre === 'alternance') {
             $sql .= ", niveau_etude = ?, 
                     type_contrat = ?, 
@@ -145,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Ajoutez cette fonction de validation de date
 function validateDate($date, $format = 'Y-m-d') {
     $d = DateTime::createFromFormat($format, $date);
     return $d && $d->format($format) === $date;
@@ -219,7 +210,6 @@ function validateDate($date, $format = 'Y-m-d') {
                 </div>
 
                 <?php if($type_offre === 'alternance'): ?>
-                <!-- Options de rémunération spécifiques à l'alternance -->
                 <div class="form-group">
                     <label for="remuneration">Rémunération mensuelle*</label>
                     <select id="remuneration" name="remuneration" required onchange="toggleAutreMontant()">
@@ -243,7 +233,6 @@ function validateDate($date, $format = 'Y-m-d') {
                     </div>
                 </div>
                 <?php else: ?>
-                <!-- Rémunération pour les stages -->
                 <div class="form-group">
                     <label for="remuneration">Rémunération mensuelle*</label>
                     <select id="remuneration" name="remuneration" required onchange="toggleAutreMontant()">
@@ -261,12 +250,10 @@ function validateDate($date, $format = 'Y-m-d') {
                         ];
                         $selected_value = null;
                         foreach ($remunerations as $value => $label) {
-                            // Si la valeur dans la base correspond à une des options prédéfinies
                             $selected = ($offre['remuneration'] == $value) ? 'selected' : '';
                             if ($selected) $selected_value = $value;
                             echo "<option value=\"$value\" $selected>$label</option>";
                         }
-                        // Si aucune option n'a été sélectionnée, c'est "autre"
                         if (!$selected_value && $offre['remuneration']) {
                             echo "<script>document.addEventListener('DOMContentLoaded', function() { 
                                 document.querySelector('#remuneration').value = 'autre';
@@ -299,7 +286,6 @@ function validateDate($date, $format = 'Y-m-d') {
                 </div>
 
                 <?php if($type_offre === 'alternance'): ?>
-                <!-- Champs spécifiques à l'alternance -->
                 <div class="form-group">
                     <label for="niveau_etude">Niveau d'étude requis*</label>
                     <select id="niveau_etude" name="niveau_etude" required>
@@ -418,7 +404,6 @@ function validateDate($date, $format = 'Y-m-d') {
         const currentDepartement = "<?= htmlspecialchars($offre['departement']) ?>";
         const currentVille = "<?= htmlspecialchars($offre['ville']) ?>";
         
-        // Initialiser l'affichage "autre montant" si nécessaire
         document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('remuneration')) {
                 toggleAutreMontant();

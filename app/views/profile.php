@@ -20,7 +20,7 @@ if (!$user) {
 }
 
 $isCertified = false;
-$currentThemeColor = '#3498db'; // Couleur par défaut
+$currentThemeColor = '#3498db';
 
 if ($_SESSION['role'] == 'entreprise') {
     $stmt = $pdo->prepare("SELECT certification, theme_color FROM entreprises WHERE id = ?");
@@ -33,12 +33,10 @@ if ($_SESSION['role'] == 'entreprise') {
 $errors = [];
 $successMessage = "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Récupération des champs communs
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
 
-    // Validation du mot de passe si fourni
     if (!empty($new_password)) {
         if (strlen($new_password) < 8 || !preg_match('/[A-Z]/', $new_password) || !preg_match('/[0-9]/', $new_password)) {
             $errors[] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.";
@@ -47,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Traitement de la photo de profil
     if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/profil/';
         if (!file_exists($uploadDir)) {
@@ -74,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Traitement du CV pour les étudiants
     if ($_SESSION['role'] == 'etudiant' && isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/cv/';
         if (!file_exists($uploadDir)) {
@@ -101,7 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Si pas d'erreurs, mise à jour des informations
     if (empty($errors)) {
         try {
             if ($_SESSION['role'] == 'entreprise') {
@@ -109,17 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $description = $_POST['description_entreprise'] ?? '';
                 $siret = $_POST['siret'] ?? '';
                 
-                // Initialiser les champs de base
                 $fields = ['username = ?', 'email = ?', 'nom = ?', 'description = ?', 'siret = ?'];
                 $params = [$username, $email, $nom_entreprise, $description, $siret];
 
-                // Ajouter le mot de passe si nécessaire
                 if (!empty($new_password)) {
                     $fields[] = 'password = ?';
                     $params[] = $hashed_password;
                 }
 
-                // Gérer la couleur uniquement pour les entreprises certifiées
                 if ($isCertified && isset($_POST['theme_color'])) {
                     $newColor = $_POST['theme_color'];
                     if (preg_match('/^#[a-fA-F0-9]{6}$/', $newColor)) {
@@ -129,22 +121,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }
 
-                // Ajouter l'ID pour la clause WHERE
                 $params[] = $_SESSION['user_id'];
 
-                // Construire et exécuter la requête
                 $sql = "UPDATE entreprises SET " . implode(', ', $fields) . " WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
 
-                // Recharger les données de l'utilisateur
                 $user = get_user($pdo, $_SESSION['user_id'], $table);
                 $successMessage = "Votre profil a été mis à jour avec succès !";
             } else {
-                // Récupérer les champs spécifiques à l'étudiant
                 $nom = $_POST['nom'];
                 $prenom = $_POST['prenom'];
-                $preference = $_POST['preference'] ?: null; // Convertit une chaîne vide en NULL
+                $preference = $_POST['preference'] ?: null;
 
                 if (!empty($new_password)) {
                     $stmt = $pdo->prepare("UPDATE $table SET username = ?, email = ?, password = ?, nom = ?, prenom = ?, preference = ? WHERE id = ?");

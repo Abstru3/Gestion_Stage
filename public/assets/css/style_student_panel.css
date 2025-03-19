@@ -26,7 +26,6 @@
     font-size: 1.1rem;
 }
 
-/* Style pour les cartes */
 .card {
     background: white;
     border-radius: 8px;
@@ -48,7 +47,6 @@
     text-align: center;
 }
 
-/* Style pour le bouton large */
 .btn-large {
     display: inline-block;
     background: var(--secondary-color);
@@ -70,19 +68,16 @@
     margin-right: 0.5rem;
 }
 
-/* Style pour le conteneur principal */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
 }
 
-/* Style pour l'espacement des éléments */
 .card-body p {
     margin-bottom: 1rem;
 }
 
-/* Style pour les icônes */
 .fas {
     margin-right: 0.5rem;
 }

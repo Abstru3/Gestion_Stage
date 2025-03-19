@@ -8,9 +8,9 @@
     --text-color: #333;
     --light-gray: #f5f6fa;
     --border-radius: 8px;
-    --alternance-primary: #ff9f43;      /* Orange plus clair */
-    --alternance-secondary: #ffd60a;     /* Jaune doré */
-    --alternance-hover: #fa8231;         /* Orange plus foncé pour le hover */
+    --alternance-primary: #ff9f43;
+    --alternance-secondary: #ffd60a;
+    --alternance-hover: #fa8231;
 }
 
 .container-all-internships {
@@ -326,7 +326,6 @@
     display: block;
 }
 
-/* Amélioration de la section filtres */
 .filters-panel {
     background-color: #f8f9fa;
     border-radius: 10px;
@@ -351,7 +350,6 @@
     margin: 0 0 0.75rem 0;
 }
 
-/* Style pour la section mise en évidence */
 .highlighted-section {
     background-color: #f0f8ff;
     border-radius: 8px;
@@ -393,7 +391,6 @@
     border-color: #e74c3c;
 }
 
-/* Grille de filtres améliorée */
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -424,7 +421,6 @@
     outline: none;
 }
 
-/* Style pour les input avec icône */
 .input-with-icon {
     position: relative;
     display: flex;
@@ -641,7 +637,6 @@
     color: white;
 }
 
-/* Style pour les cartes d'alternance */
 .offer-card.alternance-card {
     border-left: 4px #ff6a00;
 }

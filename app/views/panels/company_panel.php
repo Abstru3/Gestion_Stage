@@ -10,22 +10,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'entreprise') {
     exit();
 }
 
-// Récupération du paramètre de tri
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'date_desc';
 
 try {
-    // Modification de la requête pour récupérer les offres
     $stmt = $pdo->prepare("SELECT * FROM offres_stages WHERE entreprise_id = ? ORDER BY date_publication DESC");
     $stmt->execute([$_SESSION['user_id']]);
     $offres = $stmt->fetchAll();
     
-    // Initialiser le compteur à 0 pour toutes les offres
     $applications_count = [];
     foreach ($offres as $offre) {
         $applications_count[$offre['id']] = 0;
     }
     
-    // Récupérer le nombre de candidatures pour toutes les offres en une seule requête
     $offre_ids = array_column($offres, 'id');
     
     if (!empty($offre_ids)) {
@@ -43,24 +39,19 @@ try {
         }
     }
     
-    // Appliquer le tri sélectionné
     if ($sort === 'candidates_desc') {
-        // Tri par nombre de candidatures décroissant
         uasort($offres, function($a, $b) use ($applications_count) {
             return $applications_count[$b['id']] <=> $applications_count[$a['id']];
         });
     } elseif ($sort === 'candidates_asc') {
-        // Tri par nombre de candidatures croissant
         uasort($offres, function($a, $b) use ($applications_count) {
             return $applications_count[$a['id']] <=> $applications_count[$b['id']];
         });
     } elseif ($sort === 'date_asc') {
-        // Tri par date de publication croissante
         usort($offres, function($a, $b) {
             return strtotime($a['date_publication']) <=> strtotime($b['date_publication']);
         });
     }
-    // Le tri par défaut est déjà date_desc, appliqué par la requête SQL
     
 } catch (PDOException $e) {
     error_log("Erreur lors de la récupération des offres : " . $e->getMessage());
@@ -100,7 +91,6 @@ function formatDateFr($date) {
 function formatRemuneration($remuneration, $type_offre) {
     if (empty($remuneration)) return 'Non spécifiée';
     
-    // Si c'est une alternance avec notation en pourcentage du SMIC
     if ($type_offre === 'alternance' && strpos($remuneration, 'smic') !== false) {
         switch ($remuneration) {
             case 'smic27': return '27% du SMIC';
@@ -110,12 +100,10 @@ function formatRemuneration($remuneration, $type_offre) {
             default: return $remuneration;
         }
     } else {
-        // Format monétaire standard pour les stages et les autres cas
         return number_format($remuneration, 0, ',', ' ') . ' €/mois';
     }
 }
 
-// Filtrer par type d'offre (stage ou alternance)
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 ?>
 
@@ -160,7 +148,6 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
             </div>
         </div>
         
-        <!-- Nouvelle interface de tri avec icône -->
 <div class="filter-sort-container">
     <div class="filter-tabs">
         <a href="?filter=all" class="filter-tab <?= $filter === 'all' ? 'active' : '' ?>">
@@ -220,8 +207,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
             </div>
         <?php else: ?>
             <div class="offers-grid">
-                <?php foreach ($offres as $offre): 
-                    // Filtrer selon le type sélectionné
+                <?php foreach ($offres as $offre):
                     if ($filter !== 'all' && $offre['type_offre'] !== $filter) {
                         continue;
                     }
@@ -264,7 +250,6 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
                             <?php endif; ?>
                         </div>
 
-                        <!-- Interface améliorée pour les informations spécifiques à l'alternance -->
                         <?php if ($offre['type_offre'] === 'alternance'): ?>
                             <div class="alternance-details">
                                 <h4><span class="icon">📋</span> Détails de l'alternance</h4>
@@ -288,10 +273,8 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
                                                 $date_fin = new DateTime($offre['date_fin']);
                                                 $interval = $date_debut->diff($date_fin);
                                                 
-                                                // Calculate total months (years * 12 + months)
                                                 $months = $interval->y * 12 + $interval->m;
                                                 
-                                                // Add an additional month if there are more than 15 days
                                                 if ($interval->d > 15) {
                                                     $months++;
                                                 }
@@ -399,27 +382,22 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
         });
     });
 function applySorting(sortValue) {
-    // Récupérer le filtre actuel
     const urlParams = new URLSearchParams(window.location.search);
     const currentFilter = urlParams.get('filter') || 'all';
     
-    // Rediriger avec le nouveau tri et le filtre actuel
     window.location.href = `?filter=${currentFilter}&sort=${sortValue}`;
 }
 </script>
 <script>
-// JavaScript pour le menu déroulant de tri
 document.addEventListener('DOMContentLoaded', function() {
     const sortToggle = document.getElementById('sort-toggle');
     const sortMenu = document.getElementById('sort-menu');
     
-    // Fonction pour afficher/cacher le menu de tri
     sortToggle.addEventListener('click', function(e) {
         e.preventDefault();
         sortMenu.classList.toggle('show');
     });
     
-    // Fermer le menu si on clique ailleurs sur la page
     document.addEventListener('click', function(e) {
         if (!sortToggle.contains(e.target) && !sortMenu.contains(e.target)) {
             sortMenu.classList.remove('show');
@@ -428,7 +406,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script>
-// JavaScript pour le menu de navigation responsif
 document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.querySelector('.menu-toggle');
     const menu = document.querySelector('.menu');
@@ -437,7 +414,6 @@ document.addEventListener('DOMContentLoaded', function() {
         menu.classList.toggle('active');
         menuToggle.classList.toggle('active');
         
-        // Changer l'accessibilité
         const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true' || false;
         menuToggle.setAttribute('aria-expanded', !isExpanded);
     });

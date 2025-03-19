@@ -7,7 +7,6 @@ $isStudent = isset($_SESSION['role']) && $_SESSION['role'] === 'etudiant';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/config/database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/app/helpers/functions.php';
 
-// Variables pour les contrôles
 $hasCV = false;
 $alreadyApplied = false;
 $applicationStatus = null;
@@ -18,7 +17,6 @@ if ($isStudent) {
     $student = $stmt->fetch();
     $hasCV = !empty($student['cv']);
     
-    // Vérifier si l'étudiant a déjà postulé à cette offre
     if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         $stmt = $pdo->prepare("SELECT statut FROM candidatures WHERE etudiant_id = ? AND offre_id = ?");
         $stmt->execute([$_SESSION['user_id'], $_GET['id']]);
@@ -53,27 +51,22 @@ if (!$internship) {
     exit();
 }
 
-// Calculer la durée en mois pour les alternances
 $duree_mois = null;
 if ($internship['type_offre'] === 'alternance' && !empty($internship['date_debut']) && !empty($internship['date_fin'])) {
     $date_debut = new DateTime($internship['date_debut']);
     $date_fin = new DateTime($internship['date_fin']);
     $interval = $date_debut->diff($date_fin);
     
-    // Calculer le nombre total de mois (années * 12 + mois)
     $duree_mois = $interval->y * 12 + $interval->m;
     
-    // Ajouter un mois supplémentaire si plus de 15 jours
     if ($interval->d > 15) {
         $duree_mois++;
     }
 }
 
-// Formatter la rémunération selon le type d'offre
 function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
     if (empty($remuneration)) return 'Non spécifiée';
     
-    // Si c'est une alternance avec notation en pourcentage du SMIC
     if ($type_offre === 'alternance' && strpos($type_remuneration, 'smic') !== false) {
         switch ($type_remuneration) {
             case 'smic27': return '27% du SMIC';
@@ -83,7 +76,6 @@ function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
             default: return number_format($remuneration, 0, ',', ' ') . ' €/mois';
         }
     } else {
-        // Format monétaire standard pour les stages et les autres cas
         return number_format($remuneration, 0, ',', ' ') . ' €/mois';
     }
 }
@@ -143,7 +135,6 @@ function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
                     </div>
 
                     <?php if($internship['type_offre'] === 'alternance'): ?>
-                    <!-- Section spécifique à l'alternance -->
                     <div class="alternance-details">
                         <h3><i class="fas fa-graduation-cap"></i> Détails de l'alternance</h3>
                         

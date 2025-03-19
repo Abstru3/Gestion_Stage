@@ -1023,12 +1023,10 @@ form {
     }
 }
 
-/* Couleurs distinctes pour les cartes de stage et d'alternance */
 .alternance-card .offer-header {
     background: darkorange
 }
 
-/* Légende des types d'offres */
 .offer-type-legend {
     display: flex;
     gap: 20px;

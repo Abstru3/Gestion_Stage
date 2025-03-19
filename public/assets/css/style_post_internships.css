@@ -245,7 +245,6 @@ optgroup {
     z-index: 1000;
 }
 
-/* Style pour le bouton de retour */
 .index-button {
     display: inline-block;
     background: linear-gradient(135deg, #3498db, #2980b9);
@@ -267,7 +266,7 @@ optgroup {
     color: white;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-/* Style pour l'interface */
+
 .offre-type-selector {
     display: flex;
     justify-content: center;
@@ -317,7 +316,6 @@ optgroup {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Style différent selon le type d'offre */
 .alternance-mode .step.active {
     background-color: #ee7d0c;
 }

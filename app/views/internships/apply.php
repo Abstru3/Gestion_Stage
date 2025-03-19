@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role
     exit();
 }
 
-// Vérifier si l'étudiant a un CV
 $stmt = $pdo->prepare("SELECT cv FROM etudiants WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $student = $stmt->fetch();
@@ -24,10 +23,8 @@ if (empty($student['cv'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
     $offre_id = (int)$_POST['offre_id'];
     
-    // Récupérer le CV de l'étudiant pour l'insérer dans la candidature
     $etudiant_cv = $student['cv'];
     
-    // Vérifier si l'étudiant n'a pas déjà postulé
     $stmt = $pdo->prepare("SELECT id FROM candidatures WHERE etudiant_id = ? AND offre_id = ?");
     $stmt->execute([$_SESSION['user_id'], $offre_id]);
     if ($stmt->fetch()) {
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
         exit();
     }
 
-    // Traitement de la lettre de motivation
     if (isset($_FILES['lettre_motivation']) && $_FILES['lettre_motivation']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/Gestion_Stage/public/uploads/candidatures/';
         if (!file_exists($uploadDir)) {
@@ -50,11 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
 
             if (move_uploaded_file($_FILES['lettre_motivation']['tmp_name'], $uploadFile)) {
                 try {
-                    // Insertion de la candidature AVEC le CV
                     $stmt = $pdo->prepare("INSERT INTO candidatures (etudiant_id, offre_id, cv, lettre_motivation, date_candidature, statut) 
                                           VALUES (?, ?, ?, ?, NOW(), 'en_attente')");
                     
-                    // Log des valeurs pour déboguer
                     error_log("Tentative d'insertion - etudiant_id: " . $_SESSION['user_id'] . 
                               ", offre_id: " . $offre_id . 
                               ", cv: " . $etudiant_cv . 
@@ -63,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
                     $stmt->execute([
                         $_SESSION['user_id'],
                         $offre_id,
-                        $etudiant_cv,       // Ajout du CV
+                        $etudiant_cv,
                         $newFileName
                     ]);
 
@@ -71,10 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['offre_id'])) {
                     header('Location: /Gestion_Stage/app/views/panels/student_panel.php');
                     exit();
                 } catch (PDOException $e) {
-                    // Log l'erreur complète
                     error_log("Erreur SQL: " . $e->getMessage());
                     $_SESSION['error'] = "Une erreur est survenue lors de l'envoi de votre candidature: " . $e->getMessage();
-                    unlink($uploadFile); // Supprimer le fichier en cas d'erreur
+                    unlink($uploadFile);
                 }
             } else {
                 $_SESSION['error'] = "Erreur lors du téléchargement de la lettre de motivation.";
