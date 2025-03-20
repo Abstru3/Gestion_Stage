@@ -23,32 +23,6 @@ function formatStatus($status) {
     }
 }
 
-$search = $_GET['search'] ?? '';
-$sort = $_GET['sort'] ?? 'date_debut';
-$order = $_GET['order'] ?? 'ASC';
-
-$valid_sorts = ['date_debut', 'titre', 'entreprise_nom'];
-$valid_orders = ['ASC', 'DESC'];
-
-if (!in_array($sort, $valid_sorts)) {
-    $sort = 'date_debut';
-}
-
-if (!in_array($order, $valid_orders)) {
-    $order = 'ASC';
-}
-
-$query = "SELECT o.*, e.nom as entreprise_nom FROM offres_stages o 
-          JOIN entreprises e ON o.entreprise_id = e.id 
-          WHERE o.titre LIKE :search OR o.description LIKE :search OR e.nom LIKE :search 
-          ORDER BY :sort $order";
-
-$stmt = $pdo->prepare($query);
-$stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
-$stmt->bindValue(':sort', $sort, PDO::PARAM_STR);
-$stmt->execute();
-$internships = $stmt->fetchAll();
-
 $applications = get_applications($pdo, $_SESSION['user_id']);
 
 ?>

@@ -269,7 +269,7 @@ function formatRemuneration($remuneration, $type_offre, $type_remuneration) {
 
                     <?php if ($isStudent): ?>
     <div class="card application-card">
-        <h2><i class="fas fa-paper-plane"></i> Postuler</h2>
+        <h2><i class="fas fa-paper-plane"></i> Postuler</h2> 
         <?php if ($alreadyApplied): ?>
             <div class="alert <?php echo $applicationStatus === 'acceptee' ? 'alert-success' : ($applicationStatus === 'refusee' ? 'alert-danger' : 'alert-info'); ?>">
                 <i class="fas <?php echo $applicationStatus === 'acceptee' ? 'fa-check-circle' : ($applicationStatus === 'refusee' ? 'fa-times-circle' : 'fa-info-circle'); ?>"></i>
