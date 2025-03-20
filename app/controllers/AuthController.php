@@ -4,7 +4,6 @@ namespace App\Controllers;
 class AuthController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Logique de connexion
         } else {
             require_once '../app/views/auth/login.php';
         }
@@ -12,7 +11,6 @@ class AuthController {
 
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Logique d'inscription
         } else {
             require_once '../app/views/auth/register.php';
         }
